@@ -11,7 +11,6 @@
     <!-- Social Media Sharing (Open Graph) -->
     <meta property="og:title" content="Listen | ToneVault">
     <meta property="og:description" content="Enter the vault and hear the latest productions from Harish Cousal.">
-    <!-- Updated path to root/Images -->
     <meta property="og:image" content="https://tonevault.qd.je/Images/BackGround.jpg">
     <meta property="og:url" content="https://tonevault.qd.je/Pages/Listen.html">
     <meta name="twitter:card" content="summary_large_image">
@@ -20,7 +19,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* Updated background-image path to go up one level */
+        /* Base Styling & Global Parallax Background */
         body, html {
             margin: 0;
             padding: 0;
@@ -28,6 +27,7 @@
             color: #f0f0f0;
             scroll-behavior: smooth; 
             overflow-x: hidden; 
+            /* Updated path to point to Images folder in root */
             background-image: linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.9)), url('../Images/BackGround.jpg');
             background-repeat: no-repeat;
             background-position: center center;
@@ -35,15 +35,53 @@
             background-attachment: fixed; 
         }
         
-        /* ... (rest of your styles remain the same) ... */
+        a { text-decoration: none; color: #00d4ff; transition: color 0.3s; }
+        a:hover { color: #ffffff; }
+
+        /* NAVIGATION BAR */
+        header {
+            position: fixed;
+            top: 20px; left: 50%;
+            transform: translateX(-50%); 
+            width: 98%; 
+            background-color: rgba(20, 20, 20, 0.3); 
+            backdrop-filter: blur(15px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 50px; 
+            z-index: 1000;
+            padding: 15px 40px; 
+            box-sizing: border-box;
+        }
+
+        .nav-container { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
+        .logo span { color: #00d4ff; }
+        nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 40px; }
+        nav ul li a { color: #fff; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+        nav ul li a:hover { color: #00d4ff; }
+
+        /* Icon Buttons */
+        .icon-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 45px; height: 45px; border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff; font-size: 1.2rem; transition: all 0.3s ease;
+        }
+        .icon-btn:hover { background-color: #00d4ff; color: #000; transform: translateY(-3px); }
+
+        /* Cards & Grid */
+        .track-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; margin-top: 40px; margin-bottom: 80px; max-width: 1200px; margin-left: auto; margin-right: auto; }
+        .card { width: 320px; background-color: rgba(15, 15, 15, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 20px; padding: 40px 30px; }
+        .glass-panel { max-width: 1000px; margin: 0 auto; background-color: rgba(15, 15, 15, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 24px; padding: 60px 40px; }
+        
+        footer { background-color: rgba(5, 5, 5, 0.95); backdrop-filter: blur(10px); padding: 40px 20px; text-align: center; border-top: 1px solid #222; }
     </style>
 </head>
 <body>
 
-    <!-- NAVIGATION HEADER -->
     <header>
         <div class="nav-container">
-            <!-- Pointing back to root index.html -->
             <a href="../index.html" class="logo">Tone<span>Vault</span></a>
             <nav>
                 <ul>
@@ -56,4 +94,24 @@
         </div>
     </header>
 
-    <!-- ... (rest of your page content remains the same) ... -->
+    <main style="padding: 180px 20px 80px 20px; min-height: 65vh; text-align: center;">
+        <h1 style="font-size: 3rem; text-transform: uppercase; letter-spacing: 2px; color: #fff;">The <span style="color: #00d4ff;">Vault</span></h1>
+        
+        <div class="track-grid">
+            <div class="card">
+                <h3 style="color: #00d4ff; font-size: 1.6rem;">"Messed Up"</h3>
+                <p>Emotional EDM with orchestral depth.</p>
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <a href="https://open.spotify.com/track/0U0j66O5l7z4f9Bp0r4Z6B" class="icon-btn"><i class="fa-brands fa-spotify"></i></a>
+                    <a href="https://music.youtube.com/watch?v=v6RgvfohugI" class="icon-btn"><i class="fa-brands fa-youtube"></i></a>
+                </div>
+            </div>
+            <!-- Add other tracks following this pattern -->
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 ToneVault by HC. All rights reserved.</p>
+    </footer>
+</body>
+</html>
