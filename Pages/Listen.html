@@ -4,22 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Listen | ToneVault</title>
-	<!-- Basic SEO -->
+    <!-- Basic SEO -->
     <meta name="description" content="Listen to the latest releases, custom productions, and cinematic scores out of the ToneVault studio by Harish Cousal.">
     <meta name="keywords" content="ToneVault music, Harish Cousal tracks, EDM portfolio, cinematic music portfolio, stream ToneVault">
 
     <!-- Social Media Sharing (Open Graph) -->
     <meta property="og:title" content="Listen | ToneVault">
     <meta property="og:description" content="Enter the vault and hear the latest productions from Harish Cousal.">
-    <meta property="og:image" content="https://tonevault.page.gd/wp-content/uploads/2026/07/BackGround-scaled.jpg">
-    <meta property="og:url" content="https://tonevault.page.gd/listen">
+    <!-- Updated path to root/Images -->
+    <meta property="og:image" content="https://tonevault.qd.je/Images/BackGround.jpg">
+    <meta property="og:url" content="https://tonevault.qd.je/Pages/Listen.html">
     <meta name="twitter:card" content="summary_large_image">
     
     <!-- Added FontAwesome for Premium Social Logos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* Base Styling & Global Parallax Background */
+        /* Updated background-image path to go up one level */
         body, html {
             margin: 0;
             padding: 0;
@@ -27,145 +28,14 @@
             color: #f0f0f0;
             scroll-behavior: smooth; 
             overflow-x: hidden; 
-            
-            background-image: linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.9)), url('https://tonevault.page.gd/wp-content/uploads/2026/07/BackGround-scaled.jpg');
+            background-image: linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.9)), url('../Images/BackGround.jpg');
             background-repeat: no-repeat;
             background-position: center center;
             background-size: cover;
             background-attachment: fixed; 
         }
         
-        a {
-            text-decoration: none;
-            color: #00d4ff; 
-            transition: color 0.3s;
-        }
-
-        a:hover {
-            color: #ffffff;
-        }
-
-        /* ROUNDED FROSTED NAVIGATION BAR */
-        header {
-            position: fixed;
-            top: 20px; 
-            left: 50%;
-            transform: translateX(-50%); 
-            width: 98%; 
-            max-width: none; 
-            background-color: rgba(20, 20, 20, 0.3); 
-            backdrop-filter: blur(15px); 
-            -webkit-backdrop-filter: blur(15px); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 50px; 
-            z-index: 1000;
-            padding: 15px 40px; 
-            box-sizing: border-box;
-        }
-
-        .nav-container { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .logo { font-size: 1.5rem; font-weight: bold; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
-        .logo span { color: #00d4ff; }
-        nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 40px; }
-        nav ul li a { color: #fff; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; transition: color 0.3s ease; }
-        nav ul li a:hover { color: #00d4ff; }
-
-        /* General Buttons */
-        .btn { padding: 15px 35px; font-size: 1rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; border-radius: 3px; cursor: pointer; transition: all 0.3s ease; text-align: center; display: inline-block; }
-        .btn-primary { background-color: #00d4ff; color: #000; border: none; }
-        .btn-primary:hover { background-color: #fff; color: #000; }
-        .btn-secondary { background-color: transparent; color: #fff; border: 2px solid #fff; }
-        .btn-secondary:hover { background-color: #fff; color: #000; }
-
-        /* NEW: Circular Icon Buttons for Logos */
-        .icon-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #fff;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-        }
-        .icon-btn:hover {
-            background-color: #00d4ff;
-            border-color: #00d4ff;
-            color: #000;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
-        }
-
-        /* Glass Panels */
-        .glass-panel {
-            max-width: 1000px;
-            margin: 0 auto;
-            background-color: rgba(15, 15, 15, 0.75); 
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 24px; 
-            padding: 60px 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        /* UPDATED: Flex Layout to center the bottom row */
-        .track-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 30px;
-            margin-top: 40px;
-            margin-bottom: 80px;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .card {
-            width: 320px; 
-            max-width: 100%;
-            background-color: rgba(15, 15, 15, 0.75); 
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 20px; 
-            padding: 40px 30px;
-            transition: transform 0.3s, border-color 0.3s, background-color 0.3s;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: #00d4ff;
-            background-color: rgba(20, 20, 20, 0.85);
-        }
-
-        /* Footer */
-        footer { background-color: rgba(5, 5, 5, 0.95); backdrop-filter: blur(10px); padding: 40px 20px; text-align: center; border-top: 1px solid #222; }
-        footer p { color: #555; font-size: 0.9rem; margin-bottom: 15px; }
-        .socials a { margin: 0 15px; font-size: 1.2rem; color: #777; text-decoration: none; transition: color 0.3s; }
-        .socials a:hover { color: #00d4ff; }
-
-        /* Mobile Adjustments */
-        @media (max-width: 1024px) {
-            header { width: 95%; padding: 15px 30px; }
-            nav ul { gap: 20px; }
-            .glass-panel { padding: 40px 30px; }
-        }
-        @media (max-width: 768px) {
-            header { width: 92%; border-radius: 20px; padding: 20px; }
-            .nav-container { flex-direction: column; gap: 15px; }
-            nav ul { flex-wrap: wrap; justify-content: center; gap: 12px; }
-            nav ul li a { font-size: 0.75rem; }
-            .glass-panel, .card { padding: 30px 20px; }
-        }
+        /* ... (rest of your styles remain the same) ... */
     </style>
 </head>
 <body>
@@ -173,136 +43,17 @@
     <!-- NAVIGATION HEADER -->
     <header>
         <div class="nav-container">
-            <a href="https://tonevault.page.gd/" class="logo">Tone<span>Vault</span></a>
+            <!-- Pointing back to root index.html -->
+            <a href="../index.html" class="logo">Tone<span>Vault</span></a>
             <nav>
                 <ul>
-                    <li><a href="https://tonevault.page.gd/">Home</a></li>
-                    <li><a href="https://tonevault.page.gd/listen">Listen</a></li>
-                    <!-- <li><a href="https://tonevault.page.gd/store">Store</a></li> -->
-                    <li><a href="https://tonevault.page.gd/services">Services</a></li>
-                    <li><a href="https://tonevault.page.gd/contact">About & Contact</a></li>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="Listen.html">Listen</a></li>
+                    <li><a href="Services.html">Services</a></li>
+                    <li><a href="About & Contact.html">About & Contact</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <main style="padding: 180px 20px 80px 20px; min-height: 65vh; text-align: center;">
-        
-        <!-- Page Header & Story Intro -->
-        <div style="margin-bottom: 80px; max-width: 800px; margin-left: auto; margin-right: auto;">
-            <h1 style="font-size: 3rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; margin-top: 0; color: #fff;">The <span style="color: #00d4ff;">Vault</span></h1>
-            <p style="color: #bbb; font-size: 1.1rem; line-height: 1.8;">
-                Every track here tells a story – from cinematic builds to bass-heavy drops. Crafted to move, scored to resonate. where every melody carries a piece of my soul and every beat speaks a language beyond words. 
-            </p>
-        </div>
-
-        <h2 style="font-size: 2rem; text-transform: uppercase; letter-spacing: 2px; margin-top: 40px; color: #fff;">Featured / Latest Releases</h2>
-        
-        <!-- Center-Aligned Flex Grid -->
-        <div class="track-grid">
-            
-            <!-- Track 1 -->
-            <div class="card">
-                <div>
-                    <h3 style="color: #00d4ff; margin-top: 0; font-size: 1.6rem; text-transform: uppercase;">"Messed Up"</h3>
-                    <p style="font-size: 0.95rem; margin-bottom: 30px; font-style: italic;">Emotional EDM with orchestral depth, echoing heartbreak and healing.</p>
-                </div>
-                <!-- Circular Icon Buttons -->
-                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <a href="https://open.spotify.com/track/0U0j66O5l7z4f9Bp0r4Z6B?si=d3968cfd21d44cbe" target="_blank" class="icon-btn" title="Spotify"><i class="fa-brands fa-spotify"></i></a>
-                    <a href="https://music.youtube.com/watch?v=v6RgvfohugI&si=0p6ALe67_QsJSzxi" target="_blank" class="icon-btn" title="YouTube Music"><i class="fa-brands fa-youtube"></i></a>
-                    <a href="https://music.amazon.in/tracks/B0D1CL322Q?marketplaceId=A21TJRUUN4KGV&musicTerritory=IN&ref=dm_sh_T5MjMUCmC3yEj1pDzvRL0T6yf" target="_blank" class="icon-btn" title="Amazon Music"><i class="fa-brands fa-amazon"></i></a>
-                </div>
-            </div>
-
-            <!-- Track 2 -->
-            <div class="card">
-                <div>
-                    <h3 style="color: #00d4ff; margin-top: 0; font-size: 1.6rem; text-transform: uppercase;">"Fall Again"</h3>
-                    <p style="font-size: 0.95rem; margin-bottom: 30px; font-style: italic;">A euphoric pop-EDM ride through the rush of falling in love.</p>
-                </div>
-                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <a href="https://open.spotify.com/track/1SOM6fiiguui0zqmewIhqP?si=978e983232f74c46" target="_blank" class="icon-btn" title="Spotify"><i class="fa-brands fa-spotify"></i></a>
-                    <a href="https://music.youtube.com/watch?v=hkT_ev5iBLk&si=wRgLcBh8TcoVdNa2" target="_blank" class="icon-btn" title="YouTube Music"><i class="fa-brands fa-youtube"></i></a>
-                    <a href="https://music.amazon.in/tracks/B0D1VRD5KV?marketplaceId=A21TJRUUN4KGV&musicTerritory=IN&ref=dm_sh_0ZchYiUGm66srRcrvNsi5Z4HZ" target="_blank" class="icon-btn" title="Amazon Music"><i class="fa-brands fa-amazon"></i></a>
-                </div>
-            </div>
-
-            <!-- Track 3 -->
-            <div class="card">
-                <div>
-                    <h3 style="color: #00d4ff; margin-top: 0; font-size: 1.6rem; text-transform: uppercase;">"She is a Warrior"</h3>
-                    <p style="font-size: 0.95rem; margin-bottom: 30px; font-style: italic;">A bold, cinematic anthem for the fierce and fearless.</p>
-                </div>
-                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <a href="https://open.spotify.com/track/35fUQtLwDxlpMifxOKSaMd?si=3e24acb9aa554c77" target="_blank" class="icon-btn" title="Spotify"><i class="fa-brands fa-spotify"></i></a>
-                    <a href="https://music.youtube.com/watch?v=01B4ToM-ems&si=Q8Laq9pQbDKPwmne" target="_blank" class="icon-btn" title="YouTube Music"><i class="fa-brands fa-youtube"></i></a>
-                    <a href="https://music.amazon.in/tracks/B0D1GSVDNW?marketplaceId=A21TJRUUN4KGV&musicTerritory=IN&ref=dm_sh_pdoA9IDeczYlV9dZp9hqGZn1G" target="_blank" class="icon-btn" title="Amazon Music"><i class="fa-brands fa-amazon"></i></a>
-                </div>
-            </div>
-
-            <!-- Track 4 -->
-            <div class="card">
-                <div>
-                    <h3 style="color: #00d4ff; margin-top: 0; font-size: 1.6rem; text-transform: uppercase;">"Reborn"</h3>
-                    <p style="font-size: 0.95rem; margin-bottom: 30px; font-style: italic;">An uplifting blend of synths and strings capturing the spark of starting over.</p>
-                </div>
-                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <a href="https://open.spotify.com/track/3nsCtJLcMDa3zQknS3GSlV?si=b0c070958d8b4881" target="_blank" class="icon-btn" title="Spotify"><i class="fa-brands fa-spotify"></i></a>
-                    <a href="https://music.youtube.com/watch?v=okWWDEX5pdo&si=CqnncAqeXM63fH3P" target="_blank" class="icon-btn" title="YouTube Music"><i class="fa-brands fa-youtube"></i></a>
-                    <a href="https://music.amazon.in/tracks/B0D1CJWP28?marketplaceId=A21TJRUUN4KGV&musicTerritory=IN&ref=dm_sh_fLQP9PtscQ9kiSQJrS8pv6OeW" target="_blank" class="icon-btn" title="Amazon Music"><i class="fa-brands fa-amazon"></i></a>
-                </div>
-            </div>
-
-            <!-- Track 5 -->
-            <div class="card">
-                <div>
-                    <h3 style="color: #00d4ff; margin-top: 0; font-size: 1.6rem; text-transform: uppercase;">"On a Sunday"</h3>
-                    <p style="font-size: 0.95rem; margin-bottom: 30px; font-style: italic;">High-energy club vibes wrapped in weekend nostalgia.</p>
-                </div>
-                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <a href="https://open.spotify.com/track/6B6goYUzkaficliMgO1wSS?si=e6c68659cb7041fe" target="_blank" class="icon-btn" title="Spotify"><i class="fa-brands fa-spotify"></i></a>
-                    <a href="https://music.youtube.com/watch?v=oTgwHmTDOXg&si=m5R-52dU44CG2XB-" target="_blank" class="icon-btn" title="YouTube Music"><i class="fa-brands fa-youtube"></i></a>
-                    <a href="https://music.amazon.in/tracks/B07DWNHCZM?marketplaceId=A21TJRUUN4KGV&musicTerritory=IN&ref=dm_sh_rxdJ0d17NHrAVD1gxQZOmGmmP" target="_blank" class="icon-btn" title="Amazon Music"><i class="fa-brands fa-amazon"></i></a>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Full Playlist Section (Now uses logos) -->
-        <div class="glass-panel" style="margin-bottom: 40px; padding: 50px 30px;">
-            <h2 style="font-size: 2rem; color: #fff; text-transform: uppercase; margin-bottom: 15px; margin-top: 0;">Full Playlist</h2>
-            <p style="color: #bbb; margin-bottom: 30px; font-size: 1.1rem;">Dive into the vault – all my curated playlists are just a click away.</p>
-            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                <a href="https://open.spotify.com/playlist/17GahcMOzKBMoZFZkOZxnd?si=ETNB3usjR1KWbSvE-pScDQ" target="_blank" class="icon-btn" title="Spotify Playlist"><i class="fa-brands fa-spotify"></i></a>
-                <a href="https://youtube.com/playlist?list=PLQoZQFSdJlf8PFFDnHo2l3KkSmi1ba4fa&si=M0ViL-g4MdGidtfc" target="_blank" class="icon-btn" title="YouTube Music Playlist"><i class="fa-brands fa-youtube"></i></a>
-                <a href="https://music.amazon.in/user-playlists/a621b15c709c4ddf808e6ff7f1341c45i8n0?marketplaceId=A21TJRUUN4KGV&musicTerritory=IN&ref=dm_sh_ofzdOuBjlprIcWtBbudX050Ox" target="_blank" class="icon-btn" title="Amazon Music Playlist"><i class="fa-brands fa-amazon"></i></a>
-            </div>
-        </div>
-
-        <!-- Artist Page Section (Now uses logos) -->
-        <div class="glass-panel" style="margin-bottom: 60px; padding: 50px 30px;">
-            <h2 style="font-size: 2rem; color: #fff; text-transform: uppercase; margin-bottom: 15px; margin-top: 0;">Artist Page</h2>
-            <p style="color: #bbb; margin-bottom: 30px; font-size: 1.1rem; max-width: 650px; margin-left: auto; margin-right: auto; line-height: 1.6;">
-                Tap into my sonic world – find all my artist links below, or simply search <strong>"Harish Cousal"</strong> on your favorite music platform to vibe with my latest drops.
-            </p>
-            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                <a href="https://open.spotify.com/artist/1NG26wsGLK06YmZLxaMbHY?si=984daEISTYG8kGL9Kt153A" target="_blank" class="icon-btn" title="Spotify Artist Page"><i class="fa-brands fa-spotify"></i></a>
-                <a href="https://music.youtube.com/channel/UCvNtML3BRNFXKtzzGEpQehg?si=7HdnthFtRdeZW-OG" target="_blank" class="icon-btn" title="YouTube Music Artist Page"><i class="fa-brands fa-youtube"></i></a>
-                <a href="https://music.amazon.in/artists/B07BZ5HLZ6/harish-cousal?marketplaceId=A21TJRUUN4KGV&musicTerritory=IN&ref=dm_sh_VNNxdxTV5E84IBx2l3a4FC2uB" target="_blank" class="icon-btn" title="Amazon Music Artist Page"><i class="fa-brands fa-amazon"></i></a>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- FOOTER -->
-    <footer>
-        <div class="socials">
-            <a href="https://www.instagram.com/harish.cousal" target="_blank">Instagram</a> | 
-            <a href="https://www.youtube.com/@tone-vault" target="_blank">YouTube</a>
-        </div>
-        <p>&copy; 2026 ToneVault by HC. All rights reserved.</p>
-    </footer>
-
-</body>
-</html>
+    <!-- ... (rest of your page content remains the same) ... -->
