@@ -11,13 +11,12 @@
     <!-- Social Media Sharing (Open Graph) -->
     <meta property="og:title" content="Services | ToneVault">
     <meta property="og:description" content="Custom production, cinematic scoring, and professional mixing by Harish Cousal.">
-    <!-- Updated image path -->
     <meta property="og:image" content="https://tonevault.qd.je/Images/BackGround.jpg">
     <meta property="og:url" content="https://tonevault.qd.je/Pages/Services.html">
     <meta name="twitter:card" content="summary_large_image">
     
     <style>
-        /* Updated background-image path to go up one level */
+        /* Base Styling & Global Parallax Background */
         body, html {
             margin: 0;
             padding: 0;
@@ -25,6 +24,7 @@
             color: #f0f0f0;
             scroll-behavior: smooth; 
             overflow-x: hidden; 
+            /* Updated path to point to Images folder in root */
             background-image: linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.9)), url('../Images/BackGround.jpg');
             background-repeat: no-repeat;
             background-position: center center;
@@ -32,15 +32,46 @@
             background-attachment: fixed; 
         }
         
-        /* ... (rest of your styles remain the same) ... */
+        a { text-decoration: none; color: #00d4ff; transition: color 0.3s; }
+        a:hover { color: #ffffff; }
+
+        /* NAVIGATION BAR */
+        header {
+            position: fixed;
+            top: 20px; left: 50%;
+            transform: translateX(-50%); 
+            width: 98%; 
+            background-color: rgba(20, 20, 20, 0.3); 
+            backdrop-filter: blur(15px); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-radius: 50px; 
+            z-index: 1000;
+            padding: 15px 40px; 
+            box-sizing: border-box;
+        }
+
+        .nav-container { display: flex; justify-content: space-between; align-items: center; width: 100%; }
+        .logo { font-size: 1.5rem; font-weight: bold; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
+        .logo span { color: #00d4ff; }
+        nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 40px; }
+        nav ul li a { color: #fff; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+        nav ul li a:hover { color: #00d4ff; }
+
+        /* Service Cards */
+        .section-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; margin-bottom: 80px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; }
+        .card { background-color: rgba(15, 15, 15, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 20px; padding: 50px 40px; text-align: center; }
+        .icon { font-size: 3rem; margin-bottom: 25px; }
+        .card h3 { font-size: 1.4rem; color: #fff; text-transform: uppercase; }
+        .btn-primary { background-color: #00d4ff; color: #000; padding: 15px 35px; border-radius: 3px; font-weight: bold; text-transform: uppercase; }
+        
+        footer { background-color: rgba(5, 5, 5, 0.95); backdrop-filter: blur(10px); padding: 40px 20px; text-align: center; border-top: 1px solid #222; }
     </style>
 </head>
 <body>
 
-    <!-- NAVIGATION HEADER -->
     <header>
         <div class="nav-container">
-            <!-- Pointing back to root index.html -->
             <a href="../index.html" class="logo">Tone<span>Vault</span></a>
             <nav>
                 <ul>
@@ -53,11 +84,38 @@
         </div>
     </header>
 
-    <!-- ... (rest of your page content) ... -->
+    <main style="padding: 180px 0 80px 0; min-height: 65vh;">
+        <div style="text-align: center; margin-bottom: 60px;">
+            <h1 style="font-size: 3rem; color: #fff; text-transform: uppercase;">The Sonic <span style="color: #00d4ff;">Arsenal</span></h1>
+        </div>
 
-    <!-- Call to Action Button in FAQ section -->
-    <div style="text-align: center; margin-top: 50px;">
-        <a href="About & Contact.html" class="btn btn-primary">Start Your Project</a>
-    </div>
+        <div class="section-container">
+            <div class="grid">
+                <div class="card">
+                    <div class="icon">🎹</div>
+                    <h3>Full Track Production</h3>
+                    <p style="color: #bbb;">From raw concept to club-ready anthem.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">🎛️</div>
+                    <h3>Mixing & Mastering</h3>
+                    <p style="color: #bbb;">Turn your rough mix into a sonic weapon.</p>
+                </div>
+                <div class="card">
+                    <div class="icon">🎬</div>
+                    <h3>Cinematic Scoring</h3>
+                    <p style="color: #bbb;">Custom soundtracks designed to elevate your visuals.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 50px;">
+            <a href="About & Contact.html" class="btn-primary">Start Your Project</a>
+        </div>
+    </main>
 
-    <!-- ... (rest of page) ... -->
+    <footer>
+        <p>&copy; 2026 ToneVault by HC. All rights reserved.</p>
+    </footer>
+</body>
+</html>
