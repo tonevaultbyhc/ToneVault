@@ -14,7 +14,6 @@
     <meta property="og:image" content="https://tonevault.qd.je/Images/BackGround.jpg">
     <meta property="og:url" content="https://tonevault.qd.je/Pages/Services.html">
     <meta name="twitter:card" content="summary_large_image">
-    
     <style>
         /* Base Styling & Global Parallax Background */
         body, html {
@@ -24,7 +23,6 @@
             color: #f0f0f0;
             scroll-behavior: smooth; 
             overflow-x: hidden; 
-            /* Corrected path to Images folder */
             background-image: linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.9)), url('../Images/BackGround.jpg');
             background-repeat: no-repeat;
             background-position: center center;
@@ -35,14 +33,16 @@
         a { text-decoration: none; color: #00d4ff; transition: color 0.3s; }
         a:hover { color: #ffffff; }
 
-        /* NAVIGATION BAR */
+        /* ROUNDED FROSTED NAVIGATION BAR */
         header {
             position: fixed;
-            top: 20px; left: 50%;
+            top: 20px; 
+            left: 50%;
             transform: translateX(-50%); 
             width: 98%; 
             background-color: rgba(20, 20, 20, 0.3); 
             backdrop-filter: blur(15px); 
+            -webkit-backdrop-filter: blur(15px); 
             border: 1px solid rgba(255, 255, 255, 0.1); 
             border-radius: 50px; 
             z-index: 1000;
@@ -57,22 +57,52 @@
         nav ul li a { color: #fff; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
         nav ul li a:hover { color: #00d4ff; }
 
-        /* Service Cards */
+        /* Buttons */
+        .btn { padding: 15px 35px; font-size: 1rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; border-radius: 3px; cursor: pointer; transition: all 0.3s ease; display: inline-block; }
+        .btn-primary { background-color: #00d4ff; color: #000; border: none; }
+        .btn-primary:hover { background-color: #fff; color: #000; }
+
+        /* General Layout */
         .section-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; margin-bottom: 80px; }
+        
+        .glass-panel {
+            background-color: rgba(15, 15, 15, 0.75); 
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 24px; 
+            padding: 60px 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .section-title { font-size: 2.2rem; margin-top: 0; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 2px; color: #ffffff; text-align: center; }
+        .section-title span { color: #00d4ff; }
+
+        /* Grid */
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 40px; }
         .card { background-color: rgba(15, 15, 15, 0.75); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 20px; padding: 50px 40px; text-align: center; }
         .icon { font-size: 3rem; margin-bottom: 25px; }
-        .card h3 { font-size: 1.4rem; color: #fff; text-transform: uppercase; }
-        .btn-primary { background-color: #00d4ff; color: #000; padding: 15px 35px; border-radius: 3px; font-weight: bold; text-transform: uppercase; }
-        
-        footer { background-color: rgba(5, 5, 5, 0.95); backdrop-filter: blur(10px); padding: 40px 20px; text-align: center; border-top: 1px solid #222; }
+        .card h3 { font-size: 1.4rem; margin-top: 0; margin-bottom: 20px; color: #fff; text-transform: uppercase; }
+        .card p { color: #bbb; line-height: 1.7; margin-bottom: 30px; }
+
+        /* Timeline */
+        .timeline-step { display: flex; align-items: flex-start; margin-bottom: 40px; }
+        .step-number { background: #00d4ff; color: #000; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; margin-right: 25px; }
+        .step-content h3 { margin: 0 0 10px 0; color: #fff; text-transform: uppercase; }
+        .step-content p { color: #bbb; line-height: 1.7; }
+
+        /* FAQ */
+        .faq-item { background: rgba(5, 5, 5, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; margin-bottom: 15px; }
+        .faq-item summary { padding: 25px; color: #fff; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .faq-content { padding: 0 25px 25px 25px; color: #bbb; }
+
+        footer { background-color: rgba(5, 5, 5, 0.95); padding: 40px 20px; text-align: center; border-top: 1px solid #222; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="nav-container">
-            <!-- Corrected path to root index.html -->
             <a href="../index.html" class="logo">Tone<span>Vault</span></a>
             <nav>
                 <ul>
@@ -86,8 +116,8 @@
     </header>
 
     <main style="padding: 180px 0 80px 0; min-height: 65vh;">
-        <div style="text-align: center; margin-bottom: 60px;">
-            <h1 style="font-size: 3rem; color: #fff; text-transform: uppercase;">The Sonic <span style="color: #00d4ff;">Arsenal</span></h1>
+        <div class="page-header" style="text-align: center; margin-bottom: 60px;">
+            <h1 style="font-size: 3rem; text-transform: uppercase; letter-spacing: 2px; color: #fff;">The Sonic <span style="color: #00d4ff;">Arsenal</span></h1>
         </div>
 
         <div class="section-container">
@@ -95,23 +125,47 @@
                 <div class="card">
                     <div class="icon">🎹</div>
                     <h3>Full Track Production</h3>
-                    <p style="color: #bbb;">From raw concept to club-ready anthem.</p>
+                    <p>From raw concept to club-ready anthem.</p>
                 </div>
                 <div class="card">
                     <div class="icon">🎛️</div>
                     <h3>Mixing & Mastering</h3>
-                    <p style="color: #bbb;">Turn your rough mix into a sonic weapon.</p>
+                    <p>Turn your rough mix into a sonic weapon.</p>
                 </div>
                 <div class="card">
                     <div class="icon">🎬</div>
                     <h3>Cinematic Scoring</h3>
-                    <p style="color: #bbb;">Custom soundtracks designed to elevate your visuals.</p>
+                    <p>Custom soundtracks to elevate your visuals.</p>
                 </div>
             </div>
         </div>
-        
-        <div style="text-align: center; margin-top: 50px;">
-            <a href="About & Contact.html" class="btn-primary">Start Your Project</a>
+
+        <div class="section-container">
+            <div class="glass-panel">
+                <h2 class="section-title">How The <span>Vault</span> Works</h2>
+                <div class="timeline-step">
+                    <div class="step-number">1</div>
+                    <div class="step-content"><h3>The Drop-In</h3><p>We align on your creative vision.</p></div>
+                </div>
+                <div class="timeline-step">
+                    <div class="step-number">2</div>
+                    <div class="step-content"><h3>The Lab</h3><p>I build the arrangement and structure.</p></div>
+                </div>
+                <div class="timeline-step">
+                    <div class="step-number">3</div>
+                    <div class="step-content"><h3>The Polish</h3><p>We tweak the mix until perfect.</p></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-container">
+            <div class="glass-panel">
+                <h2 class="section-title">FAQ</h2>
+                <details class="faq-item"><summary>Do I retain rights?</summary><div class="faq-content">Yes.</div></details>
+                <div style="text-align: center; margin-top: 50px;">
+                    <a href="About & Contact.html" class="btn btn-primary">Start Your Project</a>
+                </div>
+            </div>
         </div>
     </main>
 
