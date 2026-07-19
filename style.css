@@ -99,11 +99,23 @@ nav ul li a:hover { color: #00d4ff; }
 /* =========================================
    GLOBAL GLASS PANELS & CARDS
 ========================================= */
-main { padding: 85px 20px 80px 20px; min-height: 65vh; } /* Snugs right up to the bottom of the navbar */
+main { padding: 85px 20px 80px 20px; min-height: 65vh; } 
 
 .hero { margin-top: 0; text-align: center; } 
-.hero-logo { max-width: 500px; width: 100%; margin: -20px auto 5px auto; display: block; } /* Pulls logo up and drastically shrinks bottom gap */
-.hero p { font-size: 1.2rem; color: #b0b0b0; max-width: 600px; margin: 0 auto 25px auto; text-align: center; line-height: 1.6; } /* Tightens the text to the logo and buttons */
+.hero-logo { 
+    max-width: 500px; 
+    width: 100%; 
+    margin: -70px auto -15px auto; /* Aggressively pulls the logo up (-70px) and pulls the text up into the logo (-15px) */
+    display: block; 
+} 
+.hero p { 
+    font-size: 1.2rem; 
+    color: #b0b0b0; 
+    max-width: 600px; 
+    margin: 0 auto 20px auto; /* Tightly packs the text against the buttons */
+    text-align: center; 
+    line-height: 1.6; 
+}
 
 .featured-track { padding: 60px 20px; text-align: center; }
 
