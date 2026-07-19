@@ -99,23 +99,11 @@ nav ul li a:hover { color: #00d4ff; }
 /* =========================================
    GLOBAL GLASS PANELS & CARDS
 ========================================= */
-main { padding: 85px 20px 80px 20px; min-height: 65vh; } 
+main { padding: 110px 20px 80px 20px; min-height: 65vh; } /* Clean, normal breathing room from the nav bar */
 
 .hero { margin-top: 0; text-align: center; } 
-.hero-logo { 
-    max-width: 500px; 
-    width: 100%; 
-    margin: -70px auto -15px auto; /* Aggressively pulls the logo up (-70px) and pulls the text up into the logo (-15px) */
-    display: block; 
-} 
-.hero p { 
-    font-size: 1.2rem; 
-    color: #b0b0b0; 
-    max-width: 600px; 
-    margin: 0 auto 20px auto; /* Tightly packs the text against the buttons */
-    text-align: center; 
-    line-height: 1.6; 
-}
+.hero-logo { max-width: 500px; width: 100%; margin: 0 auto 25px auto; display: block; } /* No more negative margins! */
+.hero p { font-size: 1.2rem; color: #b0b0b0; max-width: 600px; margin: 0 auto 35px auto; text-align: center; line-height: 1.6; }
 
 .featured-track { padding: 60px 20px; text-align: center; }
 
@@ -224,10 +212,10 @@ footer p { color: #555; font-size: 0.9rem; margin-bottom: 15px; }
     nav ul li a { font-size: 0.75rem; }
     
     /* Mobile Content Layouts */
-    main { padding-top: 120px; } /* Reduced from 160px to shrink the top gap */
+    main { padding-top: 110px; } 
     
     .hero { margin-top: 0; min-height: auto; }
-    .hero-logo { max-width: 280px; margin: 0 auto 25px auto; } /* 25px gap perfectly matches the top visual space */
+    .hero-logo { max-width: 280px; margin: 0 auto 20px auto; } /* Clean 20px gap below the newly cropped logo */
     .hero p { font-size: 1rem; padding: 0 10px; margin-top: 0; margin-bottom: 30px; }
     
     .featured-track { padding: 40px 15px; }
