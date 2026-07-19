@@ -378,16 +378,25 @@
                 margin-bottom: 30px;
             }
 
-            .btn-container {
-                flex-direction: column;
-                width: 100%;
-                padding: 0 20px;
-                box-sizing: border-box;
-            }
-
-            .btn {
-                width: 100%;
-            }
+            .btn-container { 
+        flex-direction: column; 
+        width: 100%; 
+        padding: 0 20px; 
+        box-sizing: border-box; /* Prevents container from overflowing */
+    }
+    
+    .btn { 
+        width: 100%; 
+        display: block; 
+        box-sizing: border-box; /* Keeps padding inside the 100% width */
+        margin-bottom: 15px; 
+    }
+    
+    /* Keep your other mobile header/nav styles here... */
+    header { width: 92%; border-radius: 20px; padding: 20px; }
+    .nav-container { flex-direction: column; gap: 15px; }
+    nav ul { flex-wrap: wrap; justify-content: center; gap: 12px; }
+}
 
             .featured-track {
                 padding: 40px 15px;
