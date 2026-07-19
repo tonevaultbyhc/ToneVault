@@ -99,9 +99,9 @@ nav ul li a:hover { color: #00d4ff; }
 /* =========================================
    GLOBAL GLASS PANELS & CARDS
 ========================================= */
-main { padding: 120px 20px 80px 20px; min-height: 65vh; } /* Reduced from 180px */
+main { padding: 75px 20px 80px 20px; min-height: 65vh; } /* Reduced from 100px to 75px */
 
-.hero { margin-top: 40px; text-align: center; } /* Reduced from 150px */
+.hero { margin-top: -20px; text-align: center; } /* Forces the image up if the PNG has empty space */
 .hero-logo { max-width: 500px; width: 100%; margin: 0 auto 30px auto; display: block; } /* Added proper 30px bottom margin */
 .hero p { font-size: 1.2rem; color: #b0b0b0; max-width: 600px; margin: 0 auto 40px auto; text-align: center; line-height: 1.6; } /* Removed the -50px negative margin */
 
