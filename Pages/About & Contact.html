@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About & Contact | ToneVault</title>
-    <!-- Add your favicon link here -->
-	<link rel="icon" type="image/x-icon" href="../Images/favicon.ico">
+    
+    <!-- Universal Favicon -->
+    <link rel="icon" type="image/x-icon" href="/Images/favicon.ico">
+    
     <!-- Basic SEO -->
     <meta name="description" content="Connect with Harish Cousal at ToneVault. Reach out for custom production inquiries, collaborations, and project rates.">
     <meta name="keywords" content="contact ToneVault, Harish Cousal email, hire Harish Cousal, music producer contact">
@@ -13,147 +15,23 @@
     <!-- Social Media Sharing (Open Graph) -->
     <meta property="og:title" content="About & Contact | ToneVault">
     <meta property="og:description" content="Get in touch with Harish Cousal for production inquiries and collaborations.">
-    <!-- Updated path to the new Images folder -->
     <meta property="og:image" content="https://tonevault.qd.je/Images/BackGround.jpg">
     <meta property="og:url" content="https://tonevault.qd.je/Pages/About & Contact.html">
     <meta name="twitter:card" content="summary_large_image">
-    <style>
-        /* Base Styling & Global Parallax Background */
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            color: #f0f0f0;
-            scroll-behavior: smooth; 
-            overflow-x: hidden; 
-            /* Updated to look for image in the root/Images folder */
-            background-image: linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.9)), url('../Images/BackGround.jpg');
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-size: cover;
-            background-attachment: fixed; 
-        }
-        
-        a { text-decoration: none; color: #00d4ff; transition: color 0.3s; }
-        a:hover { color: #ffffff; }
 
-        /* ROUNDED FROSTED NAVIGATION BAR - ULTRAWIDE */
-        header {
-            position: fixed;
-            top: 20px; 
-            left: 50%;
-            transform: translateX(-50%); 
-            width: 98%; 
-            max-width: none; 
-            background-color: rgba(20, 20, 20, 0.3); 
-            backdrop-filter: blur(15px); 
-            -webkit-backdrop-filter: blur(15px); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 50px; 
-            z-index: 1000;
-            padding: 15px 40px; 
-            box-sizing: border-box;
-        }
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-        .nav-container { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .logo { font-size: 1.5rem; font-weight: bold; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
-        .logo span { color: #00d4ff; }
-        nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 40px; }
-        nav ul li a { color: #fff; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; transition: color 0.3s ease; }
-        nav ul li a:hover { color: #00d4ff; }
-
-        /* Buttons */
-        .btn { padding: 15px 35px; font-size: 1rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; border-radius: 3px; cursor: pointer; transition: all 0.3s ease; }
-        .btn-primary { background-color: #00d4ff; color: #000; border: none; }
-        .btn-primary:hover { background-color: #fff; color: #000; }
-        .btn-secondary { background-color: transparent; color: #fff; border: 2px solid #fff; }
-        .btn-secondary:hover { background-color: #fff; color: #000; }
-
-        /* Glass Panels */
-        .glass-panel {
-            max-width: 1000px;
-            margin: 0 auto;
-            background-color: rgba(15, 15, 15, 0.75); 
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 24px; 
-            padding: 60px 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .glass-panel h2 { font-size: 2.5rem; margin-top: 0; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 2px; color: #ffffff !important; }
-
-        /* Split Layout for About & Contact */
-        .split-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; max-width: 1200px; margin: 0 auto; align-items: start; text-align: left; }
-
-        /* Form Styling */
-        .form-group { margin-bottom: 20px; text-align: left; }
-        .form-group label { display: block; margin-bottom: 8px; color: #bbb; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
-        .form-group input, .form-group textarea { width: 100%; padding: 15px; background-color: rgba(5, 5, 5, 0.6); border: 1px solid #333; border-radius: 8px; color: #fff; font-family: inherit; font-size: 1rem; box-sizing: border-box; transition: border-color 0.3s, box-shadow 0.3s; }
-        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #00d4ff; box-shadow: 0 0 10px rgba(0, 212, 255, 0.2); }
-        .form-group textarea { resize: vertical; min-height: 150px; }
-
-        /* Success Message Styling */
-        #form-status {
-            display: none;
-            padding: 30px;
-            background-color: rgba(0, 212, 255, 0.1);
-            border: 1px solid #00d4ff;
-            border-radius: 10px;
-            text-align: center;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Footer */
-        footer { background-color: rgba(5, 5, 5, 0.95); backdrop-filter: blur(10px); padding: 40px 20px; text-align: center; border-top: 1px solid #222; }
-        footer p { color: #555; font-size: 0.9rem; margin-bottom: 15px; }
-        .socials a { margin: 0 15px; font-size: 1.2rem; color: #777; text-decoration: none; transition: color 0.3s; }
-        .socials a:hover { color: #00d4ff; }
-
-        /* --- TABLET & MOBILE OPTIMIZATION --- */
-        @media (max-width: 1024px) {
-            header { width: 95%; padding: 15px 30px; }
-            nav ul { gap: 20px; }
-            .glass-panel { padding: 40px 30px; }
-            .split-layout { grid-template-columns: 1fr; gap: 30px; }
-        }
-
-        @media (max-width: 768px) {
-            header { width: 92%; border-radius: 20px; padding: 20px; }
-            .nav-container { flex-direction: column; gap: 15px; }
-            nav ul { flex-wrap: wrap; justify-content: center; gap: 12px; }
-            nav ul li a { font-size: 0.75rem; }
-            .glass-panel { padding: 30px 20px; }
-            .glass-panel h2 { font-size: 2rem; margin-bottom: 30px; }
-        }
-    </style>
+    <!-- UNIVERSAL DESIGN EDITOR -->
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
-    <!-- NAVIGATION HEADER -->
-    <header>
-        <div class="nav-container">
-            <!-- Redirects to root -->
-            <a href="../index.html" class="logo">Tone<span>Vault</span></a>
-            <nav>
-                <ul>
-                    <li><a href="../index.html">Home</a></li>
-                    <li><a href="Listen.html">Listen</a></li>
-                    <li><a href="Services.html">Services</a></li>
-                    <li><a href="About & Contact.html">About & Contact</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+    <!-- UNIVERSAL HEADER -->
+    <site-header></site-header>
 
     <!-- PAGE CONTENT AREA -->
-    <main style="padding: 180px 20px 80px 20px; min-height: 65vh; text-align: center;">
+    <main>
         
         <!-- Page Header -->
         <div class="page-header" style="text-align: center; margin-bottom: 60px;">
@@ -224,14 +102,11 @@
 
     </main>
 
-    <!-- FOOTER -->
-    <footer>
-        <div class="socials">
-            <a href="https://www.instagram.com/harish.cousal?igsh=dGh2Y3Zwb2hnaXFt" target="_blank">Instagram</a> | 
-            <a href="https://www.youtube.com/@tone-vault" target="_blank">YouTube</a>
-        </div>
-        <p>&copy; 2026 ToneVault by HC. All rights reserved.</p>
-    </footer>
+    <!-- UNIVERSAL FOOTER -->
+    <site-footer></site-footer>
+
+    <!-- UNIVERSAL HTML COMPONENT EDITOR -->
+    <script src="/components.js"></script>
 
     <!-- FormSubmit AJAX Script -->
     <script>
