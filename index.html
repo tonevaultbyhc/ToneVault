@@ -382,21 +382,24 @@
         flex-direction: column; 
         width: 100%; 
         padding: 0 20px; 
-        box-sizing: border-box; /* Prevents container from overflowing */
+        box-sizing: border-box; 
     }
     
     .btn { 
         width: 100%; 
-        display: block; 
-        box-sizing: border-box; /* Keeps padding inside the 100% width */
+        display: flex;              /* Changes from block to flex for perfect alignment */
+        justify-content: center;    /* Centers text horizontally */
+        align-items: center;        /* Centers text vertically */
+        text-align: center;         /* Backup text alignment */
+        box-sizing: border-box; 
         margin-bottom: 15px; 
+        padding: 15px;              /* Overrides the 35px side padding from desktop */
     }
     
-    /* Keep your other mobile header/nav styles here... */
     header { width: 92%; border-radius: 20px; padding: 20px; }
     .nav-container { flex-direction: column; gap: 15px; }
     nav ul { flex-wrap: wrap; justify-content: center; gap: 12px; }
-}
+		}
 
             .featured-track {
                 padding: 40px 15px;
