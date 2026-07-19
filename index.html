@@ -4,457 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ToneVault | The Sonic Lab</title>
-	<!-- Add your favicon link here -->
-	<link rel="icon" type="image/x-icon" href="Images/favicon.ico">
-	<!-- Basic SEO -->
+    
+    <!-- Universal Favicon -->
+    <link rel="icon" type="image/x-icon" href="/Images/favicon.ico">
+    
+    <!-- Basic SEO -->
     <meta name="description" content="ToneVault is the sonic laboratory of Harish Cousal. Professional music production blending hard-hitting electronic drops with cinematic orchestral arrangements.">
     <meta name="keywords" content="Harish Cousal, ToneVault, music producer, EDM producer, cinematic scoring, custom beats, mixing and mastering">
     <meta name="author" content="Harish Cousal">
 
     <!-- Social Media Sharing (Open Graph) -->
-    <meta property="og:title" content="Listen | ToneVault">
+    <meta property="og:title" content="ToneVault | The Sonic Lab">
     <meta property="og:description" content="Enter the vault and hear the latest productions from Harish Cousal.">
     <meta property="og:image" content="https://tonevault.qd.je/Images/BackGround.jpg">
-    <meta property="og:url" content="https://tonevault.qd.je/Pages/Listen.html">
+    <meta property="og:url" content="https://tonevault.qd.je/">
     <meta name="twitter:card" content="summary_large_image">
 
-    <!-- FontAwesome for Premium Social Logos -->
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <style>
-        /* Base Styling & Global Parallax Background */
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            color: #f0f0f0;
-            scroll-behavior: smooth; 
-            overflow-x: hidden; /* Prevents horizontal scrolling on mobile */
-            
-            /* Put your studio background image URL here */
-            background-image: linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.9)), url('Images/BackGround.jpg');
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-size: cover;
-            background-attachment: fixed; 
-        }
-        
-        a {
-            text-decoration: none;
-            color: #00d4ff; 
-            transition: color 0.3s;
-        }
-
-        a:hover {
-            color: #ffffff;
-        }
-
-        /* ROUNDED FROSTED NAVIGATION BAR - ULTRAWIDE */
-        header {
-            position: fixed;
-            top: 20px; 
-            left: 50%;
-            transform: translateX(-50%); 
-            
-            width: 98%; 
-            max-width: none; 
-            
-            background-color: rgba(20, 20, 20, 0.3); 
-            backdrop-filter: blur(15px); 
-            -webkit-backdrop-filter: blur(15px); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 50px; 
-            
-            z-index: 1000;
-            padding: 15px 40px; 
-            box-sizing: border-box;
-        }
-
-        .nav-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 100%; 
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #fff;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .logo span {
-            color: #00d4ff; 
-        }
-
-        nav ul {
-            list-style: none;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            gap: 40px; 
-        }
-
-        nav ul li a {
-            color: #fff;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: bold;
-            transition: color 0.3s ease;
-        }
-
-        nav ul li a:hover {
-            color: #00d4ff;
-        }
-
-        /* Hero Section */
-        .hero-logo {
-            max-width: 500px; 
-            width: 100%;
-            height: auto;
-            display: block; 
-            margin: 0 auto; 
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            color: #b0b0b0;
-            max-width: 600px;
-            margin: -50px auto 40px auto; 
-            text-align: center; 
-            line-height: 1.6;
-        }
-
-        .btn-container {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .btn {
-            padding: 15px 35px;
-            font-size: 1rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-radius: 3px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary {
-            background-color: #00d4ff; 
-            color: #000;
-            border: none;
-        }
-        
-        .btn-primary:hover {
-            background-color: #fff;
-            color: #000;
-        }
-        
-        .btn-secondary {
-            background-color: transparent;
-            color: #fff;
-            border: 2px solid #fff;
-        }
-
-        .btn-secondary:hover {
-            background-color: #fff;
-            color: #000;
-        }
-
-        /* Circular Icon Buttons for Logos */
-        .icon-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #fff;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-        }
-        
-        .icon-btn:hover {
-            background-color: #00d4ff;
-            border-color: #00d4ff;
-            color: #000;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
-        }
-
-        /* Featured Audio Section */
-        .featured-track {
-            padding: 60px 20px;
-            text-align: center;
-        }
-        
-        .glass-panel {
-            max-width: 1000px;
-            margin: 0 auto;
-            background-color: rgba(15, 15, 15, 0.75); 
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 24px; 
-            padding: 60px 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .glass-panel h2 {
-            font-size: 2.5rem;
-            margin-top: 0;
-            margin-bottom: 40px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #ffffff !important; 
-        }
-
-        .embed-placeholder {
-            max-width: 800px;
-            margin: 0 auto;
-            height: 150px;
-            background-color: rgba(5, 5, 5, 0.6);
-            border: 1px dashed #444;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #888;
-            border-radius: 10px;
-        }
-
-        /* The Hub (Quick Links) */
-        .hub {
-            padding: 60px 20px 100px 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
-        }
-
-        .card {
-            background-color: rgba(15, 15, 15, 0.75); 
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 20px; 
-            padding: 40px 30px;
-            transition: transform 0.3s, border-color 0.3s, background-color 0.3s;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: #00d4ff;
-            background-color: rgba(20, 20, 20, 0.85);
-        }
-
-        .icon {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
-        }
-
-        .card h3 {
-            font-size: 1.4rem;
-            margin-bottom: 15px;
-            color: #fff;
-        }
-
-        .card p {
-            color: #bbb;
-            line-height: 1.6;
-            margin-bottom: 25px;
-        }
-
-        .card-link {
-            font-size: 0.9rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            display: inline-block;
-        }
-        
-        .coming-soon {
-            color: #777 !important;
-            cursor: default;
-        }
-
-        /* Footer */
-        footer {
-            background-color: rgba(5, 5, 5, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 40px 20px;
-            text-align: center;
-            border-top: 1px solid #222;
-        }
-
-        footer p {
-            color: #555;
-            font-size: 0.9rem;
-            margin-bottom: 15px;
-        }
-
-        .socials a {
-            margin: 0 15px;
-            font-size: 1.2rem;
-            color: #777;
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-
-        .socials a:hover {
-            color: #00d4ff;
-        }
-
-        /* --- TABLET OPTIMIZATION --- */
-        @media (max-width: 1024px) {
-            header {
-                width: 95%;
-                padding: 15px 30px;
-            }
-
-            nav ul {
-                gap: 20px;
-            }
-
-            .hero-logo {
-                max-width: 400px;
-            }
-
-            .glass-panel {
-                padding: 40px 30px;
-            }
-        }
-
-        /* --- MOBILE OPTIMIZATION --- */
-        @media (max-width: 768px) {
-            header {
-                width: 92%;
-                border-radius: 20px; 
-                padding: 20px;
-            }
-
-            .nav-container {
-                flex-direction: column;
-                gap: 15px;
-            }
-
-            nav ul {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 12px;
-            }
-
-            nav ul li a {
-                font-size: 0.75rem;
-            }
-
-            .hero {
-                margin-top: 110px; 
-                min-height: 40vh;
-            }
-
-            .hero-logo {
-                max-width: 280px;
-                margin-bottom: 0; 
-            }
-
-            .hero p {
-                font-size: 1rem;
-                padding: 0 10px;
-                margin-top: -30px; 
-                margin-bottom: 30px;
-            }
-
-            .btn-container { 
-        flex-direction: column; 
-        width: 100%; 
-        padding: 0 20px; 
-        box-sizing: border-box; 
-    }
-    
-    .btn { 
-        width: 100%; 
-        display: flex;              /* Changes from block to flex for perfect alignment */
-        justify-content: center;    /* Centers text horizontally */
-        align-items: center;        /* Centers text vertically */
-        text-align: center;         /* Backup text alignment */
-        box-sizing: border-box; 
-        margin-bottom: 15px; 
-        padding: 15px;              /* Overrides the 35px side padding from desktop */
-    }
-    
-    header { width: 92%; border-radius: 20px; padding: 20px; }
-    .nav-container { flex-direction: column; gap: 15px; }
-    nav ul { flex-wrap: wrap; justify-content: center; gap: 12px; }
-		}
-
-            .featured-track {
-                padding: 40px 15px;
-            }
-
-            .glass-panel {
-                padding: 30px 20px;
-            }
-
-            .glass-panel h2 {
-                font-size: 2rem;
-                margin-bottom: 30px;
-            }
-
-            .hub {
-                padding: 40px 15px 60px 15px;
-            }
-
-            .card {
-                padding: 30px 20px;
-            }
-
-            .socials span {
-                margin: 0 10px;
-                font-size: 1rem;
-            }
-        }
-    </style>
+    <!-- UNIVERSAL DESIGN EDITOR -->
+    <link rel="stylesheet" href="/style.css">
 </head>
 <body>
 
-<!-- NAVIGATION HEADER -->
-    <header>
-        <div class="nav-container">
-            <a href="index.html" class="logo">Tone<span>Vault</span></a>
-            <nav>
-                 <ul>
-                    <li><a href="index">Home</a></li>
-                    <li><a href="Pages/Listen.html">Listen</a></li>
-                    <!-- <li><a href="Store.html">Store</a></li> -->
-                    <li><a href="Pages/Services.html">Services</a></li>
-                    <li><a href="Pages/About & Contact.html">About & Contact</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+    <!-- UNIVERSAL HEADER -->
+    <site-header></site-header>
 
     <main>
         <section class="hero">
-            <img src="Images/Logo White with shadow.png" alt="ToneVault Logo" class="hero-logo">
+            <img src="/Images/Logo White with shadow.png" alt="ToneVault Logo" class="hero-logo">
             
             <p>The sonic lab of Harish Cousal. Where electronic energy meets orchestral elegance.</p>
             <div class="btn-container">
-			<a href="Pages/Listen.html" class="btn btn-primary">Hear the Vault</a>
-			<a href="Pages/About & Contact.html" class="btn btn-secondary">Let's Collaborate</a>
+                <a href="/Pages/Listen.html" class="btn btn-primary">Hear the Vault</a>
+                <a href="/Pages/About & Contact.html" class="btn btn-secondary">Let's Collaborate</a>
             </div>
         </section>
 
@@ -475,7 +59,7 @@
 
                 <!-- Custom Ad-Free Audio Player -->
                 <audio controls style="width: 100%; max-width: 600px; outline: none; border-radius: 50px;">
-                    <source src="Media/Messed Up.mp3" type="audio/mpeg">
+                    <source src="/Media/Messed Up.mp3" type="audio/mpeg">
                     Your browser does not support the audio element.
                 </audio>
 
@@ -488,13 +72,14 @@
             </div>
         </section>
 
+        <!-- SECTION 3: THE HUB -->
         <section class="hub">
             <div class="grid">
                 <div class="card">
                     <div class="icon">🎛️</div>
                     <h3>Custom Production & Scoring</h3>
                     <p>From hard-hitting drops to emotionally layered cinematic scores, get your next project mixed, mastered, or custom-built.</p>
-                    <a href="Pages/Services.html" class="card-link">View Services &rarr;</a>
+                    <a href="/Pages/Services.html" class="card-link">View Services &rarr;</a>
                 </div>
 
                 <div class="card">
@@ -514,13 +99,11 @@
         </section>
     </main>
 
-    <footer>
-        <div class="socials">
-            <a href="https://www.instagram.com/harish.cousal?igsh=dGh2Y3Zwb2hnaXFt" target="_blank">Instagram</a> | 
-            <a href="https://www.youtube.com/@tone-vault" target="_blank">YouTube</a>
-        </div>
-        <p>&copy; 2026 ToneVault by HC. All rights reserved.</p>
-    </footer>
+    <!-- UNIVERSAL FOOTER -->
+    <site-footer></site-footer>
+
+    <!-- UNIVERSAL HTML COMPONENT EDITOR -->
+    <script src="/components.js"></script>
 
 </body>
 </html>
