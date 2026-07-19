@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Listen | ToneVault</title>
-    <!-- Add your favicon link here -->
-	<link rel="icon" type="image/x-icon" href="../Images/favicon.ico">
+    
+    <!-- Universal Favicon -->
+    <link rel="icon" type="image/x-icon" href="/Images/favicon.ico">
+    
     <!-- Basic SEO -->
     <meta name="description" content="Listen to the latest releases, custom productions, and cinematic scores out of the ToneVault studio by Harish Cousal.">
     <meta name="keywords" content="ToneVault music, Harish Cousal tracks, EDM portfolio, cinematic music portfolio, stream ToneVault">
@@ -13,102 +15,19 @@
     <!-- Social Media Sharing (Open Graph) -->
     <meta property="og:title" content="Listen | ToneVault">
     <meta property="og:description" content="Enter the vault and hear the latest productions from Harish Cousal.">
-    <!-- Updated path to root/Images -->
     <meta property="og:image" content="https://tonevault.qd.je/Images/BackGround.jpg">
     <meta property="og:url" content="https://tonevault.qd.je/Pages/Listen.html">
     <meta name="twitter:card" content="summary_large_image">
     
-    <!-- Added FontAwesome for Premium Social Logos -->
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- UNIVERSAL DESIGN EDITOR -->
+    <link rel="stylesheet" href="/style.css">
+
+    <!-- Page-Specific Styles -->
     <style>
-        /* Base Styling & Global Parallax Background */
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            color: #f0f0f0;
-            scroll-behavior: smooth; 
-            overflow-x: hidden; 
-            /* Updated path to point to Images folder in root */
-            background-image: linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.9)), url('../Images/BackGround.jpg');
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-size: cover;
-            background-attachment: fixed; 
-        }
-        
-        a { text-decoration: none; color: #00d4ff; transition: color 0.3s; }
-        a:hover { color: #ffffff; }
-
-        /* ROUNDED FROSTED NAVIGATION BAR */
-        header {
-            position: fixed;
-            top: 20px; 
-            left: 50%;
-            transform: translateX(-50%); 
-            width: 98%; 
-            max-width: none; 
-            background-color: rgba(20, 20, 20, 0.3); 
-            backdrop-filter: blur(15px); 
-            -webkit-backdrop-filter: blur(15px); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-radius: 50px; 
-            z-index: 1000;
-            padding: 15px 40px; 
-            box-sizing: border-box;
-        }
-
-        .nav-container { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .logo { font-size: 1.5rem; font-weight: bold; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
-        .logo span { color: #00d4ff; }
-        nav ul { list-style: none; margin: 0; padding: 0; display: flex; gap: 40px; }
-        nav ul li a { color: #fff; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; transition: color 0.3s ease; }
-        nav ul li a:hover { color: #00d4ff; }
-
-        /* General Buttons */
-        .btn { padding: 15px 35px; font-size: 1rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; border-radius: 3px; cursor: pointer; transition: all 0.3s ease; text-align: center; display: inline-block; }
-        .btn-primary { background-color: #00d4ff; color: #000; border: none; }
-        .btn-primary:hover { background-color: #fff; color: #000; }
-        .btn-secondary { background-color: transparent; color: #fff; border: 2px solid #fff; }
-        .btn-secondary:hover { background-color: #fff; color: #000; }
-
-        /* NEW: Circular Icon Buttons for Logos */
-        .icon-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #fff;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-        }
-        .icon-btn:hover {
-            background-color: #00d4ff;
-            border-color: #00d4ff;
-            color: #000;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 212, 255, 0.4);
-        }
-
-        /* Glass Panels */
-        .glass-panel {
-            max-width: 1000px;
-            margin: 0 auto;
-            background-color: rgba(15, 15, 15, 0.75); 
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 24px; 
-            padding: 60px 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        /* UPDATED: Flex Layout to center the bottom row */
+        /* Flex Layout specifically to center the bottom row of tracks */
         .track-grid {
             display: flex;
             flex-wrap: wrap;
@@ -120,78 +39,25 @@
             margin-left: auto;
             margin-right: auto;
         }
-
-        .card {
-            width: 320px; 
-            max-width: 100%;
-            background-color: rgba(15, 15, 15, 0.75); 
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 20px; 
-            padding: 40px 30px;
-            transition: transform 0.3s, border-color 0.3s, background-color 0.3s;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: #00d4ff;
-            background-color: rgba(20, 20, 20, 0.85);
-        }
-
-        /* Footer */
-        footer { background-color: rgba(5, 5, 5, 0.95); backdrop-filter: blur(10px); padding: 40px 20px; text-align: center; border-top: 1px solid #222; }
-        footer p { color: #555; font-size: 0.9rem; margin-bottom: 15px; }
-        .socials a { margin: 0 15px; font-size: 1.2rem; color: #777; text-decoration: none; transition: color 0.3s; }
-        .socials a:hover { color: #00d4ff; }
-
-        /* Mobile Adjustments */
-        @media (max-width: 1024px) {
-            header { width: 95%; padding: 15px 30px; }
-            nav ul { gap: 20px; }
-            .glass-panel { padding: 40px 30px; }
-        }
-        @media (max-width: 768px) {
-            header { width: 92%; border-radius: 20px; padding: 20px; }
-            .nav-container { flex-direction: column; gap: 15px; }
-            nav ul { flex-wrap: wrap; justify-content: center; gap: 12px; }
-            nav ul li a { font-size: 0.75rem; }
-            .glass-panel, .card { padding: 30px 20px; }
-        }
     </style>
 </head>
 <body>
 
-    <!-- NAVIGATION HEADER -->
-    <header>
-        <div class="nav-container">
-            <a href="../index.html" class="logo">Tone<span>Vault</span></a>
-            <nav>
-                <ul>
-                    <li><a href="../index.html">Home</a></li>
-                    <li><a href="Listen.html">Listen</a></li>
-                    <li><a href="Services.html">Services</a></li>
-                    <li><a href="About & Contact.html">About & Contact</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+    <!-- UNIVERSAL HEADER -->
+    <site-header></site-header>
 
-    <main style="padding: 180px 20px 80px 20px; min-height: 65vh; text-align: center;">
+    <!-- PAGE CONTENT AREA -->
+    <main>
         
-        <!-- Page Header & Story Intro -->
-        <div style="margin-bottom: 80px; max-width: 800px; margin-left: auto; margin-right: auto;">
+        <!-- Page Header & Story Intro (using your preferred margins) -->
+        <div class="page-header" style="text-align: center; margin-top: 80px; margin-bottom: 100px; max-width: 800px; margin-left: auto; margin-right: auto;">
             <h1 style="font-size: 3rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; margin-top: 0; color: #fff;">The <span style="color: #00d4ff;">Vault</span></h1>
             <p style="color: #bbb; font-size: 1.1rem; line-height: 1.8;">
                 Every track here tells a story – from cinematic builds to bass-heavy drops. Crafted to move, scored to resonate. where every melody carries a piece of my soul and every beat speaks a language beyond words. 
             </p>
         </div>
 
-        <h2 style="font-size: 2rem; text-transform: uppercase; letter-spacing: 2px; margin-top: 40px; color: #fff;">Featured / Latest Releases</h2>
+        <h2 style="text-align: center; font-size: 2rem; text-transform: uppercase; letter-spacing: 2px; margin-top: 40px; color: #fff;">Featured / Latest Releases</h2>
         
         <!-- Center-Aligned Flex Grid -->
         <div class="track-grid">
@@ -264,8 +130,8 @@
 
         </div>
 
-        <!-- Full Playlist Section (Now uses logos) -->
-        <div class="glass-panel" style="margin-bottom: 40px; padding: 50px 30px;">
+        <!-- Full Playlist Section -->
+        <div class="glass-panel" style="margin-bottom: 40px; padding: 50px 30px; text-align: center;">
             <h2 style="font-size: 2rem; color: #fff; text-transform: uppercase; margin-bottom: 15px; margin-top: 0;">Full Playlist</h2>
             <p style="color: #bbb; margin-bottom: 30px; font-size: 1.1rem;">Dive into the vault – all my curated playlists are just a click away.</p>
             <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
@@ -275,8 +141,8 @@
             </div>
         </div>
 
-        <!-- Artist Page Section (Now uses logos) -->
-        <div class="glass-panel" style="margin-bottom: 60px; padding: 50px 30px;">
+        <!-- Artist Page Section -->
+        <div class="glass-panel" style="margin-bottom: 60px; padding: 50px 30px; text-align: center;">
             <h2 style="font-size: 2rem; color: #fff; text-transform: uppercase; margin-bottom: 15px; margin-top: 0;">Artist Page</h2>
             <p style="color: #bbb; margin-bottom: 30px; font-size: 1.1rem; max-width: 650px; margin-left: auto; margin-right: auto; line-height: 1.6;">
                 Tap into my sonic world – find all my artist links below, or simply search <strong>"Harish Cousal"</strong> on your favorite music platform to vibe with my latest drops.
@@ -290,14 +156,11 @@
 
     </main>
 
-    <!-- FOOTER -->
-    <footer>
-        <div class="socials">
-            <a href="https://www.instagram.com/harish.cousal?igsh=dGh2Y3Zwb2hnaXFt" target="_blank">Instagram</a> | 
-            <a href="https://www.youtube.com/@tone-vault" target="_blank">YouTube</a>
-        </div>
-        <p>&copy; 2026 ToneVault by HC. All rights reserved.</p>
-    </footer>
+    <!-- UNIVERSAL FOOTER -->
+    <site-footer></site-footer>
+
+    <!-- UNIVERSAL HTML COMPONENT EDITOR -->
+    <script src="/components.js"></script>
 
 </body>
 </html>
