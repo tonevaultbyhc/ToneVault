@@ -211,11 +211,11 @@ footer p { color: #555; font-size: 0.9rem; margin-bottom: 15px; }
     nav ul li a { font-size: 0.75rem; }
     
     /* Mobile Content Layouts */
-    main { padding-top: 160px; } /* Clears the tall mobile navbar */
+    main { padding-top: 120px; } /* Reduced from 160px to shrink the top gap */
     
-    .hero { margin-top: 0; min-height: 40vh; }
-    .hero-logo { max-width: 280px; margin-bottom: 20px; } /* Adds even space below logo */
-    .hero p { font-size: 1rem; padding: 0 10px; margin-top: 0; margin-bottom: 30px; } /* Removed the negative margin hack */
+    .hero { margin-top: 0; min-height: auto; }
+    .hero-logo { max-width: 280px; margin: 0 auto 25px auto; } /* 25px gap perfectly matches the top visual space */
+    .hero p { font-size: 1rem; padding: 0 10px; margin-top: 0; margin-bottom: 30px; }
     
     .featured-track { padding: 40px 15px; }
     .glass-panel { padding: 30px 20px; }
