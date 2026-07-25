@@ -27,22 +27,22 @@ a:hover {
 }
 
 /* =========================================
-   UNIVERSAL HEADER & NAVIGATION (Original Layout)
+   UNIVERSAL HEADER & NAVIGATION (Wide Reference Style)
 ========================================= */
 header {
     position: fixed; 
-    top: 20px; 
+    top: 15px; 
     left: 50%; 
     transform: translateX(-50%); 
-    width: 98%; 
+    width: 96%; 
     max-width: 1400px; 
-    background-color: rgba(20, 20, 20, 0.3); 
+    background-color: rgba(20, 20, 20, 0.4); 
     backdrop-filter: blur(15px); 
     -webkit-backdrop-filter: blur(15px); 
     border: 1px solid rgba(255, 255, 255, 0.1); 
-    border-radius: 50px; 
+    border-radius: 40px; 
     z-index: 1000; 
-    padding: 15px 40px; 
+    padding: 12px 35px; 
     box-sizing: border-box;
 }
 
@@ -53,7 +53,7 @@ header {
     width: 100%; 
 }
 .logo { 
-    font-size: 1.5rem; 
+    font-size: 1.4rem; 
     font-weight: bold; 
     color: #fff; 
     letter-spacing: 2px; 
@@ -67,11 +67,11 @@ nav ul {
     margin: 0; 
     padding: 0; 
     display: flex; 
-    gap: 40px; 
+    gap: 35px; 
 }
 nav ul li a { 
     color: #fff; 
-    font-size: 0.9rem; 
+    font-size: 0.85rem; 
     text-transform: uppercase; 
     letter-spacing: 1px; 
     font-weight: bold; 
@@ -126,7 +126,7 @@ nav ul li a:hover {
    GLOBAL GLASS PANELS & CARDS (Reduced Heights)
 ========================================= */
 main { 
-    padding: 100px 20px 40px 20px; 
+    padding: 95px 20px 40px 20px; 
     min-height: 60vh; 
 }
 
@@ -198,19 +198,19 @@ main {
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* =========================================
-   UNIVERSAL FOOTER (Header Width & Spaced)
+   UNIVERSAL FOOTER (Matching Header Width & Shape)
 ========================================= */
 footer {
     margin: 0 auto 30px auto;
-    width: 98%;
+    width: 96%;
     max-width: 1400px;
-    border-radius: 50px;
-    background: rgba(20, 20, 20, 0.3);
+    border-radius: 40px;
+    background: rgba(20, 20, 20, 0.4);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    padding: 20px 40px;
+    padding: 15px 35px;
     box-sizing: border-box;
     display: flex;
     justify-content: space-between;
@@ -223,7 +223,7 @@ footer {
 }
 
 .socials a { 
-    font-size: 0.9rem; 
+    font-size: 0.85rem; 
     color: #fff; 
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -246,7 +246,7 @@ footer p {
    MOBILE OPTIMIZATION (TABLETS & PHONES)
 ========================================= */
 @media (max-width: 1024px) {
-    header, footer { width: 95%; padding: 15px 30px; }
+    header, footer { width: 95%; padding: 12px 25px; }
     nav ul { gap: 20px; }
     .hero-logo { max-width: 380px; }
     .glass-panel { padding: 30px 20px; }
@@ -274,18 +274,17 @@ footer p {
     header, footer { 
         width: 92%; 
         border-radius: 20px; 
-        padding: 20px; 
+        padding: 15px 20px; 
         flex-direction: column;
-        gap: 15px;
+        gap: 12px;
         text-align: center;
     }
-    .nav-container { flex-direction: column; gap: 15px; }
+    .nav-container { flex-direction: column; gap: 12px; }
     nav ul { flex-wrap: wrap; justify-content: center; gap: 12px; }
     nav ul li a { font-size: 0.75rem; }
     
     .socials {
         justify-content: center;
-        margin-bottom: 5px; /* Creates extra gap between socials and copyright on mobile */
     }
 
     main { padding-top: 130px; }
