@@ -10,7 +10,6 @@ body, html {
     overflow-x: hidden; 
     
     /* UNIVERSAL BACKGROUND IMAGE */
-    /* Starting with a slash '/' ensures it works on all pages (index, Listen, Services, etc.) */
     background-image: linear-gradient(rgba(10, 10, 10, 0.7), rgba(10, 10, 10, 0.9)), url('/Images/BackGround.jpg');
     background-repeat: no-repeat; 
     background-position: center center;
@@ -99,10 +98,10 @@ nav ul li a:hover { color: #00d4ff; }
 /* =========================================
    GLOBAL GLASS PANELS & CARDS
 ========================================= */
-main { padding: 110px 20px 80px 20px; min-height: 65vh; } /* Clean, normal breathing room from the nav bar */
+main { padding: 110px 20px 80px 20px; min-height: 65vh; }
 
 .hero { margin-top: 0; text-align: center; } 
-.hero-logo { max-width: 500px; width: 100%; margin: 0 auto 25px auto; display: block; } /* No more negative margins! */
+.hero-logo { max-width: 500px; width: 100%; margin: 0 auto 25px auto; display: block; } 
 .hero p { font-size: 1.2rem; color: #b0b0b0; max-width: 600px; margin: 0 auto 35px auto; text-align: center; line-height: 1.6; }
 
 .featured-track { padding: 60px 20px; text-align: center; }
@@ -124,7 +123,7 @@ main { padding: 110px 20px 80px 20px; min-height: 65vh; } /* Clean, normal breat
     border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 20px; padding: 40px 30px; 
     transition: transform 0.3s, border-color 0.3s; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); 
     display: flex; flex-direction: column; justify-content: space-between;
-    text-align: center; /* <--- ADDED HERE */
+    text-align: center; 
 }
 .card:hover { transform: translateY(-5px); border-color: #00d4ff; background-color: rgba(20, 20, 20, 0.85); }
 .icon { font-size: 2.5rem; margin-bottom: 20px; }
@@ -169,29 +168,16 @@ main { padding: 110px 20px 80px 20px; min-height: 65vh; } /* Clean, normal breat
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* =========================================
-   UNIVERSAL FOOTER
-========================================= */
-footer { background-color: rgba(5, 5, 5, 0.95); padding: 40px 20px; text-align: center; border-top: 1px solid #222; }
-footer p { color: #555; font-size: 0.9rem; margin-bottom: 15px; }
-.socials a { margin: 0 15px; font-size: 1.2rem; color: #777; text-decoration: none; transition: color 0.3s; }
-.socials a:hover { color: #00d4ff; }
-
-/* =========================================
-   UNIVERSAL FOOTER
+   UNIVERSAL FOOTER (Glassmorphic & Rounded)
 ========================================= */
 footer {
-    /* Floating rounded glass panel layout */
     margin: 0 auto 40px auto;
     max-width: 1000px;
     width: 90%;
     border-radius: 20px;
-    
-    /* Frosted glass styling */
     background: rgba(20, 20, 20, 0.65);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    
-    /* Borders and spacing */
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     padding: 35px 20px;
@@ -217,15 +203,42 @@ footer p {
 .socials a:hover { 
     color: #00d4ff; 
 }
+
+/* =========================================
+   MOBILE OPTIMIZATION (TABLETS & PHONES)
+========================================= */
+@media (max-width: 1024px) {
+    header { width: 95%; padding: 15px 30px; }
+    nav ul { gap: 20px; }
+    .hero-logo { max-width: 400px; }
+    .glass-panel { padding: 40px 30px; }
+    .split-layout { grid-template-columns: 1fr; gap: 30px; }
+}
+
+@media (max-width: 768px) {
+    .btn-container { 
+        flex-direction: column; 
+        width: 100%; 
+        padding: 0 20px; 
+        box-sizing: border-box; 
+    }
+    .btn { 
+        width: 100%; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        text-align: center; 
+        box-sizing: border-box; 
+        margin-bottom: 15px; 
+        padding: 15px; 
+    }
     
-    /* Mobile Header */
     header { width: 92%; border-radius: 20px; padding: 20px; }
     .nav-container { flex-direction: column; gap: 15px; }
     nav ul { flex-wrap: wrap; justify-content: center; gap: 12px; }
     nav ul li a { font-size: 0.75rem; }
     
-    /* Mobile Content Layouts */
-    main { padding-top: 150px; } /* Increased from 110px to clear the taller mobile navbar */
+    main { padding-top: 150px; }
     
     .hero { margin-top: 0; min-height: auto; }
     .hero-logo { max-width: 280px; margin: 0 auto 20px auto; }
