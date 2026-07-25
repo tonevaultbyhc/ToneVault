@@ -10,19 +10,12 @@
     <!-- UNIVERSAL DESIGN EDITOR -->
     <link rel="stylesheet" href="/style.css">
 
-    <!-- Page-Specific Styles -->
+    <!-- Page-Specific Styles for Uniform Cards -->
     <style>
-        /* Flex Layout specifically to center the bottom row of tracks */
-        .track-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 30px;
-            margin-top: 40px;
-            margin-bottom: 80px;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
+        /* Ensures odd-numbered cards in a grid don't stretch */
+        .hub .grid .card {
+            width: 100%;
+            box-sizing: border-box;
         }
     </style>
 </head>
@@ -34,7 +27,7 @@
     <!-- PAGE CONTENT AREA -->
     <main>
         
-        <!-- Page Header & Story Intro (using your preferred margins) -->
+        <!-- Page Header & Story Intro -->
         <div class="page-header" style="text-align: center; margin-top: 80px; margin-bottom: 100px; max-width: 800px; margin-left: auto; margin-right: auto;">
             <h1 style="font-size: 3rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; margin-top: 0; color: #fff;">The <span style="color: #00d4ff;">Vault</span></h1>
             <p style="color: #bbb; font-size: 1.1rem; line-height: 1.8;">
@@ -44,75 +37,76 @@
 
         <h2 style="text-align: center; font-size: 2rem; text-transform: uppercase; letter-spacing: 2px; margin-top: 40px; color: #fff;">Featured / Latest Releases</h2>
         
-        <!-- Center-Aligned Flex Grid -->
-        <div class="track-grid">
-            
-            <!-- Track 1 -->
-            <div class="card">
-                <div>
-                    <h3 style="color: #00d4ff; margin-top: 0; font-size: 1.6rem; text-transform: uppercase;">"Messed Up"</h3>
-                    <p style="font-size: 0.95rem; margin-bottom: 30px; font-style: italic;">Emotional EDM with orchestral depth, echoing heartbreak and healing.</p>
+        <!-- Uniform Grid Container -->
+        <div class="hub" style="padding-top: 40px; padding-bottom: 60px;">
+            <div class="grid">
+                
+                <!-- Track 1 -->
+                <div class="card">
+                    <div>
+                        <h3 style="color: #00d4ff; margin-top: 0; font-size: 1.6rem; text-transform: uppercase;">"Messed Up"</h3>
+                        <p style="font-size: 0.95rem; margin-bottom: 30px; font-style: italic;">Emotional EDM with orchestral depth, echoing heartbreak and healing.</p>
+                    </div>
+                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <a href="https://open.spotify.com/track/0U0j66O5l7z4f9Bp0r4Z6B?si=d3968cfd21d44cbe" target="_blank" class="icon-btn" title="Spotify"><i class="fa-brands fa-spotify"></i></a>
+                        <a href="https://music.youtube.com/watch?v=v6RgvfohugI&si=0p6ALe67_QsJSzxi" target="_blank" class="icon-btn" title="YouTube Music"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="https://music.amazon.in/tracks/B0D1CL322Q?marketplaceId=A21TJRUUN4KGV&musicTerritory=IN&ref=dm_sh_T5MjMUCmC3yEj1pDzvRL0T6yf" target="_blank" class="icon-btn" title="Amazon Music"><i class="fa-brands fa-amazon"></i></a>
+                    </div>
                 </div>
-                <!-- Circular Icon Buttons -->
-                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <a href="https://open.spotify.com/track/0U0j66O5l7z4f9Bp0r4Z6B?si=d3968cfd21d44cbe" target="_blank" class="icon-btn" title="Spotify"><i class="fa-brands fa-spotify"></i></a>
-                    <a href="https://music.youtube.com/watch?v=v6RgvfohugI&si=0p6ALe67_QsJSzxi" target="_blank" class="icon-btn" title="YouTube Music"><i class="fa-brands fa-youtube"></i></a>
-                    <a href="https://music.amazon.in/tracks/B0D1CL322Q?marketplaceId=A21TJRUUN4KGV&musicTerritory=IN&ref=dm_sh_T5MjMUCmC3yEj1pDzvRL0T6yf" target="_blank" class="icon-btn" title="Amazon Music"><i class="fa-brands fa-amazon"></i></a>
-                </div>
-            </div>
 
-            <!-- Track 2 -->
-            <div class="card">
-                <div>
-                    <h3 style="color: #00d4ff; margin-top: 0; font-size: 1.6rem; text-transform: uppercase;">"Fall Again"</h3>
-                    <p style="font-size: 0.95rem; margin-bottom: 30px; font-style: italic;">A euphoric pop-EDM ride through the rush of falling in love.</p>
+                <!-- Track 2 -->
+                <div class="card">
+                    <div>
+                        <h3 style="color: #00d4ff; margin-top: 0; font-size: 1.6rem; text-transform: uppercase;">"Fall Again"</h3>
+                        <p style="font-size: 0.95rem; margin-bottom: 30px; font-style: italic;">A euphoric pop-EDM ride through the rush of falling in love.</p>
+                    </div>
+                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <a href="https://open.spotify.com/track/1SOM6fiiguui0zqmewIhqP?si=978e983232f74c46" target="_blank" class="icon-btn" title="Spotify"><i class="fa-brands fa-spotify"></i></a>
+                        <a href="https://music.youtube.com/watch?v=hkT_ev5iBLk&si=wRgLcBh8TcoVdNa2" target="_blank" class="icon-btn" title="YouTube Music"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="https://music.amazon.in/tracks/B0D1VRD5KV?marketplaceId=A21TJRUUN4KGV&musicTerritory=IN&ref=dm_sh_0ZchYiUGm66srRcrvNsi5Z4HZ" target="_blank" class="icon-btn" title="Amazon Music"><i class="fa-brands fa-amazon"></i></a>
+                    </div>
                 </div>
-                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <a href="https://open.spotify.com/track/1SOM6fiiguui0zqmewIhqP?si=978e983232f74c46" target="_blank" class="icon-btn" title="Spotify"><i class="fa-brands fa-spotify"></i></a>
-                    <a href="https://music.youtube.com/watch?v=hkT_ev5iBLk&si=wRgLcBh8TcoVdNa2" target="_blank" class="icon-btn" title="YouTube Music"><i class="fa-brands fa-youtube"></i></a>
-                    <a href="https://music.amazon.in/tracks/B0D1VRD5KV?marketplaceId=A21TJRUUN4KGV&musicTerritory=IN&ref=dm_sh_0ZchYiUGm66srRcrvNsi5Z4HZ" target="_blank" class="icon-btn" title="Amazon Music"><i class="fa-brands fa-amazon"></i></a>
-                </div>
-            </div>
 
-            <!-- Track 3 -->
-            <div class="card">
-                <div>
-                    <h3 style="color: #00d4ff; margin-top: 0; font-size: 1.6rem; text-transform: uppercase;">"She is a Warrior"</h3>
-                    <p style="font-size: 0.95rem; margin-bottom: 30px; font-style: italic;">A bold, cinematic anthem for the fierce and fearless.</p>
+                <!-- Track 3 -->
+                <div class="card">
+                    <div>
+                        <h3 style="color: #00d4ff; margin-top: 0; font-size: 1.6rem; text-transform: uppercase;">"She is a Warrior"</h3>
+                        <p style="font-size: 0.95rem; margin-bottom: 30px; font-style: italic;">A bold, cinematic anthem for the fierce and fearless.</p>
+                    </div>
+                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <a href="https://open.spotify.com/track/35fUQtLwDxlpMifxOKSaMd?si=3e24acb9aa554c77" target="_blank" class="icon-btn" title="Spotify"><i class="fa-brands fa-spotify"></i></a>
+                        <a href="https://music.youtube.com/watch?v=01B4ToM-ems&si=Q8Laq9pQbDKPwmne" target="_blank" class="icon-btn" title="YouTube Music"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="https://music.amazon.in/tracks/B0D1GSVDNW?marketplaceId=A21TJRUUN4KGV&musicTerritory=IN&ref=dm_sh_pdoA9IDeczYlV9dZp9hqGZn1G" target="_blank" class="icon-btn" title="Amazon Music"><i class="fa-brands fa-amazon"></i></a>
+                    </div>
                 </div>
-                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <a href="https://open.spotify.com/track/35fUQtLwDxlpMifxOKSaMd?si=3e24acb9aa554c77" target="_blank" class="icon-btn" title="Spotify"><i class="fa-brands fa-spotify"></i></a>
-                    <a href="https://music.youtube.com/watch?v=01B4ToM-ems&si=Q8Laq9pQbDKPwmne" target="_blank" class="icon-btn" title="YouTube Music"><i class="fa-brands fa-youtube"></i></a>
-                    <a href="https://music.amazon.in/tracks/B0D1GSVDNW?marketplaceId=A21TJRUUN4KGV&musicTerritory=IN&ref=dm_sh_pdoA9IDeczYlV9dZp9hqGZn1G" target="_blank" class="icon-btn" title="Amazon Music"><i class="fa-brands fa-amazon"></i></a>
-                </div>
-            </div>
 
-            <!-- Track 4 -->
-            <div class="card">
-                <div>
-                    <h3 style="color: #00d4ff; margin-top: 0; font-size: 1.6rem; text-transform: uppercase;">"Reborn"</h3>
-                    <p style="font-size: 0.95rem; margin-bottom: 30px; font-style: italic;">An uplifting blend of synths and strings capturing the spark of starting over.</p>
+                <!-- Track 4 -->
+                <div class="card">
+                    <div>
+                        <h3 style="color: #00d4ff; margin-top: 0; font-size: 1.6rem; text-transform: uppercase;">"Reborn"</h3>
+                        <p style="font-size: 0.95rem; margin-bottom: 30px; font-style: italic;">An uplifting blend of synths and strings capturing the spark of starting over.</p>
+                    </div>
+                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <a href="https://open.spotify.com/track/3nsCtJLcMDa3zQknS3GSlV?si=b0c070958d8b4881" target="_blank" class="icon-btn" title="Spotify"><i class="fa-brands fa-spotify"></i></a>
+                        <a href="https://music.youtube.com/watch?v=okWWDEX5pdo&si=CqnncAqeXM63fH3P" target="_blank" class="icon-btn" title="YouTube Music"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="https://music.amazon.in/tracks/B0D1CJWP28?marketplaceId=A21TJRUUN4KGV&musicTerritory=IN&ref=dm_sh_fLQP9PtscQ9kiSQJrS8pv6OeW" target="_blank" class="icon-btn" title="Amazon Music"><i class="fa-brands fa-amazon"></i></a>
+                    </div>
                 </div>
-                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <a href="https://open.spotify.com/track/3nsCtJLcMDa3zQknS3GSlV?si=b0c070958d8b4881" target="_blank" class="icon-btn" title="Spotify"><i class="fa-brands fa-spotify"></i></a>
-                    <a href="https://music.youtube.com/watch?v=okWWDEX5pdo&si=CqnncAqeXM63fH3P" target="_blank" class="icon-btn" title="YouTube Music"><i class="fa-brands fa-youtube"></i></a>
-                    <a href="https://music.amazon.in/tracks/B0D1CJWP28?marketplaceId=A21TJRUUN4KGV&musicTerritory=IN&ref=dm_sh_fLQP9PtscQ9kiSQJrS8pv6OeW" target="_blank" class="icon-btn" title="Amazon Music"><i class="fa-brands fa-amazon"></i></a>
-                </div>
-            </div>
 
-            <!-- Track 5 -->
-            <div class="card">
-                <div>
-                    <h3 style="color: #00d4ff; margin-top: 0; font-size: 1.6rem; text-transform: uppercase;">"On a Sunday"</h3>
-                    <p style="font-size: 0.95rem; margin-bottom: 30px; font-style: italic;">High-energy club vibes wrapped in weekend nostalgia.</p>
+                <!-- Track 5 -->
+                <div class="card">
+                    <div>
+                        <h3 style="color: #00d4ff; margin-top: 0; font-size: 1.6rem; text-transform: uppercase;">"On a Sunday"</h3>
+                        <p style="font-size: 0.95rem; margin-bottom: 30px; font-style: italic;">High-energy club vibes wrapped in weekend nostalgia.</p>
+                    </div>
+                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <a href="https://open.spotify.com/track/6B6goYUzkaficliMgO1wSS?si=e6c68659cb7041fe" target="_blank" class="icon-btn" title="Spotify"><i class="fa-brands fa-spotify"></i></a>
+                        <a href="https://music.youtube.com/watch?v=oTgwHmTDOXg&si=m5R-52dU44CG2XB-" target="_blank" class="icon-btn" title="YouTube Music"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="https://music.amazon.in/tracks/B07DWNHCZM?marketplaceId=A21TJRUUN4KGV&musicTerritory=IN&ref=dm_sh_rxdJ0d17NHrAVD1gxQZOmGmmP" target="_blank" class="icon-btn" title="Amazon Music"><i class="fa-brands fa-amazon"></i></a>
+                    </div>
                 </div>
-                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                    <a href="https://open.spotify.com/track/6B6goYUzkaficliMgO1wSS?si=e6c68659cb7041fe" target="_blank" class="icon-btn" title="Spotify"><i class="fa-brands fa-spotify"></i></a>
-                    <a href="https://music.youtube.com/watch?v=oTgwHmTDOXg&si=m5R-52dU44CG2XB-" target="_blank" class="icon-btn" title="YouTube Music"><i class="fa-brands fa-youtube"></i></a>
-                    <a href="https://music.amazon.in/tracks/B07DWNHCZM?marketplaceId=A21TJRUUN4KGV&musicTerritory=IN&ref=dm_sh_rxdJ0d17NHrAVD1gxQZOmGmmP" target="_blank" class="icon-btn" title="Amazon Music"><i class="fa-brands fa-amazon"></i></a>
-                </div>
-            </div>
 
+            </div>
         </div>
 
         <!-- Full Playlist Section -->
