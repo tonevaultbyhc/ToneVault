@@ -29,13 +29,6 @@ class SiteFooter extends HTMLElement {
                     <a href="https://www.instagram.com/harish.cousal" target="_blank">Instagram</a>
                     <a href="https://www.youtube.com/@tone-vault" target="_blank">YouTube</a>
                 </div>
-                
-                <div class="footer-links">
-                    <a href="/">Home</a>
-                    <a href="/Pages/Listen.html">Listen</a>
-                    <a href="/Pages/Services.html">Services</a>
-                    <a href="/Pages/About & Contact.html">About & Contact</a>
-                </div>
 
                 <p>&copy; 2026 ToneVault by HC. All rights reserved.</p>
             </footer>
