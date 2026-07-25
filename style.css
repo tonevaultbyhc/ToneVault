@@ -177,34 +177,46 @@ footer p { color: #555; font-size: 0.9rem; margin-bottom: 15px; }
 .socials a:hover { color: #00d4ff; }
 
 /* =========================================
-   MOBILE OPTIMIZATION (TABLETS & PHONES)
+   UNIVERSAL FOOTER
 ========================================= */
-@media (max-width: 1024px) {
-    header { width: 95%; padding: 15px 30px; }
-    nav ul { gap: 20px; }
-    .hero-logo { max-width: 400px; }
-    .glass-panel { padding: 40px 30px; }
-    .split-layout { grid-template-columns: 1fr; gap: 30px; }
+footer {
+    /* Floating rounded glass panel layout */
+    margin: 0 auto 40px auto;
+    max-width: 1000px;
+    width: 90%;
+    border-radius: 20px;
+    
+    /* Frosted glass styling */
+    background: rgba(20, 20, 20, 0.65);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    
+    /* Borders and spacing */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    padding: 35px 20px;
+    text-align: center;
+    box-sizing: border-box;
 }
 
-@media (max-width: 768px) {
-    /* Mobile Buttons Fixed (Centered + Contained) */
-    .btn-container { 
-        flex-direction: column; 
-        width: 100%; 
-        padding: 0 20px; 
-        box-sizing: border-box; 
-    }
-    .btn { 
-        width: 100%; 
-        display: flex; 
-        justify-content: center; 
-        align-items: center; 
-        text-align: center; 
-        box-sizing: border-box; 
-        margin-bottom: 15px; 
-        padding: 15px; /* Overrides the 35px side padding */
-    }
+footer p { 
+    color: #bbb; 
+    font-size: 0.9rem; 
+    margin-top: 0;
+    margin-bottom: 15px; 
+}
+
+.socials a { 
+    margin: 0 15px; 
+    font-size: 1.2rem; 
+    color: #777; 
+    text-decoration: none; 
+    transition: color 0.3s; 
+}
+
+.socials a:hover { 
+    color: #00d4ff; 
+}
     
     /* Mobile Header */
     header { width: 92%; border-radius: 20px; padding: 20px; }
