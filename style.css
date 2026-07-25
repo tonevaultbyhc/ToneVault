@@ -27,22 +27,22 @@ a:hover {
 }
 
 /* =========================================
-   UNIVERSAL HEADER & NAVIGATION (Wide Reference Style)
+   UNIVERSAL HEADER & NAVIGATION (Wide Spanning)
 ========================================= */
 header {
     position: fixed; 
     top: 15px; 
     left: 50%; 
     transform: translateX(-50%); 
-    width: 96%; 
-    max-width: 1400px; 
+    width: 98%; 
+    max-width: none; 
     background-color: rgba(20, 20, 20, 0.4); 
     backdrop-filter: blur(15px); 
     -webkit-backdrop-filter: blur(15px); 
     border: 1px solid rgba(255, 255, 255, 0.1); 
     border-radius: 40px; 
     z-index: 1000; 
-    padding: 12px 35px; 
+    padding: 12px 40px; 
     box-sizing: border-box;
 }
 
@@ -198,19 +198,19 @@ main {
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
 /* =========================================
-   UNIVERSAL FOOTER (Matching Header Width & Shape)
+   UNIVERSAL FOOTER (Wide Spanning, Matching Header)
 ========================================= */
 footer {
     margin: 0 auto 30px auto;
-    width: 96%;
-    max-width: 1400px;
+    width: 98%;
+    max-width: none;
     border-radius: 40px;
     background: rgba(20, 20, 20, 0.4);
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    padding: 15px 35px;
+    padding: 15px 40px;
     box-sizing: border-box;
     display: flex;
     justify-content: space-between;
@@ -246,7 +246,7 @@ footer p {
    MOBILE OPTIMIZATION (TABLETS & PHONES)
 ========================================= */
 @media (max-width: 1024px) {
-    header, footer { width: 95%; padding: 12px 25px; }
+    header, footer { width: 95%; padding: 12px 25px; max-width: none; }
     nav ul { gap: 20px; }
     .hero-logo { max-width: 380px; }
     .glass-panel { padding: 30px 20px; }
@@ -278,6 +278,7 @@ footer p {
         flex-direction: column;
         gap: 12px;
         text-align: center;
+        max-width: none;
     }
     .nav-container { flex-direction: column; gap: 12px; }
     nav ul { flex-wrap: wrap; justify-content: center; gap: 12px; }
