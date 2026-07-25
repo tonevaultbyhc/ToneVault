@@ -26,8 +26,8 @@ class SiteFooter extends HTMLElement {
         this.innerHTML = `
             <footer>
                 <div class="socials" style="display: flex; gap: 15px;">
-                    <a href="https://www.instagram.com/harish.cousal" target="_blank" class="icon-btn" title="Instagram"><i class="fa-brands fa-instagram"></i></a>
-                    <a href="https://www.youtube.com/@tone-vault" target="_blank" class="icon-btn" title="YouTube"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="https://www.instagram.com/harish.cousal" target="_blank" class="footer-btn"><i class="fa-brands fa-instagram"></i> Instagram</a>
+                    <a href="https://www.youtube.com/@tone-vault" target="_blank" class="footer-btn"><i class="fa-brands fa-youtube"></i> YouTube</a>
                 </div>
 
                 <p>&copy; 2026 ToneVault by HC. All rights reserved.</p>
