@@ -10,12 +10,19 @@
     <!-- UNIVERSAL DESIGN EDITOR -->
     <link rel="stylesheet" href="/style.css">
 
-    <!-- Page-Specific Styles for Uniform Cards -->
+    <!-- Page-Specific Styles for Centered Bottom Row -->
     <style>
-        /* Ensures odd-numbered cards in a grid don't stretch */
-        .hub .grid .card {
-            width: 100%;
-            box-sizing: border-box;
+        .centered-track-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .centered-track-grid .card {
+            flex: 1 1 300px;
+            max-width: 350px;
         }
     </style>
 </head>
@@ -37,9 +44,9 @@
 
         <h2 style="text-align: center; font-size: 2rem; text-transform: uppercase; letter-spacing: 2px; margin-top: 40px; color: #fff;">Featured / Latest Releases</h2>
         
-        <!-- Uniform Grid Container -->
+        <!-- Centered Flex Grid Container -->
         <div class="hub" style="padding-top: 40px; padding-bottom: 60px;">
-            <div class="grid">
+            <div class="centered-track-grid">
                 
                 <!-- Track 1 -->
                 <div class="card">
