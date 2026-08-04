@@ -10,6 +10,12 @@ class SiteHeader extends HTMLElement {
                         <ul>
                             <li><a href="/">Home</a></li>
                             <li><a href="/Pages/Listen.html">Listen</a></li>
+                            <li class="dropdown">
+                                <a href="#" class="drop-btn">AI Tools <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; margin-left: 4px;"></i></a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="/AI Tools/Audio 2 MIDI.html">Audio 2 MIDI</a></li>
+                                </ul>
+                            </li>
                             <li><a href="/Pages/Services.html">Services</a></li>
                             <li><a href="/Pages/About & Contact.html">About & Contact</a></li>
                         </ul>
@@ -44,7 +50,6 @@ customElements.define('site-footer', SiteFooter);
 document.addEventListener("DOMContentLoaded", function() {
     const path = window.location.pathname;
 
-    // Define page-specific configurations
     let pageTitle = "ToneVault | The Sonic Lab";
     let pageDescription = "ToneVault is the sonic laboratory of Harish Cousal. Professional music production blending hard-hitting electronic drops with cinematic orchestral arrangements.";
     let ogUrl = "https://tonevault.qd.je" + path;
@@ -55,34 +60,32 @@ document.addEventListener("DOMContentLoaded", function() {
     } else if (path.includes("Services.html")) {
         pageTitle = "Services | ToneVault";
         pageDescription = "Explore custom music production, mixing, mastering, and scoring services by Harish Cousal.";
+    } else if (path.includes("Audio 2 MIDI")) {
+        pageTitle = "Audio 2 MIDI | ToneVault";
+        pageDescription = "Extract polyphonic MIDI sequences directly from audio tracks using our browser-based AI tool.";
     } else if (path.includes("About")) {
         pageTitle = "About & Contact | ToneVault";
         pageDescription = "Get in touch with Harish Cousal for collaborations, custom beats, and project inquiries.";
     }
 
-    // Set the dynamic title
     document.title = pageTitle;
 
-    // Define all global and page-aware meta tags
     const metaTags = [
         { charset: "UTF-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1.0" },
         { name: "description", content: pageDescription },
-        { name: "keywords", content: "Harish Cousal, ToneVault, music producer, EDM producer, cinematic scoring, custom beats, mixing and mastering" },
+        { name: "keywords", content: "Harish Cousal, ToneVault, music producer, EDM producer, cinematic scoring, custom beats, mixing and mastering, audio to midi" },
         { name: "author", content: "Harish Cousal" },
         
-        // Open Graph / Social Media Preview (WhatsApp, Facebook, etc.)
         { property: "og:title", content: pageTitle },
         { property: "og:description", content: pageDescription },
         { property: "og:image", content: "https://tonevault.qd.je/Images/Logo with text.png" },
         { property: "og:url", content: ogUrl },
         { property: "og:type", content: "website" },
         
-        // Twitter Card
         { name: "twitter:card", content: "summary_large_image" }
     ];
 
-    // Inject meta tags dynamically into head
     metaTags.forEach(tagData => {
         let meta = document.createElement('meta');
         for (let key in tagData) {
@@ -91,7 +94,6 @@ document.addEventListener("DOMContentLoaded", function() {
         document.head.appendChild(meta);
     });
 
-    // Inject Favicon dynamically
     let favicon = document.createElement('link');
     favicon.rel = "icon";
     favicon.type = "image/x-icon";
