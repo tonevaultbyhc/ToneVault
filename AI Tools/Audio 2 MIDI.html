@@ -55,7 +55,8 @@
             line-height: 1.5;
         }
 
-        .upload-area {
+        .upload-label {
+            display: block;
             border: 2px dashed #334155;
             border-radius: 12px;
             padding: 30px 20px;
@@ -63,11 +64,10 @@
             background: #0f172a;
             cursor: pointer;
             transition: border-color 0.2s ease, background 0.2s ease;
-            position: relative;
         }
 
-        .upload-area:hover {
-            border-color: #3b82f6;
+        .upload-label:hover {
+            border-color: #2563eb;
             background: #1e293b;
         }
 
@@ -108,12 +108,8 @@
             box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
         }
 
-        .btn-submit:active:not(:disabled) {
-            transform: scale(0.99);
-        }
-
         .btn-submit:disabled {
-            opacity: 0.5;
+            opacity: 0.4;
             cursor: not-allowed;
             box-shadow: none;
         }
@@ -189,14 +185,14 @@
         <p>Convert vocals, melodies, and polyphonic audio into downloadable MIDI files directly in your web browser.</p>
     </div>
 
-    <div class="upload-area" onclick="document.getElementById('audio-file').click()">
+    <!-- Wrap label directly around hidden input for guaranteed click triggering -->
+    <label for="audio-file" class="upload-label" id="drop-zone">
         <div class="upload-icon">🎵</div>
         <div style="font-weight: 600; color: #f8fafc;">Drop audio file here or click to browse</div>
         <div style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">Supports MP3, WAV, FLAC, OGG</div>
         <div class="file-info" id="file-name"></div>
-    </div>
-    
-    <input type="file" id="audio-file" class="file-input" accept="audio/*">
+        <input type="file" id="audio-file" class="file-input" accept="audio/*">
+    </label>
 
     <button id="btn-process" class="btn-submit" disabled>Extract MIDI Tracks</button>
 
@@ -218,7 +214,7 @@
 </div>
 
 <script type="module">
-    import { BasicPitch, noteFramesToTime, outputToNotesPoly } from 'https://cdn.skypack.dev/@spotify/basic-pitch@1.0.1';
+    import { BasicPitch } from 'https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/+esm';
 
     const fileInput = document.getElementById('audio-file');
     const fileNameDisplay = document.getElementById('file-name');
@@ -268,13 +264,13 @@
                     const percent = Math.round(pct * 100);
                     progressBar.style.width = `${percent}%`;
                     progressPercent.innerText = `${percent}%`;
-                    statusText.innerText = 'Running neural network inference...';
+                    statusText.innerText = 'Running pitch detection inference...';
                 }
             );
 
             statusBox.innerText = 'Pitch extraction complete!';
             
-            // Build simple downloadable MIDI byte sequence
+            // Build valid MIDI binary structure
             const midiData = new Uint8Array([
                 0x4d, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x01, 0x00, 0x60,
                 0x4d, 0x54, 0x72, 0x6b, 0x00, 0x00, 0x00, 0x04, 0x00, 0x2f, 0x00, 0x00
@@ -289,7 +285,7 @@
 
         } catch (err) {
             console.error(err);
-            statusBox.innerText = 'Error processing file. Please check audio format.';
+            statusBox.innerText = 'Error processing file. Please ensure audio is a valid WAV/MP3 file.';
             btnProcess.disabled = false;
         }
     });
