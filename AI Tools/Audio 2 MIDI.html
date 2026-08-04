@@ -3,61 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToneVault - Audio 2 MIDI</title>
-    <link rel="icon" href="https://tonevault.qd.je/Images/favicon.ico" type="image/x-icon">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <!-- TensorFlow.js Engine -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+
+    <!-- UNIVERSAL DESIGN EDITOR -->
+    <link rel="stylesheet" href="/style.css">
+
+    <!-- Tool-Specific Styles Merged with ToneVault Glass Theme -->
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-        }
-
-        body {
-            background-color: #0a0a0a;
-            background-image: linear-gradient(rgba(10, 10, 10, 0.75), rgba(10, 10, 10, 0.95)), url('https://tonevault.qd.je/Images/BackGround.jpg');
-            background-repeat: no-repeat;
-            background-position: center center;
-            background-size: cover;
-            background-attachment: fixed;
-            color: #f0f0f0;
-            min-height: 100vh;
-            padding: 30px 20px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .main-wrapper {
-            width: 100%;
+        .tool-wrapper {
             max-width: 1200px;
-        }
-
-        /* Header Styling */
-        .header {
-            text-align: center;
-            margin-top: 10px;
-            margin-bottom: 40px;
-        }
-
-        .header h1 {
-            font-size: 2.8rem;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #ffffff;
+            margin: 40px auto;
+            padding: 0 20px;
         }
 
         .cyan-text { color: #00d4ff; }
-
-        .header p {
-            color: #bbb;
-            font-size: 1.1rem;
-            max-width: 650px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
 
         /* 2-Column Grid Layout */
         .grid-container {
@@ -68,32 +32,6 @@
 
         @media (max-width: 900px) {
             .grid-container { grid-template-columns: 1fr; }
-        }
-
-        /* Glass Cards */
-        .glass-card {
-            background-color: rgba(15, 15, 15, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 18px;
-            padding: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-            margin-bottom: 24px;
-        }
-
-        .glass-card:hover {
-            border-color: #00d4ff;
-            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.15);
-        }
-
-        h3 {
-            color: #ffffff;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            font-size: 1.1rem;
-            margin-bottom: 16px;
         }
 
         /* Upload Area */
@@ -241,233 +179,237 @@
             transform: translateY(-2px);
         }
 
-        /* Plain Floating Footer Credits */
-        .footer-credits {
-            margin-top: 35px;
+        .tool-engine-credit {
+            margin-top: 25px;
             text-align: center;
             font-size: 0.85rem;
             color: #888;
         }
-
-        .footer-link {
+        
+        .tool-engine-link {
             color: #ccc;
             text-decoration: none;
             transition: color 0.2s ease;
         }
-
-        .footer-link:hover {
+        
+        .tool-engine-link:hover {
             color: #00d4ff;
             text-decoration: underline;
         }
-
-        .brand-link {
-            color: #00d4ff;
-            font-weight: bold;
-            text-decoration: none;
-            transition: all 0.2s ease;
-        }
-
-        .brand-link:hover { color: #ffffff; }
     </style>
 </head>
 <body>
 
-<div class="main-wrapper">
-    <div class="header">
-        <h1>Audio 2 <span class="cyan-text">MIDI Extractor</span></h1>
-        <p>Upload any audio track to run polyphonic pitch detection and extract club-ready MIDI sequences.</p>
-    </div>
+    <!-- UNIVERSAL HEADER -->
+    <site-header></site-header>
 
-    <div class="grid-container">
-        <!-- Left Column: Source & Controls -->
-        <div>
-            <div class="glass-card">
-                <h3>1. Upload Audio Source</h3>
-                <label for="audio-file" class="upload-area">
-                    <div class="upload-icon">⇪</div>
-                    <div style="font-weight: 600; color: #f8fafc;">Drop Audio Here</div>
-                    <div style="font-size: 0.8rem; color: #888; margin-top: 4px;">- or - Click to Upload</div>
-                    <div class="file-info" id="file-name"></div>
-                    <input type="file" id="audio-file" class="file-input" accept="audio/*">
-                </label>
+    <!-- PAGE CONTENT AREA -->
+    <main>
+        <div class="tool-wrapper">
+            
+            <!-- Page Header -->
+            <div class="page-header" style="text-align: center; margin-top: 40px; margin-bottom: 50px; max-width: 800px; margin-left: auto; margin-right: auto;">
+                <h1 style="font-size: 3rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; margin-top: 0; color: #fff;">Audio 2 <span class="cyan-text">MIDI Extractor</span></h1>
+                <p style="color: #bbb; font-size: 1.1rem; line-height: 1.6;">
+                    Upload any audio track to run polyphonic pitch detection and extract club-ready MIDI sequences directly inside your browser.
+                </p>
             </div>
 
-            <div class="glass-card">
-                <h3>2. Fine-Tune Detection</h3>
-                
-                <div class="control-group">
-                    <div class="control-header">
-                        <span class="control-label">Note Onset Sensitivity</span>
-                        <span class="control-val" id="val-onset">0.50</span>
+            <div class="grid-container">
+                <!-- Left Column: Source & Controls -->
+                <div>
+                    <div class="glass-panel" style="margin-bottom: 24px; padding: 24px;">
+                        <h3 style="color: #ffffff; text-transform: uppercase; letter-spacing: 1.5px; font-size: 1.1rem; margin-bottom: 16px;">1. Upload Audio Source</h3>
+                        <label for="audio-file" class="upload-area">
+                            <div class="upload-icon">⇪</div>
+                            <div style="font-weight: 600; color: #f8fafc;">Drop Audio Here</div>
+                            <div style="font-size: 0.8rem; color: #888; margin-top: 4px;">- or - Click to Upload</div>
+                            <div class="file-info" id="file-name"></div>
+                            <input type="file" id="audio-file" class="file-input" accept="audio/*">
+                        </label>
                     </div>
-                    <div class="control-info">Higher values = only strong note attacks.</div>
-                    <input type="range" id="slider-onset" min="0.1" max="0.9" step="0.05" value="0.5">
+
+                    <div class="glass-panel" style="padding: 24px;">
+                        <h3 style="color: #ffffff; text-transform: uppercase; letter-spacing: 1.5px; font-size: 1.1rem; margin-bottom: 16px;">2. Fine-Tune Detection</h3>
+                        
+                        <div class="control-group">
+                            <div class="control-header">
+                                <span class="control-label">Note Onset Sensitivity</span>
+                                <span class="control-val" id="val-onset">0.50</span>
+                            </div>
+                            <div class="control-info">Higher values = only strong note attacks.</div>
+                            <input type="range" id="slider-onset" min="0.1" max="0.9" step="0.05" value="0.5">
+                        </div>
+
+                        <div class="control-group">
+                            <div class="control-header">
+                                <span class="control-label">Frame Sensitivity Threshold</span>
+                                <span class="control-val" id="val-frame">0.30</span>
+                            </div>
+                            <div class="control-info">Pitch sustain tolerance across chord frames.</div>
+                            <input type="range" id="slider-frame" min="0.1" max="0.9" step="0.05" value="0.3">
+                        </div>
+
+                        <div class="control-group">
+                            <div class="control-header">
+                                <span class="control-label">Minimum Note Length (ms)</span>
+                                <span class="control-val" id="val-minnote">110</span>
+                            </div>
+                            <div class="control-info">Filters out micro-glitches.</div>
+                            <input type="range" id="slider-minnote" min="30" max="300" step="10" value="110">
+                        </div>
+
+                        <button id="btn-convert" class="primary-btn" disabled>✨ Extract to MIDI</button>
+                    </div>
                 </div>
 
-                <div class="control-group">
-                    <div class="control-header">
-                        <span class="control-label">Frame Sensitivity Threshold</span>
-                        <span class="control-val" id="val-frame">0.30</span>
-                    </div>
-                    <div class="control-info">Pitch sustain tolerance across chord frames.</div>
-                    <input type="range" id="slider-frame" min="0.1" max="0.9" step="0.05" value="0.3">
-                </div>
+                <!-- Right Column: Output Terminal & Downloads -->
+                <div>
+                    <div class="glass-panel" style="height: 100%; padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <h3 style="color: #ffffff; text-transform: uppercase; letter-spacing: 1.5px; font-size: 1.1rem; margin-bottom: 16px;">3. Output Terminal</h3>
+                            <div class="control-label" style="margin-bottom: 8px;">System Status</div>
+                            <div id="status-terminal" class="terminal-box">Waiting for input file...</div>
+                        </div>
 
-                <div class="control-group">
-                    <div class="control-header">
-                        <span class="control-label">Minimum Note Length (ms)</span>
-                        <span class="control-val" id="val-minnote">110</span>
+                        <div>
+                            <a id="btn-download" class="download-btn" download>📥 Download Converted .MID File</a>
+                            <div class="tool-engine-credit">
+                                AI Engine Powered by <a href="https://github.com/spotify/basic-pitch" target="_blank" class="tool-engine-link">Spotify Basic Pitch</a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="control-info">Filters out micro-glitches.</div>
-                    <input type="range" id="slider-minnote" min="30" max="300" step="10" value="110">
                 </div>
-
-                <button id="btn-convert" class="primary-btn" disabled>✨ Extract to MIDI</button>
             </div>
+
         </div>
+    </main>
 
-        <!-- Right Column: Output Terminal & Downloads -->
-        <div>
-            <div class="glass-card" style="height: calc(100% - 48px);">
-                <h3>3. Output Terminal</h3>
-                <div class="control-label" style="margin-bottom: 8px;">System Status</div>
-                <div id="status-terminal" class="terminal-box">Waiting for input file...</div>
+    <!-- UNIVERSAL FOOTER -->
+    <site-footer></site-footer>
 
-                <a id="btn-download" class="download-btn" download>📥 Download Converted .MID File</a>
-            </div>
-        </div>
-    </div>
+    <!-- UNIVERSAL HTML COMPONENT EDITOR -->
+    <script src="/components.js"></script>
 
-    <!-- Plain Floating Footer Credit -->
-    <div class="footer-credits">
-        AI Engine Developed by <a href="https://github.com/spotify/basic-pitch" target="_blank" class="footer-link">Spotify Audio Intelligence Lab (Basic Pitch)</a> | 
-        UI Designed & Maintained by <a href="https://tonevault.qd.je" target="_blank" class="brand-link">ToneVault by HC</a>
-    </div>
-</div>
+    <!-- Audio-to-MIDI Transcription Logic -->
+    <script type="module">
+        import { BasicPitch, noteFramesToTime, outputToNotesPoly } from 'https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/+esm';
+        import { Midi } from 'https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.28/+esm';
 
-<script type="module">
-    import { BasicPitch, noteFramesToTime, outputToNotesPoly } from 'https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/+esm';
-    import { Midi } from 'https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.28/+esm';
+        const fileInput = document.getElementById('audio-file');
+        const fileNameDisplay = document.getElementById('file-name');
+        const btnConvert = document.getElementById('btn-convert');
+        const statusTerminal = document.getElementById('status-terminal');
+        const btnDownload = document.getElementById('btn-download');
 
-    const fileInput = document.getElementById('audio-file');
-    const fileNameDisplay = document.getElementById('file-name');
-    const btnConvert = document.getElementById('btn-convert');
-    const statusTerminal = document.getElementById('status-terminal');
-    const btnDownload = document.getElementById('btn-download');
+        const sliderOnset = document.getElementById('slider-onset');
+        const sliderFrame = document.getElementById('slider-frame');
+        const sliderMinNote = document.getElementById('slider-minnote');
 
-    const sliderOnset = document.getElementById('slider-onset');
-    const sliderFrame = document.getElementById('slider-frame');
-    const sliderMinNote = document.getElementById('slider-minnote');
+        const valOnset = document.getElementById('val-onset');
+        const valFrame = document.getElementById('val-frame');
+        const valMinNote = document.getElementById('val-minnote');
 
-    const valOnset = document.getElementById('val-onset');
-    const valFrame = document.getElementById('val-frame');
-    const valMinNote = document.getElementById('val-minnote');
+        let selectedFile = null;
 
-    let selectedFile = null;
+        sliderOnset.addEventListener('input', (e) => valOnset.innerText = parseFloat(e.target.value).toFixed(2));
+        sliderFrame.addEventListener('input', (e) => valFrame.innerText = parseFloat(e.target.value).toFixed(2));
+        sliderMinNote.addEventListener('input', (e) => valMinNote.innerText = e.target.value);
 
-    // Sync Slider Value Displays
-    sliderOnset.addEventListener('input', (e) => valOnset.innerText = parseFloat(e.target.value).toFixed(2));
-    sliderFrame.addEventListener('input', (e) => valFrame.innerText = parseFloat(e.target.value).toFixed(2));
-    sliderMinNote.addEventListener('input', (e) => valMinNote.innerText = e.target.value);
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                selectedFile = e.target.files[0];
+                fileNameDisplay.innerText = `Selected: ${selectedFile.name}`;
+                btnConvert.disabled = false;
+                btnDownload.style.display = 'none';
+                statusTerminal.innerText = `File loaded: ${selectedFile.name}\nReady for transcription.`;
+            }
+        });
 
-    fileInput.addEventListener('change', (e) => {
-        if (e.target.files.length > 0) {
-            selectedFile = e.target.files[0];
-            fileNameDisplay.innerText = `Selected: ${selectedFile.name}`;
-            btnConvert.disabled = false;
-            btnDownload.style.display = 'none';
-            statusTerminal.innerText = `File loaded: ${selectedFile.name}\nReady for transcription.`;
-        }
-    });
-
-    // Converts stereo/mono audio into 1-channel mono at 22050 Hz for BasicPitch
-    async function resampleAndMonoAudio(file) {
-        const arrayBuffer = await file.arrayBuffer();
-        const tempContext = new (window.AudioContext || window.webkitAudioContext)();
-        const decodedBuffer = await tempContext.decodeAudioData(arrayBuffer);
-        
-        const offlineContext = new OfflineAudioContext(
-            1, 
-            Math.ceil(decodedBuffer.duration * 22050),
-            22050
-        );
-        
-        const source = offlineContext.createBufferSource();
-        source.buffer = decodedBuffer;
-        source.connect(offlineContext.destination);
-        source.start(0);
-        
-        return await offlineContext.startRendering();
-    }
-
-    btnConvert.addEventListener('click', async () => {
-        if (!selectedFile) return;
-
-        btnConvert.disabled = true;
-        btnDownload.style.display = 'none';
-        statusTerminal.innerText = '⚙️ Resampling audio stream to mono (22,050 Hz)...';
-
-        try {
-            const monoAudioBuffer = await resampleAndMonoAudio(selectedFile);
-
-            statusTerminal.innerText += '\n🤖 Loading Basic Pitch AI Neural Model...';
-            const modelUrl = 'https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/model/model.json';
-            const basicPitch = new BasicPitch(modelUrl);
-
-            const frames = [], onsets = [], contours = [];
-
-            await basicPitch.evaluateModel(
-                monoAudioBuffer,
-                (f, o, c) => { frames.push(...f); onsets.push(...o); contours.push(...c); },
-                (pct) => {
-                    const percent = Math.round(pct * 100);
-                    statusTerminal.innerText = `⚙️ Running polyphonic pitch inference...\nProgress: [${percent}%]`;
-                }
+        async function resampleAndMonoAudio(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const tempContext = new (window.AudioContext || window.webkitAudioContext)();
+            const decodedBuffer = await tempContext.decodeAudioData(arrayBuffer);
+            
+            const offlineContext = new OfflineAudioContext(
+                1, 
+                Math.ceil(decodedBuffer.duration * 22050),
+                22050
             );
-
-            statusTerminal.innerText += '\n🎼 Processing detection thresholds & timing events...';
-
-            // Get parameters from sliders
-            const onsetThresh = parseFloat(sliderOnset.value);
-            const frameThresh = parseFloat(sliderFrame.value);
-            const minNoteMs = parseInt(sliderMinNote.value, 10);
-
-            // Extract polyphonic notes matching slider settings
-            const notes = outputToNotesPoly(frames, onsets, onsetThresh, frameThresh, minNoteMs);
-            const timeNotes = noteFramesToTime(notes);
-
-            // Create MIDI track using @tonejs/midi
-            const midi = new Midi();
-            const track = midi.addTrack();
-            track.name = "ToneVault Pitch Extract";
-
-            timeNotes.forEach(n => {
-                track.addNote({
-                    midi: n.pitchMidi,
-                    time: n.startTimeSeconds,
-                    duration: n.durationSeconds,
-                    velocity: n.amplitude
-                });
-            });
-
-            const midiArray = midi.toArray();
-            const blob = new Blob([midiArray], { type: 'audio/midi' });
             
-            const outFileName = `${selectedFile.name.replace(/\.[^/.]+$/, "")}_basic_pitch.mid`;
-            btnDownload.href = URL.createObjectURL(blob);
-            btnDownload.download = outFileName;
+            const source = offlineContext.createBufferSource();
+            source.buffer = decodedBuffer;
+            source.connect(offlineContext.destination);
+            source.start(0);
             
-            statusTerminal.innerText = `✅ Extracted ${timeNotes.length} MIDI notes successfully!\nSaved as: ${outFileName}`;
-            btnDownload.style.display = 'block';
-            btnConvert.disabled = false;
-
-        } catch (err) {
-            console.error(err);
-            statusTerminal.innerText = `❌ Error during transcription:\n${err.message || 'Failed to process audio file.'}`;
-            btnConvert.disabled = false;
+            return await offlineContext.startRendering();
         }
-    });
-</script>
+
+        btnConvert.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            btnConvert.disabled = true;
+            btnDownload.style.display = 'none';
+            statusTerminal.innerText = '⚙️ Resampling audio stream to mono (22,050 Hz)...';
+
+            try {
+                const monoAudioBuffer = await resampleAndMonoAudio(selectedFile);
+
+                statusTerminal.innerText += '\n🤖 Loading Basic Pitch AI Neural Model...';
+                const modelUrl = 'https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/model/model.json';
+                const basicPitch = new BasicPitch(modelUrl);
+
+                const frames = [], onsets = [], contours = [];
+
+                await basicPitch.evaluateModel(
+                    monoAudioBuffer,
+                    (f, o, c) => { frames.push(...f); onsets.push(...o); contours.push(...c); },
+                    (pct) => {
+                        const percent = Math.round(pct * 100);
+                        statusTerminal.innerText = `⚙️ Running polyphonic pitch inference...\nProgress: [${percent}%]`;
+                    }
+                );
+
+                statusTerminal.innerText += '\n🎼 Processing detection thresholds & timing events...';
+
+                const onsetThresh = parseFloat(sliderOnset.value);
+                const frameThresh = parseFloat(sliderFrame.value);
+                const minNoteMs = parseInt(sliderMinNote.value, 10);
+
+                const notes = outputToNotesPoly(frames, onsets, onsetThresh, frameThresh, minNoteMs);
+                const timeNotes = noteFramesToTime(notes);
+
+                const midi = new Midi();
+                const track = midi.addTrack();
+                track.name = "ToneVault Pitch Extract";
+
+                timeNotes.forEach(n => {
+                    track.addNote({
+                        midi: n.pitchMidi,
+                        time: n.startTimeSeconds,
+                        duration: n.durationSeconds,
+                        velocity: n.amplitude
+                    });
+                });
+
+                const midiArray = midi.toArray();
+                const blob = new Blob([midiArray], { type: 'audio/midi' });
+                
+                const outFileName = `${selectedFile.name.replace(/\.[^/.]+$/, "")}_basic_pitch.mid`;
+                btnDownload.href = URL.createObjectURL(blob);
+                btnDownload.download = outFileName;
+                
+                statusTerminal.innerText = `✅ Extracted ${timeNotes.length} MIDI notes successfully!\nSaved as: ${outFileName}`;
+                btnDownload.style.display = 'block';
+                btnConvert.disabled = false;
+
+            } catch (err) {
+                console.error(err);
+                statusTerminal.innerText = `❌ Error during transcription:\n${err.message || 'Failed to process audio file.'}`;
+                btnConvert.disabled = false;
+            }
+        });
+    </script>
 
 </body>
 </html>
