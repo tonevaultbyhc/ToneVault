@@ -14,6 +14,7 @@ class SiteHeader extends HTMLElement {
                                 <a href="#" class="drop-btn">AI Tools <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; margin-left: 4px;"></i></a>
                                 <ul class="dropdown-menu">
                                     <li><a href="/AI Tools/Audio 2 MIDI.html"><i class="fa-solid fa-music" style="margin-right: 8px; color: #00d4ff;"></i> Audio 2 MIDI</a></li>
+                                    <li><a href="/AI Tools/Stem Seperator.html"><i class="fa-solid fa-sliders" style="margin-right: 8px; color: #00d4ff;"></i> Stem Separator</a></li>
                                 </ul>
                             </li>
                             <li><a href="/Pages/Services.html">Services</a></li>
@@ -63,6 +64,9 @@ document.addEventListener("DOMContentLoaded", function() {
     } else if (path.includes("Audio 2 MIDI")) {
         pageTitle = "Audio 2 MIDI | ToneVault";
         pageDescription = "Extract polyphonic MIDI sequences directly from audio tracks using our browser-based AI tool.";
+    } else if (path.includes("Stem Seperator")) {
+        pageTitle = "Stem Separator | ToneVault";
+        pageDescription = "Isolate vocals, drums, bass, and instruments instantly using our AI-powered stem separation tool.";
     } else if (path.includes("About")) {
         pageTitle = "About & Contact | ToneVault";
         pageDescription = "Get in touch with Harish Cousal for collaborations, custom beats, and project inquiries.";
@@ -74,7 +78,7 @@ document.addEventListener("DOMContentLoaded", function() {
         { charset: "UTF-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1.0" },
         { name: "description", content: pageDescription },
-        { name: "keywords", content: "Harish Cousal, ToneVault, music producer, EDM producer, cinematic scoring, custom beats, mixing and mastering, audio to midi" },
+        { name: "keywords", content: "Harish Cousal, ToneVault, music producer, EDM producer, cinematic scoring, custom beats, mixing and mastering, audio to midi, stem separator" },
         { name: "author", content: "Harish Cousal" },
         
         { property: "og:title", content: pageTitle },
