@@ -213,7 +213,8 @@
 </div>
 
 <script type="module">
-    import { BasicPitch } from 'https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/+esm';
+    import { BasicPitch, noteFramesToTime, outputToNotesPoly } from 'https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/+esm';
+    import { Midi } from 'https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.28/+esm';
 
     const fileInput = document.getElementById('audio-file');
     const fileNameDisplay = document.getElementById('file-name');
@@ -238,15 +239,15 @@
         }
     });
 
-    // Helper function to decode and resample audio safely across all browsers
-    async function resampleAudio(file) {
+    // Converts any input audio (stereo/mono) into 1-channel mono at 22050 Hz
+    async function resampleAndMonoAudio(file) {
         const arrayBuffer = await file.arrayBuffer();
         const tempContext = new (window.AudioContext || window.webkitAudioContext)();
         const decodedBuffer = await tempContext.decodeAudioData(arrayBuffer);
         
-        // Resample to 22050 Hz required by BasicPitch
+        // Force 1 Channel (Mono) output required by BasicPitch
         const offlineContext = new OfflineAudioContext(
-            decodedBuffer.numberOfChannels,
+            1, 
             Math.ceil(decodedBuffer.duration * 22050),
             22050
         );
@@ -265,20 +266,19 @@
         btnProcess.disabled = true;
         progressWrapper.style.display = 'block';
         statusBox.style.display = 'block';
-        statusBox.innerText = 'Resampling audio to 22,050 Hz...';
+        statusBox.innerText = 'Converting stereo to mono (22,050 Hz)...';
 
         try {
-            // Safe cross-browser audio resampling
-            const audioBuffer = await resampleAudio(selectedFile);
+            const monoAudioBuffer = await resampleAndMonoAudio(selectedFile);
 
-            statusBox.innerText = 'Loading AI Model...';
+            statusBox.innerText = 'Loading AI pitch model...';
             const modelUrl = 'https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/model/model.json';
             const basicPitch = new BasicPitch(modelUrl);
 
             const frames = [], onsets = [], contours = [];
 
             await basicPitch.evaluateModel(
-                audioBuffer,
+                monoAudioBuffer,
                 (f, o, c) => { frames.push(...f); onsets.push(...o); contours.push(...c); },
                 (pct) => {
                     const percent = Math.round(pct * 100);
@@ -288,18 +288,33 @@
                 }
             );
 
-            statusBox.innerText = 'Pitch extraction complete!';
-            
-            // Build valid MIDI binary output file
-            const midiData = new Uint8Array([
-                0x4d, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x01, 0x00, 0x60,
-                0x4d, 0x54, 0x72, 0x6b, 0x00, 0x00, 0x00, 0x04, 0x00, 0x2f, 0x00, 0x00
-            ]);
+            statusBox.innerText = 'Generating MIDI notes...';
 
-            const blob = new Blob([midiData], { type: 'audio/midi' });
+            // Extract polyphonic notes from model outputs
+            const notes = outputToNotesPoly(frames, onsets, 0.25, 0.25, 11);
+            const timeNotes = noteFramesToTime(notes);
+
+            // Create a structured MIDI file using @tonejs/midi
+            const midi = new Midi();
+            const track = midi.addTrack();
+            track.name = "ToneVault Pitch Extract";
+
+            timeNotes.forEach(n => {
+                track.addNote({
+                    midi: n.pitchMidi,
+                    time: n.startTimeSeconds,
+                    duration: n.durationSeconds,
+                    velocity: n.amplitude
+                });
+            });
+
+            const midiArray = midi.toArray();
+            const blob = new Blob([midiArray], { type: 'audio/midi' });
+            
             btnDownload.href = URL.createObjectURL(blob);
             btnDownload.download = `${selectedFile.name.replace(/\.[^/.]+$/, "")}_ToneVault.mid`;
             
+            statusBox.innerText = 'Pitch extraction complete!';
             downloadArea.style.display = 'block';
             btnProcess.disabled = false;
 
