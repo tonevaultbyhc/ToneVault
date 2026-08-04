@@ -85,6 +85,12 @@
             font-weight: 600;
         }
 
+        .control-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
         .control-val {
             font-size: 0.85rem;
             color: #00d4ff;
@@ -92,6 +98,30 @@
             padding: 2px 8px;
             border-radius: 4px;
             border: 1px solid rgba(0, 212, 255, 0.3);
+            min-width: 45px;
+            text-align: center;
+        }
+
+        .reset-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #aaa;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .reset-btn:hover {
+            background: rgba(0, 212, 255, 0.15);
+            border-color: #00d4ff;
+            color: #00d4ff;
+            transform: rotate(-45deg);
         }
 
         .control-info {
@@ -172,6 +202,7 @@
             display: none;
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
             transition: all 0.3s ease;
+            margin-top: 15px;
         }
 
         .download-btn:hover {
@@ -180,20 +211,20 @@
         }
 
         .tool-engine-credit {
-            margin-top: 25px;
             text-align: center;
-            font-size: 0.85rem;
-            color: #888;
+            font-size: 0.82rem;
+            color: #999;
+            line-height: 1.5;
         }
         
         .tool-engine-link {
-            color: #ccc;
+            color: #00d4ff;
             text-decoration: none;
             transition: color 0.2s ease;
         }
         
         .tool-engine-link:hover {
-            color: #00d4ff;
+            color: #ffffff;
             text-decoration: underline;
         }
     </style>
@@ -232,28 +263,40 @@
                     <div class="glass-panel" style="padding: 24px;">
                         <h3 style="color: #ffffff; text-transform: uppercase; letter-spacing: 1.5px; font-size: 1.1rem; margin-bottom: 16px;">2. Fine-Tune Detection</h3>
                         
+                        <!-- Slider 1 -->
                         <div class="control-group">
                             <div class="control-header">
                                 <span class="control-label">Note Onset Sensitivity</span>
-                                <span class="control-val" id="val-onset">0.50</span>
+                                <div class="control-right">
+                                    <span class="control-val" id="val-onset">0.50</span>
+                                    <button type="button" class="reset-btn" id="reset-onset" title="Reset to default"><i class="fa-solid fa-rotate-right"></i></button>
+                                </div>
                             </div>
                             <div class="control-info">Higher values = only strong note attacks.</div>
                             <input type="range" id="slider-onset" min="0.1" max="0.9" step="0.05" value="0.5">
                         </div>
 
+                        <!-- Slider 2 -->
                         <div class="control-group">
                             <div class="control-header">
                                 <span class="control-label">Frame Sensitivity Threshold</span>
-                                <span class="control-val" id="val-frame">0.30</span>
+                                <div class="control-right">
+                                    <span class="control-val" id="val-frame">0.30</span>
+                                    <button type="button" class="reset-btn" id="reset-frame" title="Reset to default"><i class="fa-solid fa-rotate-right"></i></button>
+                                </div>
                             </div>
                             <div class="control-info">Pitch sustain tolerance across chord frames.</div>
                             <input type="range" id="slider-frame" min="0.1" max="0.9" step="0.05" value="0.3">
                         </div>
 
+                        <!-- Slider 3 -->
                         <div class="control-group">
                             <div class="control-header">
                                 <span class="control-label">Minimum Note Length (ms)</span>
-                                <span class="control-val" id="val-minnote">110</span>
+                                <div class="control-right">
+                                    <span class="control-val" id="val-minnote">110</span>
+                                    <button type="button" class="reset-btn" id="reset-minnote" title="Reset to default"><i class="fa-solid fa-rotate-right"></i></button>
+                                </div>
                             </div>
                             <div class="control-info">Filters out micro-glitches.</div>
                             <input type="range" id="slider-minnote" min="30" max="300" step="10" value="110">
@@ -273,10 +316,11 @@
                         </div>
 
                         <div>
-                            <a id="btn-download" class="download-btn" download>📥 Download Converted .MID File</a>
                             <div class="tool-engine-credit">
+                                UI Designed & Maintained by <a href="https://tonevault.qd.je" target="_blank" class="tool-engine-link">ToneVault by HC</a><br>
                                 AI Engine Powered by <a href="https://github.com/spotify/basic-pitch" target="_blank" class="tool-engine-link">Spotify Basic Pitch</a>
                             </div>
+                            <a id="btn-download" class="download-btn" download>📥 Download Converted .MID File</a>
                         </div>
                     </div>
                 </div>
@@ -310,11 +354,30 @@
         const valFrame = document.getElementById('val-frame');
         const valMinNote = document.getElementById('val-minnote');
 
+        const resetOnset = document.getElementById('reset-onset');
+        const resetFrame = document.getElementById('reset-frame');
+        const resetMinNote = document.getElementById('reset-minnote');
+
         let selectedFile = null;
 
+        // Sync Slider Value Displays & Reset Logic
         sliderOnset.addEventListener('input', (e) => valOnset.innerText = parseFloat(e.target.value).toFixed(2));
+        resetOnset.addEventListener('click', () => {
+            sliderOnset.value = "0.5";
+            valOnset.innerText = "0.50";
+        });
+
         sliderFrame.addEventListener('input', (e) => valFrame.innerText = parseFloat(e.target.value).toFixed(2));
+        resetFrame.addEventListener('click', () => {
+            sliderFrame.value = "0.3";
+            valFrame.innerText = "0.30";
+        });
+
         sliderMinNote.addEventListener('input', (e) => valMinNote.innerText = e.target.value);
+        resetMinNote.addEventListener('click', () => {
+            sliderMinNote.value = "110";
+            valMinNote.innerText = "110";
+        });
 
         fileInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
