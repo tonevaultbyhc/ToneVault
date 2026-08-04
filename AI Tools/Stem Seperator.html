@@ -10,37 +10,38 @@
 
     <!-- Page-Specific Styles -->
     <style>
-        /* General Layout */
-        .section-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; margin-bottom: 80px; }
-        .section-title { font-size: 2.2rem; margin-top: 0; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 2px; color: #ffffff; text-align: center; }
-        .section-title span { color: #00d4ff; }
+        .page-header {
+            text-align: center;
+            margin-top: 80px;
+            margin-bottom: 40px;
+            padding: 0 20px;
+        }
 
-        /* Process Timeline */
-        .timeline-step { display: flex; align-items: flex-start; margin-bottom: 40px; }
-        .timeline-step:last-child { margin-bottom: 0; }
-        .step-number { background: #00d4ff; color: #000; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.3rem; flex-shrink: 0; margin-right: 25px; box-shadow: 0 0 15px rgba(0, 212, 255, 0.4); }
-        .step-content h3 { margin: 0 0 10px 0; color: #fff; font-size: 1.4rem; text-transform: uppercase; letter-spacing: 1px; }
-        .step-content p { margin: 0; color: #bbb; line-height: 1.7; font-size: 1.05rem; }
+        .page-header h1 {
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            margin-top: 0;
+            color: #ffffff;
+        }
 
-        /* Interactive FAQ Accordion */
-        .faq-item { background: rgba(5, 5, 5, 0.5); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; margin-bottom: 15px; overflow: hidden; transition: all 0.3s ease; }
-        .faq-item summary { padding: 25px; color: #fff; font-weight: bold; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; text-transform: uppercase; letter-spacing: 1px; font-size: 0.95rem; }
-        .faq-item summary::-webkit-details-marker { display: none; }
-        .faq-item summary:after { content: '\002B'; color: #00d4ff; font-size: 1.8rem; transition: transform 0.3s; line-height: 1; }
-        .faq-item[open] summary:after { transform: rotate(45deg); }
-        .faq-content { padding: 0 25px 25px 25px; color: #bbb; line-height: 1.7; font-size: 1rem; }
+        .page-header h1 span {
+            color: #00d4ff;
+        }
 
-        /* Integrated Web App Container */
-        .app-embed-container {
-            background: rgba(15, 15, 15, 0.65);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 18px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
-            position: relative;
-            min-height: 750px;
+        .page-header p {
+            color: #bbbbbb;
+            font-size: 1.1rem;
+            max-width: 650px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .tool-wrapper {
+            max-width: 1200px;
+            margin: 0 auto 80px auto;
+            padding: 0 20px;
         }
 
         .app-iframe {
@@ -48,16 +49,13 @@
             height: 850px;
             border: none;
             display: block;
-            border-radius: 18px;
+            background: transparent;
         }
 
-        /* Mobile Optimization */
         @media (max-width: 768px) {
-            .timeline-step { flex-direction: column; text-align: center; align-items: center; }
-            .step-number { margin-right: 0; margin-bottom: 15px; }
-            .faq-item summary { padding: 20px; font-size: 0.85rem; }
-            .faq-content { padding: 0 20px 20px 20px; }
-            .app-iframe { height: 1100px; } /* Increased height for stacked mobile elements */
+            .page-header h1 { font-size: 2.2rem; }
+            .tool-wrapper { margin-bottom: 40px; }
+            .app-iframe { height: 1100px; }
         }
     </style>
 </head>
@@ -69,126 +67,20 @@
     <!-- PAGE CONTENT AREA -->
     <main>
         
-        <!-- Page Header -->
-        <div class="page-header" style="text-align: center; margin-top: 80px; margin-bottom: 60px; padding: 0 20px;">
-            <h1 style="font-size: 3rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; margin-top: 0; color: #fff;">Stem <span style="color: #00d4ff;">Separator</span></h1>
-            <p style="color: #bbb; font-size: 1.1rem; max-width: 650px; margin: 0 auto; line-height: 1.6;">Isolate vocals, drums, bass, and synth melodies into clean audio tracks directly on this page using Meta's Demucs AI engine.</p>
+        <!-- RETAINED PAGE HEADER -->
+        <div class="page-header">
+            <h1>Stem <span>Separator</span></h1>
+            <p>Isolate vocals, drums, bass, and synth melodies into clean audio tracks directly on this page using Meta's Demucs AI engine.</p>
         </div>
 
-        <!-- DIRECTLY INTEGRATED APP TERMINAL -->
-        <div class="section-container">
-            <div class="app-embed-container">
-                <iframe 
-                    src="https://bd861b1416a0176df8.gradio.live" 
-                    class="app-iframe"
-                    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture" 
-                    loading="lazy">
-                </iframe>
-            </div>
-        </div>
-
-        <!-- FEATURES / CAPABILITIES -->
-        <div class="section-container">
-            <div class="grid">
-                
-                <!-- Feature 1 -->
-                <div class="card">
-                    <div class="icon">🎤</div>
-                    <h3>Acapella Extraction</h3>
-                    <p>Clean vocal isolation for bootlegs, remixes, and sampling. Extracts main vocals and background harmonies while suppressing instrumental bleeds.</p>
-                </div>
-
-                <!-- Feature 2 -->
-                <div class="card">
-                    <div class="icon">🥁</div>
-                    <h3>Rhythm & Bass Isolation</h3>
-                    <p>Separate kick, snare, and percussion loops from sub-basslines. Ideal for studying drum groove design or building custom sample packs.</p>
-                </div>
-
-                <!-- Feature 3 -->
-                <div class="card">
-                    <div class="icon">🎹</div>
-                    <h3>Melodic Instrument Stems</h3>
-                    <p>Isolate lead synths, guitars, keys, and orchestral pads into an independent 'Other' track for complete creative reconstruction in your DAW.</p>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- PROCESS TIMELINE -->
-        <div class="section-container">
-            <div class="glass-panel">
-                <h2 class="section-title">How The <span>Separation</span> Works</h2>
-                
-                <div class="timeline-step">
-                    <div class="step-number">1</div>
-                    <div class="step-content">
-                        <h3>Upload Audio Track</h3>
-                        <p>Drop your MP3, WAV, or FLAC track into the integrated studio panel above.</p>
-                    </div>
-                </div>
-
-                <div class="timeline-step">
-                    <div class="step-number">2</div>
-                    <div class="step-content">
-                        <h3>Configure Quality Mode</h3>
-                        <p>Choose <b>Fast & High Quality</b> (HTDemucs) for quick rendering, or <b>Slow & Best Quality</b> (MDX-Extra) for maximum vocal-instrument separation.</p>
-                    </div>
-                </div>
-
-                <div class="timeline-step">
-                    <div class="step-number">3</div>
-                    <div class="step-content">
-                        <h3>Demucs AI Inference</h3>
-                        <p>The audio stream is processed via deep-learning spectrogram analysis, splitting the track into 4 distinct stem layers (Vocals, Drums, Bass, Other).</p>
-                    </div>
-                </div>
-
-                <div class="timeline-step">
-                    <div class="step-number">4</div>
-                    <div class="step-content">
-                        <h3>Stream & Download</h3>
-                        <p>Preview each isolated stem directly inside the terminal, then save high-quality WAV or MP3 files to your local system.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- INTERACTIVE FAQ -->
-        <div class="section-container">
-            <div class="glass-panel">
-                <h2 class="section-title">Frequently Asked <span>Questions</span></h2>
-                
-                <!-- FAQ 1 -->
-                <details class="faq-item">
-                    <summary>How does the live web integration work?</summary>
-                    <div class="faq-content">
-                        The web app panel above communicates directly with our cloud GPU backend. It processes audio tracks live without leaving your browser or requiring local file downloads.
-                    </div>
-                </details>
-
-                <!-- FAQ 2 -->
-                <details class="faq-item">
-                    <summary>What is the difference between HTDemucs and MDX-Extra?</summary>
-                    <div class="faq-content">
-                        <b>HTDemucs</b> is optimized for fast execution (~1 minute per track) with balanced frequency isolation. <b>MDX-Extra</b> takes slightly longer to render but delivers maximum isolation quality on dense EDM and rock arrangements.
-                    </div>
-                </details>
-
-                <!-- FAQ 3 -->
-                <details class="faq-item">
-                    <summary>Is there any file size or duration limit?</summary>
-                    <div class="faq-content">
-                        Because the separation runs on dedicated cloud hardware, you can process full-length tracks (up to 10+ minutes) without running into browser memory limits.
-                    </div>
-                </details>
-                
-                <!-- Call to Action Button -->
-                <div style="text-align: center; margin-top: 50px;">
-                    <a href="audio-to-midi.html" class="btn btn-primary">Try Audio to MIDI Tool</a>
-                </div>
-
-            </div>
+        <!-- EMBEDDED TOOL -->
+        <div class="tool-wrapper">
+            <iframe 
+                src="https://83499e82734db95865.gradio.live" 
+                class="app-iframe"
+                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture" 
+                allowtransparency="true">
+            </iframe>
         </div>
 
     </main>
