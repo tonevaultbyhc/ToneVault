@@ -13,9 +13,15 @@
     <!-- Page-Specific Styles -->
     <style>
         /* General Layout */
-        .section-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; margin-bottom: 80px; }
+        .section-container { max-width: 1400px; margin: 0 auto; padding: 0 20px; margin-bottom: 80px; }
         .section-title { font-size: 2.2rem; margin-top: 0; margin-bottom: 40px; text-transform: uppercase; letter-spacing: 2px; color: #ffffff; text-align: center; }
         .section-title span { color: #00d4ff; }
+
+        /* Override Grid for 3 Service Cards to Stay Centered & Balanced */
+        .section-container .grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
 
         /* Process Timeline */
         .timeline-step { display: flex; align-items: flex-start; margin-bottom: 40px; }
@@ -33,6 +39,10 @@
         .faq-content { padding: 0 25px 25px 25px; color: #bbb; line-height: 1.7; font-size: 1rem; }
 
         /* Mobile Optimization for Timeline & FAQ */
+        @media (max-width: 1024px) {
+            .section-container .grid { grid-template-columns: 1fr; }
+        }
+
         @media (max-width: 768px) {
             .timeline-step { flex-direction: column; text-align: center; align-items: center; }
             .step-number { margin-right: 0; margin-bottom: 15px; }
