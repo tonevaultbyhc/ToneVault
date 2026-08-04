@@ -13,7 +13,7 @@ class SiteHeader extends HTMLElement {
                             <li class="dropdown">
                                 <a href="#" class="drop-btn">AI Tools <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; margin-left: 4px;"></i></a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="/AI Tools/Audio 2 MIDI.html">Audio 2 MIDI</a></li>
+                                    <li><a href="/AI Tools/Audio 2 MIDI.html"><i class="fa-solid fa-music" style="margin-right: 8px; color: #00d4ff;"></i> Audio 2 MIDI</a></li>
                                 </ul>
                             </li>
                             <li><a href="/Pages/Services.html">Services</a></li>
