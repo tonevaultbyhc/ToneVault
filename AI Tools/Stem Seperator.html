@@ -12,8 +12,8 @@
     <style>
         .page-header {
             text-align: center;
-            margin-top: 80px;
-            margin-bottom: 40px;
+            margin-top: 60px;
+            margin-bottom: 30px;
             padding: 0 20px;
         }
 
@@ -33,29 +33,31 @@
         .page-header p {
             color: #bbbbbb;
             font-size: 1.1rem;
-            max-width: 650px;
+            max-width: 750px;
             margin: 0 auto;
             line-height: 1.6;
         }
 
+        /* EXPANDED CONTAINER */
         .tool-wrapper {
-            max-width: 1200px;
-            margin: 0 auto 80px auto;
+            width: 100%;
+            max-width: 1400px; /* Expanded from 1200px to match wider displays */
+            margin: 0 auto 60px auto;
             padding: 0 20px;
         }
 
         .app-iframe {
             width: 100%;
-            height: 850px;
+            height: 980px; /* Increased height so all 4 stem players fit without scrollbars */
             border: none;
             display: block;
             background: transparent;
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .page-header h1 { font-size: 2.2rem; }
-            .tool-wrapper { margin-bottom: 40px; }
-            .app-iframe { height: 1100px; }
+            .tool-wrapper { margin-bottom: 40px; padding: 0 10px; }
+            .app-iframe { height: 1350px; } /* Stacked view height for mobile screens */
         }
     </style>
 </head>
@@ -67,16 +69,16 @@
     <!-- PAGE CONTENT AREA -->
     <main>
         
-        <!-- RETAINED PAGE HEADER -->
+        <!-- PAGE HEADER -->
         <div class="page-header">
             <h1>Stem <span>Separator</span></h1>
             <p>Isolate vocals, drums, bass, and synth melodies into clean audio tracks directly on this page using Meta's Demucs AI engine.</p>
         </div>
 
-        <!-- EMBEDDED TOOL -->
+        <!-- EXPANDED EMBEDDED TOOL -->
         <div class="tool-wrapper">
             <iframe 
-                src="https://83499e82734db95865.gradio.live" 
+                src="https://60a64c7f2e8690e66e.gradio.live" 
                 class="app-iframe"
                 allow="autoplay; clipboard-write; encrypted-media; picture-in-picture" 
                 allowtransparency="true">
