@@ -94,7 +94,7 @@ header nav ul li.dropdown .dropdown-menu {
     top: 100%;
     left: 50%;
     transform: translateX(-50%);
-    padding-top: 10px; /* Safe bridge hover area */
+    padding-top: 6px; 
     background: transparent;
     min-width: 170px;
     display: flex;
@@ -108,7 +108,7 @@ header nav ul li.dropdown .dropdown-menu {
 header nav ul li.dropdown .dropdown-menu::before {
     content: '';
     position: absolute;
-    top: 10px;
+    top: 6px;
     left: 0;
     right: 0;
     bottom: 0;
@@ -129,11 +129,12 @@ header nav ul li.dropdown:hover .dropdown-menu {
 header nav ul li.dropdown .dropdown-menu li {
     width: 100%;
     margin: 0;
+    padding: 0;
 }
 
 header nav ul li.dropdown .dropdown-menu li a {
     display: block;
-    padding: 8px 16px; /* Tighter padding to remove the large gap */
+    padding: 6px 14px; 
     font-size: 0.85rem;
     color: #bbb;
     text-transform: none;
@@ -145,7 +146,7 @@ header nav ul li.dropdown .dropdown-menu li a {
 header nav ul li.dropdown .dropdown-menu li a:hover {
     background: rgba(0, 212, 255, 0.1);
     color: #00d4ff;
-    padding-left: 20px;
+    padding-left: 18px;
 }
 
 /* =========================================
