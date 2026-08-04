@@ -30,39 +30,25 @@
         .faq-item[open] summary:after { transform: rotate(45deg); }
         .faq-content { padding: 0 25px 25px 25px; color: #bbb; line-height: 1.7; font-size: 1rem; }
 
-        /* Colab Bridge Launch Card */
-        .app-launch-card {
-            text-align: center;
-            padding: 50px 30px;
+        /* Integrated Web App Container */
+        .app-embed-container {
             background: rgba(15, 15, 15, 0.65);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 18px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            position: relative;
+            min-height: 750px;
         }
 
-        .btn-launch {
-            display: inline-block;
-            background-color: #00d4ff;
-            color: #000000;
-            font-weight: bold;
-            text-transform: uppercase;
-            padding: 18px 36px;
-            border-radius: 8px;
-            text-decoration: none;
-            letter-spacing: 1.5px;
-            font-size: 1.1rem;
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
-            transition: all 0.3s ease;
-            margin-top: 20px;
-        }
-
-        .btn-launch:hover {
-            background-color: #ffffff;
-            color: #000000;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.6);
-            transform: translateY(-3px);
+        .app-iframe {
+            width: 100%;
+            height: 850px;
+            border: none;
+            display: block;
+            border-radius: 18px;
         }
 
         /* Mobile Optimization */
@@ -71,7 +57,7 @@
             .step-number { margin-right: 0; margin-bottom: 15px; }
             .faq-item summary { padding: 20px; font-size: 0.85rem; }
             .faq-content { padding: 0 20px 20px 20px; }
-            .btn-launch { width: 100%; box-sizing: border-box; }
+            .app-iframe { height: 1100px; } /* Increased height for stacked mobile elements */
         }
     </style>
 </head>
@@ -84,28 +70,24 @@
     <main>
         
         <!-- Page Header -->
-        <div class="page-header" style="text-align: center; margin-top: 80px; margin-bottom: 80px; padding: 0 20px;">
+        <div class="page-header" style="text-align: center; margin-top: 80px; margin-bottom: 60px; padding: 0 20px;">
             <h1 style="font-size: 3rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; margin-top: 0; color: #fff;">Stem <span style="color: #00d4ff;">Separator</span></h1>
-            <p style="color: #bbb; font-size: 1.1rem; max-width: 650px; margin: 0 auto; line-height: 1.6;">Isolate vocals, drums, bass, and synth melodies into studio-grade uncompressed audio stems using Meta's Demucs AI running on cloud GPUs.</p>
+            <p style="color: #bbb; font-size: 1.1rem; max-width: 650px; margin: 0 auto; line-height: 1.6;">Isolate vocals, drums, bass, and synth melodies into clean audio tracks directly on this page using Meta's Demucs AI engine.</p>
         </div>
 
-        <!-- APP LAUNCH AREA -->
+        <!-- DIRECTLY INTEGRATED APP TERMINAL -->
         <div class="section-container">
-            <div class="app-launch-card">
-                <div style="font-size: 3rem; margin-bottom: 15px;">🎛️</div>
-                <h2 style="color: #fff; font-size: 1.8rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;">Run Demucs AI Cloud Separator</h2>
-                <p style="color: #bbb; max-width: 600px; margin: 0 auto 25px auto; line-height: 1.6;">
-                    To deliver zero download friction and zero hosting lag, our high-precision Demucs engine executes on Google's free T4 Cloud GPUs. Click below to launch the dedicated studio interface.
-                </p>
-                
-                <!-- Replace 'YOUR_GOOGLE_COLAB_URL' with your published Colab notebook link -->
-                <a href="YOUR_GOOGLE_COLAB_URL" target="_blank" class="btn-launch">
-                    ⚡ Launch Free Cloud GPU Separator
-                </a>
+            <div class="app-embed-container">
+                <iframe 
+                    src="https://bd861b1416a0176df8.gradio.live" 
+                    class="app-iframe"
+                    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture" 
+                    loading="lazy">
+                </iframe>
             </div>
         </div>
 
-        <!-- FEATURES / CAPABILITIES (Uses global .grid and .card from style.css) -->
+        <!-- FEATURES / CAPABILITIES -->
         <div class="section-container">
             <div class="grid">
                 
@@ -141,32 +123,32 @@
                 <div class="timeline-step">
                     <div class="step-number">1</div>
                     <div class="step-content">
-                        <h3>Launch Cloud GPU</h3>
-                        <p>Click the launch button above to open the pre-configured Colab instance. It instantly allocates an NVIDIA T4 GPU with 16 GB of VRAM for high-speed processing.</p>
+                        <h3>Upload Audio Track</h3>
+                        <p>Drop your MP3, WAV, or FLAC track into the integrated studio panel above.</p>
                     </div>
                 </div>
 
                 <div class="timeline-step">
                     <div class="step-number">2</div>
                     <div class="step-content">
-                        <h3>Upload Audio Track</h3>
-                        <p>Drop your MP3, WAV, or FLAC track directly into the interface. Choose between <b>HTDemucs</b> for fast separation or <b>MDX-Extra</b> for maximum vocal-instrument isolation.</p>
+                        <h3>Configure Quality Mode</h3>
+                        <p>Choose <b>Fast & High Quality</b> (HTDemucs) for quick rendering, or <b>Slow & Best Quality</b> (MDX-Extra) for maximum vocal-instrument separation.</p>
                     </div>
                 </div>
 
                 <div class="timeline-step">
                     <div class="step-number">3</div>
                     <div class="step-content">
-                        <h3>Demucs Neural Processing</h3>
-                        <p>Meta's Demucs AI models run sub-band spectrogram analysis, splitting your mixed audio file into 4 distinct stem layers (Vocals, Drums, Bass, Other).</p>
+                        <h3>Demucs AI Inference</h3>
+                        <p>The audio stream is processed via deep-learning spectrogram analysis, splitting the track into 4 distinct stem layers (Vocals, Drums, Bass, Other).</p>
                     </div>
                 </div>
 
                 <div class="timeline-step">
                     <div class="step-number">4</div>
                     <div class="step-content">
-                        <h3>Download Isolated Stems</h3>
-                        <p>Preview and stream each isolated stem in real time, then download lossless WAV or 320 kbps MP3 files straight to your computer.</p>
+                        <h3>Stream & Download</h3>
+                        <p>Preview each isolated stem directly inside the terminal, then save high-quality WAV or MP3 files to your local system.</p>
                     </div>
                 </div>
             </div>
@@ -179,9 +161,9 @@
                 
                 <!-- FAQ 1 -->
                 <details class="faq-item">
-                    <summary>Why does the Stem Separator run via Google Colab?</summary>
+                    <summary>How does the live web integration work?</summary>
                     <div class="faq-content">
-                        Demucs AI requires deep learning neural hardware (~2 GB RAM and GPU acceleration) to isolate stems accurately. Running the model on free cloud GPUs keeps ToneVault 100% free with zero installation requirements for users.
+                        The web app panel above communicates directly with our cloud GPU backend. It processes audio tracks live without leaving your browser or requiring local file downloads.
                     </div>
                 </details>
 
@@ -189,7 +171,7 @@
                 <details class="faq-item">
                     <summary>What is the difference between HTDemucs and MDX-Extra?</summary>
                     <div class="faq-content">
-                        <b>HTDemucs</b> is optimized for high-speed execution (~1 minute per track) with balanced frequency isolation. <b>MDX-Extra</b> takes slightly longer to render but delivers maximum isolation quality on dense EDM and rock arrangements.
+                        <b>HTDemucs</b> is optimized for fast execution (~1 minute per track) with balanced frequency isolation. <b>MDX-Extra</b> takes slightly longer to render but delivers maximum isolation quality on dense EDM and rock arrangements.
                     </div>
                 </details>
 
@@ -197,7 +179,7 @@
                 <details class="faq-item">
                     <summary>Is there any file size or duration limit?</summary>
                     <div class="faq-content">
-                        Because the separation runs on cloud GPU hardware, you can process full-length songs (up to 10+ minutes) without hitting browser memory limits or system crashes.
+                        Because the separation runs on dedicated cloud hardware, you can process full-length tracks (up to 10+ minutes) without running into browser memory limits.
                     </div>
                 </details>
                 
