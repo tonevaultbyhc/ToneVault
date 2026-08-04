@@ -332,3 +332,66 @@ footer p {
     color: #00d4ff;
     transform: translateY(-2px);
 }
+
+/* Navigation Dropdown Styles */
+header nav ul {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    margin: 0;
+    padding: 0;
+}
+
+header nav ul li.dropdown {
+    position: relative;
+}
+
+header nav ul li.dropdown .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: rgba(12, 12, 12, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 10px 0;
+    min-width: 160px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+header nav ul li.dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+header nav ul li.dropdown .dropdown-menu li {
+    width: 100%;
+    margin: 0;
+}
+
+header nav ul li.dropdown .dropdown-menu li a {
+    display: block;
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    color: #bbb;
+    text-transform: none;
+    letter-spacing: normal;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+}
+
+header nav ul li.dropdown .dropdown-menu li a:hover {
+    background: rgba(0, 212, 255, 0.1);
+    color: #00d4ff;
+    padding-left: 24px;
+}
