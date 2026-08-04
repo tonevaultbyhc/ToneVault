@@ -94,11 +94,12 @@ header nav ul li.dropdown .dropdown-menu {
     top: 100%;
     left: 50%;
     transform: translateX(-50%);
-    padding-top: 6px; 
+    padding-top: 8px; 
     background: transparent;
     min-width: 170px;
     display: flex;
     flex-direction: column;
+    gap: 0px !important;
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
@@ -108,7 +109,7 @@ header nav ul li.dropdown .dropdown-menu {
 header nav ul li.dropdown .dropdown-menu::before {
     content: '';
     position: absolute;
-    top: 6px;
+    top: 8px;
     left: 0;
     right: 0;
     bottom: 0;
@@ -128,13 +129,14 @@ header nav ul li.dropdown:hover .dropdown-menu {
 
 header nav ul li.dropdown .dropdown-menu li {
     width: 100%;
-    margin: 0;
-    padding: 0;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 header nav ul li.dropdown .dropdown-menu li a {
     display: block;
-    padding: 6px 14px; 
+    margin: 0 !important;
+    padding: 6px 14px !important; 
     font-size: 0.85rem;
     color: #bbb;
     text-transform: none;
@@ -146,7 +148,7 @@ header nav ul li.dropdown .dropdown-menu li a {
 header nav ul li.dropdown .dropdown-menu li a:hover {
     background: rgba(0, 212, 255, 0.1);
     color: #00d4ff;
-    padding-left: 18px;
+    padding-left: 18px !important;
 }
 
 /* =========================================
