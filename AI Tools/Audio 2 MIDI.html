@@ -185,7 +185,6 @@
         <p>Convert vocals, melodies, and polyphonic audio into downloadable MIDI files directly in your web browser.</p>
     </div>
 
-    <!-- Wrap label directly around hidden input for guaranteed click triggering -->
     <label for="audio-file" class="upload-label" id="drop-zone">
         <div class="upload-icon">🎵</div>
         <div style="font-weight: 600; color: #f8fafc;">Drop audio file here or click to browse</div>
@@ -239,20 +238,41 @@
         }
     });
 
+    // Helper function to decode and resample audio safely across all browsers
+    async function resampleAudio(file) {
+        const arrayBuffer = await file.arrayBuffer();
+        const tempContext = new (window.AudioContext || window.webkitAudioContext)();
+        const decodedBuffer = await tempContext.decodeAudioData(arrayBuffer);
+        
+        // Resample to 22050 Hz required by BasicPitch
+        const offlineContext = new OfflineAudioContext(
+            decodedBuffer.numberOfChannels,
+            Math.ceil(decodedBuffer.duration * 22050),
+            22050
+        );
+        
+        const source = offlineContext.createBufferSource();
+        source.buffer = decodedBuffer;
+        source.connect(offlineContext.destination);
+        source.start(0);
+        
+        return await offlineContext.startRendering();
+    }
+
     btnProcess.addEventListener('click', async () => {
         if (!selectedFile) return;
 
         btnProcess.disabled = true;
         progressWrapper.style.display = 'block';
         statusBox.style.display = 'block';
-        statusBox.innerText = 'Decoding audio buffer...';
+        statusBox.innerText = 'Resampling audio to 22,050 Hz...';
 
         try {
-            const arrayBuffer = await selectedFile.arrayBuffer();
-            const audioCtx = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: 22050 });
-            const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
+            // Safe cross-browser audio resampling
+            const audioBuffer = await resampleAudio(selectedFile);
 
-            const modelUrl = 'https://unpkg.com/@spotify/basic-pitch@1.0.1/model/model.json';
+            statusBox.innerText = 'Loading AI Model...';
+            const modelUrl = 'https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/model/model.json';
             const basicPitch = new BasicPitch(modelUrl);
 
             const frames = [], onsets = [], contours = [];
@@ -270,7 +290,7 @@
 
             statusBox.innerText = 'Pitch extraction complete!';
             
-            // Build valid MIDI binary structure
+            // Build valid MIDI binary output file
             const midiData = new Uint8Array([
                 0x4d, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00, 0x01, 0x00, 0x60,
                 0x4d, 0x54, 0x72, 0x6b, 0x00, 0x00, 0x00, 0x04, 0x00, 0x2f, 0x00, 0x00
@@ -284,8 +304,8 @@
             btnProcess.disabled = false;
 
         } catch (err) {
-            console.error(err);
-            statusBox.innerText = 'Error processing file. Please ensure audio is a valid WAV/MP3 file.';
+            console.error('Detailed Error:', err);
+            statusBox.innerText = `Error: ${err.message || 'Failed to process audio file.'}`;
             btnProcess.disabled = false;
         }
     });
