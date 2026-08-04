@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToneVault Audio to MIDI</title>
-    <!-- Favicon -->
+    <title>ToneVault - Audio 2 MIDI</title>
     <link rel="icon" href="https://tonevault.qd.je/Images/favicon.ico" type="image/x-icon">
     <!-- TensorFlow.js Engine -->
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
@@ -13,202 +12,336 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
         }
 
         body {
-            background-color: #0b0f19;
-            color: #e2e8f0;
+            background-color: #0a0a0a;
+            background-image: linear-gradient(rgba(10, 10, 10, 0.75), rgba(10, 10, 10, 0.95)), url('https://tonevault.qd.je/Images/BackGround.jpg');
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
+            background-attachment: fixed;
+            color: #f0f0f0;
+            min-height: 100vh;
+            padding: 30px 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
         }
 
-        .container {
-            background: #111827;
-            border: 1px solid #1f293d;
-            border-radius: 16px;
+        .main-wrapper {
             width: 100%;
-            max-width: 600px;
-            padding: 32px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            max-width: 1200px;
         }
 
+        /* Header Styling */
         .header {
             text-align: center;
-            margin-bottom: 28px;
+            margin-top: 10px;
+            margin-bottom: 40px;
         }
 
         .header h1 {
-            font-size: 1.8rem;
-            font-weight: 700;
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             color: #ffffff;
-            margin-bottom: 8px;
-            letter-spacing: -0.025em;
         }
+
+        .cyan-text { color: #00d4ff; }
 
         .header p {
-            color: #94a3b8;
-            font-size: 0.95rem;
-            line-height: 1.5;
+            color: #bbb;
+            font-size: 1.1rem;
+            max-width: 650px;
+            margin: 0 auto;
+            line-height: 1.6;
         }
 
-        .upload-label {
-            display: block;
-            border: 2px dashed #334155;
+        /* 2-Column Grid Layout */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .grid-container { grid-template-columns: 1fr; }
+        }
+
+        /* Glass Cards */
+        .glass-card {
+            background-color: rgba(15, 15, 15, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 24px;
+        }
+
+        .glass-card:hover {
+            border-color: #00d4ff;
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.15);
+        }
+
+        h3 {
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+        }
+
+        /* Upload Area */
+        .upload-area {
+            background-color: rgba(5, 5, 5, 0.4);
+            border: 1px dashed rgba(0, 212, 255, 0.4);
             border-radius: 12px;
-            padding: 30px 20px;
+            padding: 40px 20px;
             text-align: center;
-            background: #0f172a;
             cursor: pointer;
             transition: border-color 0.2s ease, background 0.2s ease;
+            display: block;
         }
 
-        .upload-label:hover {
-            border-color: #2563eb;
-            background: #1e293b;
+        .upload-area:hover {
+            border-color: #00d4ff;
+            background-color: rgba(0, 212, 255, 0.05);
         }
 
         .upload-icon {
-            font-size: 32px;
+            font-size: 2.2rem;
             margin-bottom: 10px;
-        }
-
-        .file-input {
-            display: none;
+            color: #00d4ff;
         }
 
         .file-info {
-            margin-top: 10px;
-            font-size: 0.9rem;
-            color: #38bdf8;
-            font-weight: 600;
+            margin-top: 12px;
+            font-size: 0.95rem;
+            color: #00d4ff;
+            font-weight: bold;
             word-break: break-all;
         }
 
-        .btn-submit {
-            width: 100%;
-            margin-top: 24px;
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+        .file-input { display: none; }
+
+        /* Sliders */
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .control-label {
+            font-size: 0.9rem;
             color: #ffffff;
-            font-size: 1rem;
             font-weight: 600;
+        }
+
+        .control-val {
+            font-size: 0.85rem;
+            color: #00d4ff;
+            background: rgba(0, 212, 255, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .control-info {
+            font-size: 0.78rem;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: #00d4ff;
+            background: rgba(5, 5, 5, 0.6);
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
-            transition: transform 0.1s ease, box-shadow 0.2s ease;
         }
 
-        .btn-submit:hover:not(:disabled) {
-            background: linear-gradient(135deg, #3d75f3 0%, #2563eb 100%);
-            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+        /* Action Button */
+        .primary-btn {
+            width: 100%;
+            background-color: #00d4ff;
+            color: #000000;
+            border: none;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+            border-radius: 6px;
+            padding: 16px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
         }
 
-        .btn-submit:disabled {
-            opacity: 0.4;
+        .primary-btn:hover:not(:disabled) {
+            background-color: #ffffff;
+            color: #000000;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .primary-btn:disabled {
+            opacity: 0.3;
             cursor: not-allowed;
             box-shadow: none;
         }
 
-        .progress-wrapper {
-            margin-top: 24px;
-            display: none;
-        }
-
-        .progress-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.85rem;
-            color: #94a3b8;
-            margin-bottom: 8px;
-        }
-
-        .progress-bar-bg {
-            width: 100%;
-            height: 8px;
-            background: #1e293b;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-bar-fill {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #3b82f6, #06b6d4);
-            border-radius: 4px;
-            transition: width 0.2s ease;
-        }
-
-        .status-box {
-            margin-top: 16px;
-            padding: 12px 16px;
+        /* System Status Terminal */
+        .terminal-box {
+            background-color: rgba(5, 5, 5, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
-            background: #0f172a;
-            border: 1px solid #1e293b;
-            font-size: 0.9rem;
-            color: #cbd5e1;
-            text-align: center;
-            display: none;
+            padding: 16px;
+            min-height: 140px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.88rem;
+            color: #00d4ff;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            margin-bottom: 20px;
         }
 
-        .download-area {
-            margin-top: 24px;
-            display: none;
-        }
-
-        .btn-download {
+        /* Download Section */
+        .download-btn {
             width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
             background: linear-gradient(135deg, #059669 0%, #10b981 100%);
             color: #ffffff;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
             text-decoration: none;
-            display: block;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+            border-radius: 6px;
+            padding: 16px;
+            font-size: 1rem;
             text-align: center;
+            display: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
         }
+
+        .download-btn:hover {
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.6);
+            transform: translateY(-2px);
+        }
+
+        /* Plain Floating Footer Credits */
+        .footer-credits {
+            margin-top: 35px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .footer-link {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: #00d4ff;
+            text-decoration: underline;
+        }
+
+        .brand-link {
+            color: #00d4ff;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .brand-link:hover { color: #ffffff; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="main-wrapper">
     <div class="header">
-        <h1>ToneVault Audio to MIDI</h1>
-        <p>Convert vocals, melodies, and polyphonic audio into downloadable MIDI files directly in your web browser.</p>
+        <h1>Audio 2 <span class="cyan-text">MIDI Extractor</span></h1>
+        <p>Upload any audio track to run polyphonic pitch detection and extract club-ready MIDI sequences.</p>
     </div>
 
-    <label for="audio-file" class="upload-label" id="drop-zone">
-        <div class="upload-icon">🎵</div>
-        <div style="font-weight: 600; color: #f8fafc;">Drop audio file here or click to browse</div>
-        <div style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">Supports MP3, WAV, FLAC, OGG</div>
-        <div class="file-info" id="file-name"></div>
-        <input type="file" id="audio-file" class="file-input" accept="audio/*">
-    </label>
+    <div class="grid-container">
+        <!-- Left Column: Source & Controls -->
+        <div>
+            <div class="glass-card">
+                <h3>1. Upload Audio Source</h3>
+                <label for="audio-file" class="upload-area">
+                    <div class="upload-icon">⇪</div>
+                    <div style="font-weight: 600; color: #f8fafc;">Drop Audio Here</div>
+                    <div style="font-size: 0.8rem; color: #888; margin-top: 4px;">- or - Click to Upload</div>
+                    <div class="file-info" id="file-name"></div>
+                    <input type="file" id="audio-file" class="file-input" accept="audio/*">
+                </label>
+            </div>
 
-    <button id="btn-process" class="btn-submit" disabled>Extract MIDI Tracks</button>
+            <div class="glass-card">
+                <h3>2. Fine-Tune Detection</h3>
+                
+                <div class="control-group">
+                    <div class="control-header">
+                        <span class="control-label">Note Onset Sensitivity</span>
+                        <span class="control-val" id="val-onset">0.50</span>
+                    </div>
+                    <div class="control-info">Higher values = only strong note attacks.</div>
+                    <input type="range" id="slider-onset" min="0.1" max="0.9" step="0.05" value="0.5">
+                </div>
 
-    <div id="progress-wrapper" class="progress-wrapper">
-        <div class="progress-header">
-            <span id="status-text">Analyzing pitch frequencies...</span>
-            <span id="progress-percent">0%</span>
+                <div class="control-group">
+                    <div class="control-header">
+                        <span class="control-label">Frame Sensitivity Threshold</span>
+                        <span class="control-val" id="val-frame">0.30</span>
+                    </div>
+                    <div class="control-info">Pitch sustain tolerance across chord frames.</div>
+                    <input type="range" id="slider-frame" min="0.1" max="0.9" step="0.05" value="0.3">
+                </div>
+
+                <div class="control-group">
+                    <div class="control-header">
+                        <span class="control-label">Minimum Note Length (ms)</span>
+                        <span class="control-val" id="val-minnote">110</span>
+                    </div>
+                    <div class="control-info">Filters out micro-glitches.</div>
+                    <input type="range" id="slider-minnote" min="30" max="300" step="10" value="110">
+                </div>
+
+                <button id="btn-convert" class="primary-btn" disabled>✨ Extract to MIDI</button>
+            </div>
         </div>
-        <div class="progress-bar-bg">
-            <div id="progress-bar" class="progress-bar-fill"></div>
+
+        <!-- Right Column: Output Terminal & Downloads -->
+        <div>
+            <div class="glass-card" style="height: calc(100% - 48px);">
+                <h3>3. Output Terminal</h3>
+                <div class="control-label" style="margin-bottom: 8px;">System Status</div>
+                <div id="status-terminal" class="terminal-box">Waiting for input file...</div>
+
+                <a id="btn-download" class="download-btn" download>📥 Download Converted .MID File</a>
+            </div>
         </div>
     </div>
 
-    <div id="status-box" class="status-box"></div>
-
-    <div id="download-area" class="download-area">
-        <a id="btn-download" class="btn-download" download="ToneVault_Extracted.mid">Download Extracted .MID File</a>
+    <!-- Plain Floating Footer Credit -->
+    <div class="footer-credits">
+        AI Engine Developed by <a href="https://github.com/spotify/basic-pitch" target="_blank" class="footer-link">Spotify Audio Intelligence Lab (Basic Pitch)</a> | 
+        UI Designed & Maintained by <a href="https://tonevault.qd.je" target="_blank" class="brand-link">ToneVault by HC</a>
     </div>
 </div>
 
@@ -218,34 +351,41 @@
 
     const fileInput = document.getElementById('audio-file');
     const fileNameDisplay = document.getElementById('file-name');
-    const btnProcess = document.getElementById('btn-process');
-    const progressWrapper = document.getElementById('progress-wrapper');
-    const progressBar = document.getElementById('progress-bar');
-    const progressPercent = document.getElementById('progress-percent');
-    const statusText = document.getElementById('status-text');
-    const statusBox = document.getElementById('status-box');
-    const downloadArea = document.getElementById('download-area');
+    const btnConvert = document.getElementById('btn-convert');
+    const statusTerminal = document.getElementById('status-terminal');
     const btnDownload = document.getElementById('btn-download');
 
+    const sliderOnset = document.getElementById('slider-onset');
+    const sliderFrame = document.getElementById('slider-frame');
+    const sliderMinNote = document.getElementById('slider-minnote');
+
+    const valOnset = document.getElementById('val-onset');
+    const valFrame = document.getElementById('val-frame');
+    const valMinNote = document.getElementById('val-minnote');
+
     let selectedFile = null;
+
+    // Sync Slider Value Displays
+    sliderOnset.addEventListener('input', (e) => valOnset.innerText = parseFloat(e.target.value).toFixed(2));
+    sliderFrame.addEventListener('input', (e) => valFrame.innerText = parseFloat(e.target.value).toFixed(2));
+    sliderMinNote.addEventListener('input', (e) => valMinNote.innerText = e.target.value);
 
     fileInput.addEventListener('change', (e) => {
         if (e.target.files.length > 0) {
             selectedFile = e.target.files[0];
             fileNameDisplay.innerText = `Selected: ${selectedFile.name}`;
-            btnProcess.disabled = false;
-            downloadArea.style.display = 'none';
-            statusBox.style.display = 'none';
+            btnConvert.disabled = false;
+            btnDownload.style.display = 'none';
+            statusTerminal.innerText = `File loaded: ${selectedFile.name}\nReady for transcription.`;
         }
     });
 
-    // Converts any input audio (stereo/mono) into 1-channel mono at 22050 Hz
+    // Converts stereo/mono audio into 1-channel mono at 22050 Hz for BasicPitch
     async function resampleAndMonoAudio(file) {
         const arrayBuffer = await file.arrayBuffer();
         const tempContext = new (window.AudioContext || window.webkitAudioContext)();
         const decodedBuffer = await tempContext.decodeAudioData(arrayBuffer);
         
-        // Force 1 Channel (Mono) output required by BasicPitch
         const offlineContext = new OfflineAudioContext(
             1, 
             Math.ceil(decodedBuffer.duration * 22050),
@@ -260,18 +400,17 @@
         return await offlineContext.startRendering();
     }
 
-    btnProcess.addEventListener('click', async () => {
+    btnConvert.addEventListener('click', async () => {
         if (!selectedFile) return;
 
-        btnProcess.disabled = true;
-        progressWrapper.style.display = 'block';
-        statusBox.style.display = 'block';
-        statusBox.innerText = 'Converting stereo to mono (22,050 Hz)...';
+        btnConvert.disabled = true;
+        btnDownload.style.display = 'none';
+        statusTerminal.innerText = '⚙️ Resampling audio stream to mono (22,050 Hz)...';
 
         try {
             const monoAudioBuffer = await resampleAndMonoAudio(selectedFile);
 
-            statusBox.innerText = 'Loading AI pitch model...';
+            statusTerminal.innerText += '\n🤖 Loading Basic Pitch AI Neural Model...';
             const modelUrl = 'https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/model/model.json';
             const basicPitch = new BasicPitch(modelUrl);
 
@@ -282,19 +421,22 @@
                 (f, o, c) => { frames.push(...f); onsets.push(...o); contours.push(...c); },
                 (pct) => {
                     const percent = Math.round(pct * 100);
-                    progressBar.style.width = `${percent}%`;
-                    progressPercent.innerText = `${percent}%`;
-                    statusText.innerText = 'Running pitch detection inference...';
+                    statusTerminal.innerText = `⚙️ Running polyphonic pitch inference...\nProgress: [${percent}%]`;
                 }
             );
 
-            statusBox.innerText = 'Generating MIDI notes...';
+            statusTerminal.innerText += '\n🎼 Processing detection thresholds & timing events...';
 
-            // Extract polyphonic notes from model outputs
-            const notes = outputToNotesPoly(frames, onsets, 0.25, 0.25, 11);
+            // Get parameters from sliders
+            const onsetThresh = parseFloat(sliderOnset.value);
+            const frameThresh = parseFloat(sliderFrame.value);
+            const minNoteMs = parseInt(sliderMinNote.value, 10);
+
+            // Extract polyphonic notes matching slider settings
+            const notes = outputToNotesPoly(frames, onsets, onsetThresh, frameThresh, minNoteMs);
             const timeNotes = noteFramesToTime(notes);
 
-            // Create a structured MIDI file using @tonejs/midi
+            // Create MIDI track using @tonejs/midi
             const midi = new Midi();
             const track = midi.addTrack();
             track.name = "ToneVault Pitch Extract";
@@ -311,17 +453,18 @@
             const midiArray = midi.toArray();
             const blob = new Blob([midiArray], { type: 'audio/midi' });
             
+            const outFileName = `${selectedFile.name.replace(/\.[^/.]+$/, "")}_basic_pitch.mid`;
             btnDownload.href = URL.createObjectURL(blob);
-            btnDownload.download = `${selectedFile.name.replace(/\.[^/.]+$/, "")}_ToneVault.mid`;
+            btnDownload.download = outFileName;
             
-            statusBox.innerText = 'Pitch extraction complete!';
-            downloadArea.style.display = 'block';
-            btnProcess.disabled = false;
+            statusTerminal.innerText = `✅ Extracted ${timeNotes.length} MIDI notes successfully!\nSaved as: ${outFileName}`;
+            btnDownload.style.display = 'block';
+            btnConvert.disabled = false;
 
         } catch (err) {
-            console.error('Detailed Error:', err);
-            statusBox.innerText = `Error: ${err.message || 'Failed to process audio file.'}`;
-            btnProcess.disabled = false;
+            console.error(err);
+            statusTerminal.innerText = `❌ Error during transcription:\n${err.message || 'Failed to process audio file.'}`;
+            btnConvert.disabled = false;
         }
     });
 </script>
