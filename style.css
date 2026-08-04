@@ -63,7 +63,28 @@ header {
     color: #00d4ff; 
 }
 
-/* Navigation Dropdown Styles */
+/* Navigation List & Dropdown Styles */
+nav ul { 
+    list-style: none; 
+    margin: 0; 
+    padding: 0; 
+    display: flex; 
+    align-items: center;
+    gap: 30px; 
+}
+
+nav ul li a { 
+    color: #fff; 
+    font-size: 0.85rem; 
+    text-transform: uppercase; 
+    letter-spacing: 1px; 
+    font-weight: bold; 
+    transition: color 0.3s ease; 
+}
+nav ul li a:hover { 
+    color: #00d4ff; 
+}
+
 header nav ul li.dropdown {
     position: relative;
 }
