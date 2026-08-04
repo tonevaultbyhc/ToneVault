@@ -240,9 +240,9 @@ main {
 }
 .glass-panel h2 { font-size: 2.2rem; margin-top: 0; margin-bottom: 25px; text-transform: uppercase; letter-spacing: 2px; color: #ffffff !important; }
 
-/* The Grid Cards */
-.hub { padding: 40px 20px 60px 20px; max-width: 1200px; margin: 0 auto; }
-.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; }
+/* The Grid Cards (4 Columns) */
+.hub { padding: 40px 20px 60px 20px; max-width: 1400px; margin: 0 auto; }
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
 .card { 
     background-color: rgba(15, 15, 15, 0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); 
     border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 20px; padding: 30px 25px; 
@@ -340,6 +340,10 @@ footer p {
 /* =========================================
    MOBILE OPTIMIZATION (TABLETS & PHONES)
 ========================================= */
+@media (max-width: 1200px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+}
+
 @media (max-width: 1024px) {
     header, footer { width: 95%; padding: 12px 25px; max-width: none; }
     nav ul { gap: 20px; }
@@ -349,6 +353,7 @@ footer p {
 }
 
 @media (max-width: 768px) {
+    .grid { grid-template-columns: 1fr; }
     .btn-container { 
         flex-direction: column; 
         width: 100%; 
