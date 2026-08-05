@@ -41,29 +41,59 @@
             line-height: 1.6;
         }
 
-        /* EXPANDED CONTAINER */
+        /* EXPANDED CONTAINER WITH CROP WRAPPER */
         .tool-wrapper {
             width: 100%;
             max-width: 1400px;
-            margin: 0 auto 60px auto;
+            margin: 0 auto 30px auto;
             padding: 0 20px;
         }
 
-        /* INCREASED HEIGHT TO DESTROY THE INNER SCROLLBAR */
-        .app-iframe {
+        .iframe-crop-container {
+            position: relative;
             width: 100%;
-            height: 1150px; 
-            border: none;
-            display: block;
-            background: transparent;
+            height: 980px; 
             overflow: hidden;
+            border-radius: 18px;
+            background: #0a0a0a;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .app-iframe {
+            position: absolute;
+            top: -65px; /* Crops out the Hugging Face top navigation bar */
+            left: 0;
+            width: 100%;
+            height: calc(100% + 125px); /* Compensates for top/bottom cropping */
+            border: none;
+            background: transparent;
+        }
+
+        /* CREATOR CREDIT FOOTER LINK */
+        .creator-credit {
+            text-align: center;
+            margin-bottom: 50px;
+            font-size: 0.9rem;
+            color: #888;
+        }
+
+        .creator-credit a {
+            color: #00d4ff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.2s ease;
+        }
+
+        .creator-credit a:hover {
+            color: #ffffff;
+            text-decoration: underline;
         }
 
         @media (max-width: 900px) {
             .page-header h1 { font-size: 2.2rem; }
-            .tool-wrapper { margin-bottom: 40px; padding: 0 10px; }
-            /* Mobile screens need more height because the UI stacks vertically */
-            .app-iframe { height: 1600px; } 
+            .tool-wrapper { margin-bottom: 30px; padding: 0 10px; }
+            .iframe-crop-container { height: 1350px; }
         }
     </style>
 </head>
@@ -78,18 +108,25 @@
         <!-- PAGE HEADER -->
         <div class="page-header">
             <h1>Stem <span>Separator</span></h1>
-            <p>Isolate vocals, drums, bass, and synth melodies into clean audio tracks directly on this page using Meta's Demucs AI engine.</p>
+            <p>Isolate vocals, drums, bass, and synth melodies into clean audio tracks directly on this page using advanced AI models.</p>
         </div>
 
-        <!-- EXPANDED EMBEDDED TOOL (Reverted to Iframe) -->
+        <!-- EMBEDDED TOOL WITH CROPPER -->
         <div class="tool-wrapper">
-            <iframe 
-                src="https://doc-contents-foot-cute.trycloudflare.com" 
-                class="app-iframe"
-                scrolling="no"
-                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture" 
-                allowtransparency="true">
-            </iframe>
+            <div class="iframe-crop-container">
+                <iframe 
+                    src="https://ahk-d-spleeter-ht-demucs-stem-separation-2025.hf.space" 
+                    class="app-iframe"
+                    loading="lazy"
+                    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture" 
+                    allowtransparency="true">
+                </iframe>
+            </div>
+        </div>
+
+        <!-- CREATOR CREDIT -->
+        <div class="creator-credit">
+            AI Space & Engine Created by <a href="https://huggingface.co/spaces/ahk-d/Spleeter-HT-Demucs-Stem-Separation-2025" target="_blank">ahk-d</a> | Integrated & Maintained by <a href="https://tonevault.qd.je" target="_blank">ToneVault by HC</a>
         </div>
 
     </main>
