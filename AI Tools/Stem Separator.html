@@ -49,9 +49,21 @@
             padding: 0 20px;
         }
 
+        /* INCREASED HEIGHT TO DESTROY THE INNER SCROLLBAR */
+        .app-iframe {
+            width: 100%;
+            height: 1150px; 
+            border: none;
+            display: block;
+            background: transparent;
+            overflow: hidden;
+        }
+
         @media (max-width: 900px) {
             .page-header h1 { font-size: 2.2rem; }
             .tool-wrapper { margin-bottom: 40px; padding: 0 10px; }
+            /* Mobile screens need more height because the UI stacks vertically */
+            .app-iframe { height: 1600px; } 
         }
     </style>
 </head>
@@ -69,13 +81,15 @@
             <p>Isolate vocals, drums, bass, and synth melodies into clean audio tracks directly on this page using Meta's Demucs AI engine.</p>
         </div>
 
-        <!-- EXPANDED EMBEDDED TOOL -->
+        <!-- EXPANDED EMBEDDED TOOL (Reverted to Iframe) -->
         <div class="tool-wrapper">
-            <!-- GRADIO DYNAMIC SCRIPT -->
-            <script type="module" src="https://gradio.s3-us-west-2.amazonaws.com/4.40.0/gradio.js"></script>
-            
-            <!-- AUTO-RESIZING GRADIO COMPONENT -->
-            <gradio-app src="https://shopper-offered-document-bidder.trycloudflare.com/"></gradio-app>
+            <iframe 
+                src="https://doc-contents-foot-cute.trycloudflare.com" 
+                class="app-iframe"
+                scrolling="no"
+                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture" 
+                allowtransparency="true">
+            </iframe>
         </div>
 
     </main>
