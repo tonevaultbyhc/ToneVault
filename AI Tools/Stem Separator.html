@@ -41,7 +41,7 @@
             line-height: 1.6;
         }
 
-        /* EXPANDED CONTAINER (DESKTOP DEFAULT) */
+        /* FULL SIZE WRAPPER */
         .tool-wrapper {
             width: 100%;
             max-width: 1400px;
@@ -49,26 +49,25 @@
             padding: 0 20px;
         }
 
-        .iframe-crop-container {
-            position: relative;
+        .app-iframe {
             width: 100%;
-            height: 1600px; 
-            overflow: hidden;
+            height: 1950px; /* Increased height to ensure zero missing content */
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 18px;
             background: #0a0a0a;
-            border: 1px solid rgba(255, 255, 255, 0.08);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            display: block;
+            overflow: hidden;
+        }
+        
+        /* HIDE PAGE SCROLLBARS */
+        ::-webkit-scrollbar {
+            display: none;
         }
 
-        .app-iframe {
-            position: absolute;
-            top: -100px;
-            left: 0;
-            width: 100%;
-            height: calc(100% + 140px);
-            border: none;
-            background: transparent;
-            overflow: hidden;
+        html {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
 
         /* CREATOR CREDIT FOOTER LINK */
@@ -92,24 +91,19 @@
             text-decoration: underline;
         }
 
-        /* RESPONSIVE BREAKPOINTS FOR TABLETS & MOBILES */
-        
-        /* Tablet View (Screens up to 1024px) */
+        /* RESPONSIVE HEIGHT ADJUSTMENTS FOR FULL CONTENT VISIBILITY */
         @media (max-width: 1024px) {
             .page-header h1 { font-size: 2.5rem; }
             .tool-wrapper { padding: 0 15px; }
-            .iframe-crop-container { height: 2150px; }
-            .app-iframe { top: -125px; height: calc(100% + 175px); }
+            .app-iframe { height: 2450px; }
         }
 
-        /* Mobile View (Screens up to 480px) */
         @media (max-width: 480px) {
-            .page-header { margin-top: 45px; }
+            .page-header { margin-top: 40px; }
             .page-header h1 { font-size: 2rem; }
             .page-header p { font-size: 0.95rem; }
             .tool-wrapper { padding: 0 10px; }
-            .iframe-crop-container { height: 2100px; border-radius: 12px; } /* Extended height to show the bottom tip and table */
-            .app-iframe { top: -135px; height: calc(100% + 175px); } /* Reverted top crop so the header text is cleanly hidden */
+            .app-iframe { height: 2850px; border-radius: 12px; }
             .creator-credit { font-size: 0.8rem; }
         }
     </style>
@@ -128,18 +122,16 @@
             <p>Isolate vocals, drums, bass, and synth melodies into clean audio tracks directly on this page using advanced AI models.</p>
         </div>
 
-        <!-- EMBEDDED TOOL WITH RESPONSIVE CROPPER -->
+        <!-- FULL SIZE EMBEDDED TOOL -->
         <div class="tool-wrapper">
-            <div class="iframe-crop-container">
-                <iframe 
-                    src="https://ahk-d-spleeter-ht-demucs-stem-separation-2025.hf.space" 
-                    class="app-iframe"
-                    scrolling="no"
-                    loading="lazy"
-                    allow="autoplay; clipboard-write; encrypted-media; picture-in-picture" 
-                    allowtransparency="true">
-                </iframe>
-            </div>
+            <iframe 
+                src="https://ahk-d-spleeter-ht-demucs-stem-separation-2025.hf.space" 
+                class="app-iframe"
+                scrolling="no"
+                loading="lazy"
+                allow="autoplay; clipboard-write; encrypted-media; picture-in-picture" 
+                allowtransparency="true">
+            </iframe>
         </div>
 
         <!-- CREATOR CREDIT -->
