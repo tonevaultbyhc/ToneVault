@@ -41,7 +41,7 @@
             line-height: 1.6;
         }
 
-        /* EXPANDED CONTAINER WITH CROP WRAPPER */
+        /* EXPANDED CONTAINER WITH DEEP CROP WRAPPER */
         .tool-wrapper {
             width: 100%;
             max-width: 1400px;
@@ -52,7 +52,7 @@
         .iframe-crop-container {
             position: relative;
             width: 100%;
-            height: 980px; 
+            height: 900px; /* Perfectly frames the main app interface */
             overflow: hidden;
             border-radius: 18px;
             background: #0a0a0a;
@@ -62,12 +62,13 @@
 
         .app-iframe {
             position: absolute;
-            top: -65px; /* Crops out the Hugging Face top navigation bar */
+            top: -115px; /* Pushed up further to completely cut off the top links */
             left: 0;
             width: 100%;
-            height: calc(100% + 125px); /* Compensates for top/bottom cropping */
+            height: calc(100% + 185px); /* Compensates for the deeper crop */
             border: none;
             background: transparent;
+            overflow: hidden;
         }
 
         /* CREATOR CREDIT FOOTER LINK */
@@ -93,7 +94,7 @@
         @media (max-width: 900px) {
             .page-header h1 { font-size: 2.2rem; }
             .tool-wrapper { margin-bottom: 30px; padding: 0 10px; }
-            .iframe-crop-container { height: 1350px; }
+            .iframe-crop-container { height: 1300px; }
         }
     </style>
 </head>
@@ -111,12 +112,13 @@
             <p>Isolate vocals, drums, bass, and synth melodies into clean audio tracks directly on this page using advanced AI models.</p>
         </div>
 
-        <!-- EMBEDDED TOOL WITH CROPPER -->
+        <!-- EMBEDDED TOOL WITH DEEP CROPPER -->
         <div class="tool-wrapper">
             <div class="iframe-crop-container">
                 <iframe 
                     src="https://ahk-d-spleeter-ht-demucs-stem-separation-2025.hf.space" 
                     class="app-iframe"
+                    scrolling="no"
                     loading="lazy"
                     allow="autoplay; clipboard-write; encrypted-media; picture-in-picture" 
                     allowtransparency="true">
