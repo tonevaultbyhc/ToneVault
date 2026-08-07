@@ -350,10 +350,8 @@
 
         let selectedFile = null;
 
-        // Handle click upload
         dropZone.addEventListener("click", () => fileInput.click());
 
-        // Handle drag and drop visuals
         ["dragenter", "dragover"].forEach(eventName => {
             dropZone.addEventListener(eventName, (e) => {
                 e.preventDefault();
@@ -388,7 +386,6 @@
             processBtn.removeAttribute("disabled");
         }
 
-        // Process audio via Hugging Face space API client
         processBtn.addEventListener("click", async () => {
             if (!selectedFile) return;
 
@@ -398,20 +395,17 @@
             stemsContainer.innerHTML = "";
 
             try {
-                // Connect to the space backend via API
                 const app = await client("https://ahk-d-spleeter-ht-demucs-stem-separation-2025.hf.space");
                 
-                // Pass the selected parameters and file to the space prediction endpoint
                 const selectedModel = modelSelect.value;
                 const stemsCount = parseInt(stemsCountSelect.value);
                 
-                const result = await app.predict("/predict", [selectedFile, selectedModel, stemsCount]);
+                const result = await app.predict(0, [selectedFile, selectedModel, stemsCount]);
 
                 statusMessage.style.display = "none";
                 resultsArea.style.display = "block";
                 processBtn.removeAttribute("disabled");
 
-                // Render output audio players from result payload
                 const stemOutputs = result.data; 
                 
                 if (Array.isArray(stemOutputs)) {
@@ -438,10 +432,10 @@
                     });
                 }
             } catch (err) {
-                console.error("API Processing Error:", err);
+                console.error("Detailed API Error:", err);
                 statusMessage.style.display = "none";
                 processBtn.removeAttribute("disabled");
-                alert("Stem separation failed. Please ensure your audio file format is supported and try again.");
+                alert("Error: " + (err.message || "Failed to process audio via API. Check browser console for details."));
             }
         });
     </script>
