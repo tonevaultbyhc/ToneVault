@@ -386,7 +386,7 @@
         <!-- PAGE HEADER -->
         <div class="page-header">
             <h1>Thoughts to <span>MIDI</span></h1>
-            <p>Generate algorithmic MIDI compositions with custom lengths (bars), typing tempo, time signatures, and acoustic preview instruments.</p>
+            <p>Generate algorithmic MIDI compositions with physically-modeled acoustic instrument previews and instant DAW exports.</p>
         </div>
 
         <!-- CUSTOM THEMED API INTERFACE WRAPPER -->
@@ -435,8 +435,6 @@
                             <option value="6/8">6/8 (Compound)</option>
                             <option value="2/4">2/4 (March)</option>
                             <option value="5/4">5/4 (Asymmetric)</option>
-                            <option value="4/8">4/8</option>
-                            <option value="3/8">3/8</option>
                         </select>
                     </div>
                     <div class="setting-group" style="grid-column: 1 / -1;">
@@ -457,7 +455,7 @@
                 <!-- THOUGHTS & WORDS TEXTAREA -->
                 <div class="setting-group" style="margin-bottom: 25px;">
                     <label for="thoughtsInput"><i class="fa-solid fa-brain"></i> Thoughts / Inspiration / Keywords</label>
-                    <textarea id="thoughtsInput" rows="3" placeholder="e.g. emotional progression, driving groove, spacious pads..."></textarea>
+                    <textarea id="thoughtsInput" rows="3" placeholder="e.g. expressive plucks, warm strings resonance, atmospheric vibe..."></textarea>
                 </div>
 
                 <!-- SUBMIT BUTTON -->
@@ -487,16 +485,15 @@
                             <div class="waveform-box" id="waveform"></div>
                         </div>
 
-                        <!-- POST-GENERATION PREVIEW TOOLBAR (Instrument & Volume) -->
+                        <!-- POST-GENERATION PREVIEW TOOLBAR (Physical Modeling Instruments) -->
                         <div class="preview-toolbar">
                             <div class="preview-instrument-select">
                                 <label for="postInstrumentSelect"><i class="fa-solid fa-sliders"></i> Preview Instrument:</label>
                                 <select id="postInstrumentSelect">
-                                    <option value="piano" selected>Acoustic Grand Piano</option>
-                                    <option value="guitar">Acoustic Guitar Style</option>
-                                    <option value="bass">Electric Bass</option>
-                                    <option value="strings">Orchestral Strings</option>
-                                    <option value="synth">Ambient Pad Synth</option>
+                                    <option value="pluck" selected>Acoustic Pluck (Physical Model)</option>
+                                    <option value="strings">Resonant Strings (Ensemble)</option>
+                                    <option value="chime">Delicate Bell / Chimes</option>
+                                    <option value="warmkeys">Warm Cinematic Keys</option>
                                 </select>
                             </div>
                             <div class="volume-control-wrapper">
@@ -518,7 +515,7 @@
 
         <!-- CREATOR CREDIT -->
         <div class="creator-credit">
-            Algorithmic Engine Powered by ToneVault JS | Integrated & Maintained by <a href="https://tonevault.qd.je" target="_blank">ToneVault by HC</a>
+            Physical Modeling Engine Powered by Tone.js | Integrated & Maintained by <a href="https://tonevault.qd.je" target="_blank">ToneVault by HC</a>
         </div>
 
     </main>
@@ -529,7 +526,7 @@
     <!-- UNIVERSAL HTML COMPONENT EDITOR -->
     <script src="/components.js"></script>
 
-    <!-- CLIENT-SIDE SYNTHESIS & MIDI LOGIC -->
+    <!-- CLIENT-SIDE PHYSICAL MODELING & MIDI LOGIC -->
     <script type="module">
         const tempoInput = document.getElementById("tempoInput");
         const barsInput = document.getElementById("barsInput");
@@ -582,10 +579,10 @@
             if (wavesurfer) wavesurfer.setVolume(vol);
         });
 
-        // Instantly re-synthesize audio preview when instrument changes post-generation
+        // Instantly re-render offline audio preview when instrument changes post-generation
         postInstrumentSelect.addEventListener("change", async () => {
             if (generatedNotes.length > 0) {
-                await renderAudioPreview(generatedNotes, currentTempo, postInstrumentSelect.value);
+                await renderAcousticAudioPreview(generatedNotes, currentTempo, postInstrumentSelect.value);
             }
         });
 
@@ -669,8 +666,8 @@
                     resultsArea.style.display = "block";
                     waveformPreviewContainer.style.display = "block";
 
-                    // Render initial preview with selected post-instrument
-                    await renderAudioPreview(generatedNotes, currentTempo, postInstrumentSelect.value);
+                    // Render preview using physical modeling
+                    await renderAcousticAudioPreview(generatedNotes, currentTempo, postInstrumentSelect.value);
 
                     processBtn.removeAttribute("disabled");
                     resultsArea.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -684,47 +681,55 @@
             }, 500);
         });
 
-        // Function to render rich multi-instrument previews offline using Tone.js
-        async function renderAudioPreview(notes, bpm, instrumentType) {
-            const totalDuration = notes.length > 0 ? notes[notes.length - 1].time + 3 : 10;
+        // Function to render rich organic previews using Tone.js physical modeling & effects
+        async function renderAcousticAudioPreview(notes, bpm, instrumentType) {
+            const totalDuration = notes.length > 0 ? notes[notes.length - 1].time + 4 : 10;
 
             const buffer = await Tone.Offline(async () => {
-                let instrumentSynth;
+                // Studio Reverb and Delay chain for natural acoustic space
+                const reverb = new Tone.Reverb({ decay: 2.5, wet: 0.35 }).toDestination();
+                const delay = new Tone.FeedbackDelay({ delayTime: "8n", feedback: 0.2, wet: 0.2 }).connect(reverb);
+                const masterBus = new Tone.Gain(0.8).connect(delay);
 
-                if (instrumentType === "piano") {
-                    // Rich multi-oscillator piano simulation with gentle hammer decay
-                    instrumentSynth = new Tone.PolySynth(Tone.Synth, {
-                        oscillator: { type: "triangle8" },
-                        envelope: { attack: 0.01, decay: 0.4, sustain: 0.05, release: 0.8 }
-                    }).toDestination();
-                } else if (instrumentType === "guitar") {
-                    // Plucked acoustic guitar style synthesis
-                    instrumentSynth = new Tone.PolySynth(Tone.Synth, {
-                        oscillator: { type: "sine" },
-                        envelope: { attack: 0.005, decay: 0.25, sustain: 0.1, release: 0.3 }
-                    }).toDestination();
-                } else if (instrumentType === "bass") {
-                    // Deep punchy electric bass style
-                    instrumentSynth = new Tone.Synth({
-                        oscillator: { type: "sawtooth" },
-                        envelope: { attack: 0.02, decay: 0.3, sustain: 0.2, release: 0.4 }
-                    }).toDestination();
+                let instrument;
+
+                if (instrumentType === "plucked" || instrumentType === "pluck") {
+                    // Karplus-Strong string physical modeling
+                    instrument = new Tone.PluckSynth({
+                        attackNoise: 1.2,
+                        dampening: 4000,
+                        resonance: 0.98
+                    }).connect(masterBus);
                 } else if (instrumentType === "strings") {
-                    // Lush strings ensemble with slow attack
-                    instrumentSynth = new Tone.PolySynth(Tone.Synth, {
+                    // Ensemble strings using layered warm chorused oscillators with slow attack
+                    instrument = new Tone.PolySynth(Tone.Synth, {
                         oscillator: { type: "fatsawtooth" },
-                        envelope: { attack: 0.3, decay: 0.5, sustain: 0.8, release: 1.2 }
-                    }).toDestination();
+                        envelope: { attack: 0.35, decay: 0.4, sustain: 0.7, release: 1.5 }
+                    }).connect(masterBus);
+                } else if (instrumentType === "chime") {
+                    // Metallic bell physical modeling
+                    instrument = new Tone.MetalSynth({
+                        frequency: 200,
+                        envelope: { attack: 0.001, decay: 1.4, release: 1.4 },
+                        harmonicity: 5.1,
+                        modulationIndex: 32,
+                        resonance: 4000,
+                        octaves: 1.5
+                    }).connect(masterBus);
                 } else {
-                    // Default ambient pad synth
-                    instrumentSynth = new Tone.PolySynth(Tone.Synth, {
+                    // Warm cinematic keys / electric piano emulation
+                    instrument = new Tone.PolySynth(Tone.Synth, {
                         oscillator: { type: "sine" },
-                        envelope: { attack: 0.1, decay: 0.3, sustain: 0.5, release: 1.0 }
-                    }).toDestination();
+                        envelope: { attack: 0.02, decay: 0.5, sustain: 0.2, release: 1.0 }
+                    }).connect(masterBus);
                 }
 
                 notes.forEach(note => {
-                    instrumentSynth.triggerAttackRelease(note.name, note.duration, note.time, note.velocity);
+                    if (instrumentType === "chime") {
+                        instrument.triggerAttackRelease(note.name, "4n", note.time, note.velocity);
+                    } else {
+                        instrument.triggerAttackRelease(note.name, note.duration, note.time, note.velocity);
+                    }
                 });
             }, totalDuration);
 
