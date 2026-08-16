@@ -15,7 +15,7 @@ class SiteHeader extends HTMLElement {
                                 <ul class="dropdown-menu">
                                     <li><a href="/AI Tools/Audio 2 MIDI.html"><i class="fa-solid fa-music" style="margin-right: 8px; color: #00d4ff;"></i> Audio 2 MIDI</a></li>
                                     <li><a href="/AI Tools/Stem Separator.html"><i class="fa-solid fa-sliders" style="margin-right: 8px; color: #00d4ff;"></i> Stem Separator</a></li>
-                                    <li><a href="/AI Tools/Thoughts 2 Midi.html"><i class="fa-solid fa-brain" style="margin-right: 8px; color: #00d4ff;"></i> Thoughts 2 MIDI</a></li>
+                                    <li><a href="/AI Tools/Thoughts 2 MIDI.html"><i class="fa-solid fa-brain" style="margin-right: 8px; color: #00d4ff;"></i> Thoughts to MIDI</a></li>
                                 </ul>
                             </li>
                             <li><a href="/Pages/Services.html">Services</a></li>
@@ -50,28 +50,28 @@ customElements.define('site-footer', SiteFooter);
 // SMART UNIVERSAL META TAG INJECTOR
 // =========================================
 document.addEventListener("DOMContentLoaded", function() {
-    const path = window.location.pathname;
+    const path = window.location.pathname.toLowerCase();
 
     let pageTitle = "ToneVault | The Sonic Lab";
     let pageDescription = "ToneVault is the sonic laboratory of Harish Cousal. Professional music production blending hard-hitting electronic drops with cinematic orchestral arrangements.";
-    let ogUrl = "https://tonevault.qd.je" + path;
+    let ogUrl = "https://tonevault.qd.je" + window.location.pathname;
 
-    if (path.includes("Listen.html")) {
+    if (path.includes("listen.html")) {
         pageTitle = "Listen | ToneVault";
         pageDescription = "Listen to the latest releases, custom productions, and cinematic scores out of the ToneVault studio by Harish Cousal.";
-    } else if (path.includes("Services.html")) {
+    } else if (path.includes("services.html")) {
         pageTitle = "Services | ToneVault";
         pageDescription = "Explore custom music production, mixing, mastering, and scoring services by Harish Cousal.";
-    } else if (path.includes("Audio 2 MIDI")) {
+    } else if (path.includes("audio 2 midi")) {
         pageTitle = "Audio 2 MIDI | ToneVault";
         pageDescription = "Extract polyphonic MIDI sequences directly from audio tracks using our browser-based AI tool.";
-    } else if (path.includes("Stem Separator")) {
+    } else if (path.includes("stem separator")) {
         pageTitle = "Stem Separator | ToneVault";
         pageDescription = "Isolate vocals, drums, bass, and instruments instantly using our AI-powered stem separation tool.";
-    } else if (path.includes("Thoughts 2 Midi")) {
-        pageTitle = "Thoughts 2 MIDI | ToneVault";
+    } else if (path.includes("thoughts 2 midi")) {
+        pageTitle = "Thoughts to MIDI | ToneVault";
         pageDescription = "Generate complex MIDI patterns and musical ideas from simple text descriptions using AI.";
-    } else if (path.includes("About")) {
+    } else if (path.includes("about")) {
         pageTitle = "About & Contact | ToneVault";
         pageDescription = "Get in touch with Harish Cousal for collaborations, custom beats, and project inquiries.";
     }
