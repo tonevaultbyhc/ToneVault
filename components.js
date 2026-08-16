@@ -15,7 +15,7 @@ class SiteHeader extends HTMLElement {
                                 <ul class="dropdown-menu">
                                     <li><a href="/AI Tools/Audio 2 MIDI.html"><i class="fa-solid fa-music" style="margin-right: 8px; color: #00d4ff;"></i> Audio 2 MIDI</a></li>
                                     <li><a href="/AI Tools/Stem Separator.html"><i class="fa-solid fa-sliders" style="margin-right: 8px; color: #00d4ff;"></i> Stem Separator</a></li>
-                                    <li><a href="/AI Tools/Thoughts 2 MIDI.html"><i class="fa-solid fa-brain" style="margin-right: 8px; color: #00d4ff;"></i> Thoughts to MIDI</a></li>
+                                    <li><a href="/AI Tools/Thoughts 2 Midi.html"><i class="fa-solid fa-brain" style="margin-right: 8px; color: #00d4ff;"></i> Thoughts to MIDI</a></li>
                                 </ul>
                             </li>
                             <li><a href="/Pages/Services.html">Services</a></li>
