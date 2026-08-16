@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToneVault - Thoughts to MIDI Generator</title>
+    <title>Thoughts to MIDI | ToneVault</title>
     
     <!-- FONTAWESOME ICONS CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -53,11 +53,12 @@
             width: 100%;
             max-width: 1200px;
             margin: 0 auto 50px auto;
-            padding: 0 20px;
+            padding: 0 15px;
+            box-sizing: border-box;
             display: grid;
             grid-template-columns: 1fr 340px;
             gap: 30px;
-            align-items: start; /* Prevents stretching */
+            align-items: start;
         }
 
         .stem-card {
@@ -66,6 +67,7 @@
             border-radius: 18px;
             padding: 35px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-sizing: border-box;
         }
 
         /* SETTINGS SECTION */
@@ -157,6 +159,7 @@
 
         .waveform-box {
             width: 100%;
+            min-width: 0;
         }
 
         /* POST-GENERATION PREVIEW TOOLBAR */
@@ -242,6 +245,7 @@
             transition: opacity 0.2s ease, transform 0.2s ease;
             box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
             margin-top: 15px;
+            box-sizing: border-box;
         }
 
         .action-btn:hover {
@@ -325,7 +329,7 @@
             margin-top: 15px;
         }
 
-        /* KEYWORD GUIDE STYLES (MOVED TO SIDEBAR) */
+        /* KEYWORD GUIDE STYLES */
         .keyword-guide {
             padding: 25px 20px;
             background: rgba(20, 20, 20, 0.95);
@@ -333,6 +337,7 @@
             border-radius: 18px;
             color: #cfcfcf;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-sizing: border-box;
         }
 
         .keyword-guide-header {
@@ -347,12 +352,6 @@
             color: #ffffff;
             letter-spacing: 0.5px;
             text-transform: uppercase;
-        }
-
-        .keyword-guide-subtitle {
-            color: #888;
-            font-size: 12px;
-            margin-left: 4px;
         }
 
         .keyword-category {
@@ -462,7 +461,7 @@
         @media (max-width: 992px) {
             .layout-container { 
                 grid-template-columns: 1fr; 
-                max-width: 900px;
+                max-width: 700px;
             }
         }
 
@@ -770,7 +769,6 @@
         });
 
         processBtn.addEventListener("click", async () => {
-            // Unlock Tone audio context via user click gesture
             await Tone.start();
 
             processBtn.setAttribute("disabled", "true");
@@ -904,33 +902,22 @@
             }, 500);
         });
 
-        // ============================================================
-        // TONEVAULT PREVIEW INSTRUMENTS
-        // High-quality sampled piano + premium synth alternatives
-        // ============================================================
-
         let pianoSamples = null;
         let pianoSamplesLoading = null;
 
         const SALAMANDER_PIANO_URL =
             "https://tonejs.github.io/audio/salamander/";
 
-        // Load a small set of high-quality Salamander Grand Piano samples.
-        // Tone.Sampler automatically interpolates between these notes.
         async function loadPianoSamples() {
-
-            // Already loaded
             if (pianoSamples) {
                 return pianoSamples;
             }
 
-            // Prevent multiple simultaneous downloads
             if (pianoSamplesLoading) {
                 return pianoSamplesLoading;
             }
 
             pianoSamplesLoading = new Promise((resolve, reject) => {
-
                 const sampleUrls = {
                     C3: "C3.mp3",
                     "D#3": "Ds3.mp3",
@@ -957,7 +944,6 @@
 
                 Promise.all(
                     entries.map(async ([note, filename]) => {
-
                         const response = await fetch(
                             SALAMANDER_PIANO_URL + filename
                         );
@@ -979,24 +965,12 @@
                     })
                 )
                 .then(results => {
-
                     pianoSamples = Object.fromEntries(results);
-
-                    console.log(
-                        "ToneVault: Grand Piano samples loaded."
-                    );
-
                     resolve(pianoSamples);
                 })
                 .catch(error => {
-
-                    console.error(
-                        "ToneVault: Piano sample loading failed:",
-                        error
-                    );
-
+                    console.error("ToneVault: Piano sample loading failed:", error);
                     pianoSamplesLoading = null;
-
                     reject(error);
                 });
             });
@@ -1004,56 +978,37 @@
             return pianoSamplesLoading;
         }
 
-        // ============================================================
-        // RENDER HIGH-QUALITY AUDIO PREVIEW
-        // ============================================================
-
         async function renderAcousticAudioPreview(
             notes,
             totalDuration,
             instrumentType
         ) {
-
             try {
-
-                // --------------------------------------------------------
-                // Load piano samples only when a piano is requested
-                // --------------------------------------------------------
-
                 let loadedPianoSamples = null;
 
                 if (
                     instrumentType === "grandpiano" ||
                     instrumentType === "softpiano"
                 ) {
-
                     statusText.innerHTML =
                         `<i class="fa-solid fa-spinner fa-spin"></i> Loading piano samples...`;
 
                     loadedPianoSamples = await loadPianoSamples();
                 }
 
-                // --------------------------------------------------------
-                // Offline rendering
-                // --------------------------------------------------------
-
                 const buffer = await Tone.Offline(async () => {
-
-                    // Premium reverb
                     const reverb = new Tone.Reverb({
                         decay: 2.8,
                         preDelay: 0.015,
                         wet: 0.24
                     }).toDestination();
 
-                    // Very subtle stereo delay
                     const delay = new Tone.FeedbackDelay({
                         delayTime: "8n",
                         feedback: 0.08,
                         wet: 0.06
                     }).connect(reverb);
 
-                    // Gentle compressor
                     const compressor = new Tone.Compressor({
                         threshold: -18,
                         ratio: 2.5,
@@ -1066,30 +1021,13 @@
 
                     let instrument;
 
-                    // ====================================================
-                    // GRAND PIANO
-                    // ====================================================
-
                     if (instrumentType === "grandpiano") {
-
                         instrument = new Tone.Sampler({
-
                             urls: loadedPianoSamples,
-
                             attack: 0.002,
                             release: 1.8
-
                         }).connect(masterBus);
-
-                    }
-
-                    // ====================================================
-                    // SOFT GRAND PIANO
-                    // Same real piano samples, but softer and darker
-                    // ====================================================
-
-                    else if (instrumentType === "softpiano") {
-
+                    } else if (instrumentType === "softpiano") {
                         const pianoFilter = new Tone.Filter({
                             type: "lowpass",
                             frequency: 5500,
@@ -1097,183 +1035,76 @@
                         }).connect(masterBus);
 
                         instrument = new Tone.Sampler({
-
                             urls: loadedPianoSamples,
-
                             attack: 0.008,
                             release: 2.2
-
                         }).connect(pianoFilter);
 
                         instrument.volume.value = -2.5;
-                    }
-
-                    // ====================================================
-                    // ELECTRIC PIANO
-                    // ====================================================
-
-                    else if (instrumentType === "electricpiano") {
-
+                    } else if (instrumentType === "electricpiano") {
                         instrument = new Tone.PolySynth(
                             Tone.FMSynth,
                             {
-
                                 harmonicity: 2.5,
-
                                 modulationIndex: 1.5,
-
-                                oscillator: {
-                                    type: "sine"
-                                },
-
-                                envelope: {
-                                    attack: 0.01,
-                                    decay: 1.2,
-                                    sustain: 0.45,
-                                    release: 1.8
-                                },
-
-                                modulation: {
-                                    type: "sine"
-                                },
-
-                                modulationEnvelope: {
-                                    attack: 0.01,
-                                    decay: 0.8,
-                                    sustain: 0.25,
-                                    release: 1.2
-                                }
+                                oscillator: { type: "sine" },
+                                envelope: { attack: 0.01, decay: 1.2, sustain: 0.45, release: 1.8 },
+                                modulation: { type: "sine" },
+                                modulationEnvelope: { attack: 0.01, decay: 0.8, sustain: 0.25, release: 1.2 }
                             }
                         ).connect(masterBus);
 
                         instrument.volume.value = -4;
-                    }
-
-                    // ====================================================
-                    // WARM STRINGS
-                    // ====================================================
-
-                    else if (instrumentType === "strings") {
-
+                    } else if (instrumentType === "strings") {
                         instrument = new Tone.PolySynth(
                             Tone.Synth,
                             {
-
-                                oscillator: {
-                                    type: "triangle"
-                                },
-
-                                envelope: {
-                                    attack: 0.35,
-                                    decay: 0.5,
-                                    sustain: 0.65,
-                                    release: 2.5
-                                }
+                                oscillator: { type: "triangle" },
+                                envelope: { attack: 0.35, decay: 0.5, sustain: 0.65, release: 2.5 }
                             }
                         ).connect(masterBus);
 
                         instrument.volume.value = -8;
-                    }
-
-                    // ====================================================
-                    // CINEMATIC PAD
-                    // ====================================================
-
-                    else if (instrumentType === "pad") {
-
+                    } else if (instrumentType === "pad") {
                         instrument = new Tone.PolySynth(
                             Tone.Synth,
                             {
-
-                                oscillator: {
-                                    type: "sine"
-                                },
-
-                                envelope: {
-                                    attack: 0.8,
-                                    decay: 1.2,
-                                    sustain: 0.7,
-                                    release: 3.5
-                                }
+                                oscillator: { type: "sine" },
+                                envelope: { attack: 0.8, decay: 1.2, sustain: 0.7, release: 3.5 }
                             }
                         ).connect(masterBus);
 
                         instrument.volume.value = -10;
-                    }
-
-                    // ====================================================
-                    // SOFT BELL
-                    // ====================================================
-
-                    else if (instrumentType === "bell") {
-
+                    } else if (instrumentType === "bell") {
                         instrument = new Tone.MetalSynth({
-
                             frequency: 250,
-
-                            envelope: {
-                                attack: 0.001,
-                                decay: 1.8,
-                                release: 2.0
-                            },
-
+                            envelope: { attack: 0.001, decay: 1.8, release: 2.0 },
                             harmonicity: 5.1,
-
                             modulationIndex: 12,
-
                             resonance: 3500,
-
                             octaves: 1.5
-
                         }).connect(masterBus);
 
                         instrument.volume.value = -8;
-                    }
-
-                    // ====================================================
-                    // SAFETY FALLBACK
-                    // ====================================================
-
-                    else {
-
+                    } else {
                         instrument = new Tone.PolySynth(
                             Tone.Synth,
                             {
-
-                                oscillator: {
-                                    type: "triangle"
-                                },
-
-                                envelope: {
-                                    attack: 0.03,
-                                    decay: 0.4,
-                                    sustain: 0.4,
-                                    release: 1.2
-                                }
+                                oscillator: { type: "triangle" },
+                                envelope: { attack: 0.03, decay: 0.4, sustain: 0.4, release: 1.2 }
                             }
                         ).connect(masterBus);
                     }
 
-                    // ====================================================
-                    // SCHEDULE NOTES
-                    // ====================================================
-
                     notes.forEach(note => {
-
                         instrument.triggerAttackRelease(
                             note.name,
                             note.duration,
                             note.time,
                             note.velocity
                         );
-
                     });
-
                 }, totalDuration + 1);
-
-                // ========================================================
-                // CONVERT TO WAV
-                // ========================================================
 
                 const wavBlob = bufferToWave(
                     buffer.get(),
@@ -1282,40 +1113,24 @@
 
                 const wavUrl = URL.createObjectURL(wavBlob);
 
-                // Remove previous waveform
                 if (wavesurfer) {
                     wavesurfer.destroy();
                 }
 
-                // Create new waveform
                 wavesurfer = WaveSurfer.create({
-
                     container: '#waveform',
-
                     waveColor: '#444',
-
                     progressColor: '#00d4ff',
-
                     cursorColor: '#ffffff',
-
                     barWidth: 3,
-
                     barRadius: 3,
-
                     height: 60,
-
                     normalize: true
-
                 });
 
                 wavesurfer.load(wavUrl);
 
-                // ========================================================
-                // WAVEFORM EVENTS
-                // ========================================================
-
                 wavesurfer.on('ready', () => {
-
                     audioDurationText.textContent =
                         formatTime(wavesurfer.getDuration());
 
@@ -1328,37 +1143,20 @@
                 });
 
                 wavesurfer.on('play', () => {
-
-                    previewPlayIcon.className =
-                        "fa-solid fa-pause";
-
+                    previewPlayIcon.className = "fa-solid fa-pause";
                 });
 
                 wavesurfer.on('pause', () => {
-
-                    previewPlayIcon.className =
-                        "fa-solid fa-play";
-
+                    previewPlayIcon.className = "fa-solid fa-play";
                 });
 
                 wavesurfer.on('finish', () => {
-
-                    previewPlayIcon.className =
-                        "fa-solid fa-play";
-
+                    previewPlayIcon.className = "fa-solid fa-play";
                 });
 
             } catch (error) {
-
-                console.error(
-                    "ToneVault preview rendering error:",
-                    error
-                );
-
-                alert(
-                    "Could not load the preview instrument. " +
-                    "Please check your internet connection and try again."
-                );
+                console.error("ToneVault preview rendering error:", error);
+                alert("Could not load the preview instrument. Please check your internet connection and try again.");
             }
         }
         
@@ -1373,10 +1171,10 @@
             function setUint16(data) { view.setUint16(pos, data, true); pos += 2; }
             function setUint32(data) { view.setUint32(pos, data, true); pos += 4; }
 
-            setUint32(0x46464952); "RIFF"
+            setUint32(0x46464952); // "RIFF"
             setUint32(length - 8); 
-            setUint32(0x45564157); "WAVE"
-            setUint32(0x20746d66); "fmt "
+            setUint32(0x45564157); // "WAVE"
+            setUint32(0x20746d66); // "fmt "
             setUint32(16); 
             setUint16(1); 
             setUint16(numOfChan);
@@ -1384,7 +1182,7 @@
             setUint32(sampleRate * 2 * numOfChan); 
             setUint16(numOfChan * 2); 
             setUint16(16); 
-            setUint32(0x61746164); "data"
+            setUint32(0x61746164); // "data"
             setUint32(length - pos - 4);
 
             for (let i = 0; i < abuffer.numberOfChannels; i++) channels.push(abuffer.getChannelData(i));
