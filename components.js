@@ -15,6 +15,7 @@ class SiteHeader extends HTMLElement {
                                 <ul class="dropdown-menu">
                                     <li><a href="/AI Tools/Audio 2 MIDI.html"><i class="fa-solid fa-music" style="margin-right: 8px; color: #00d4ff;"></i> Audio 2 MIDI</a></li>
                                     <li><a href="/AI Tools/Stem Separator.html"><i class="fa-solid fa-sliders" style="margin-right: 8px; color: #00d4ff;"></i> Stem Separator</a></li>
+                                    <li><a href="/AI Tools/Thoughts 2 Midi.html"><i class="fa-solid fa-brain" style="margin-right: 8px; color: #00d4ff;"></i> Thoughts 2 MIDI</a></li>
                                 </ul>
                             </li>
                             <li><a href="/Pages/Services.html">Services</a></li>
@@ -67,6 +68,9 @@ document.addEventListener("DOMContentLoaded", function() {
     } else if (path.includes("Stem Separator")) {
         pageTitle = "Stem Separator | ToneVault";
         pageDescription = "Isolate vocals, drums, bass, and instruments instantly using our AI-powered stem separation tool.";
+    } else if (path.includes("Thoughts 2 Midi")) {
+        pageTitle = "Thoughts 2 MIDI | ToneVault";
+        pageDescription = "Generate complex MIDI patterns and musical ideas from simple text descriptions using AI.";
     } else if (path.includes("About")) {
         pageTitle = "About & Contact | ToneVault";
         pageDescription = "Get in touch with Harish Cousal for collaborations, custom beats, and project inquiries.";
@@ -78,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function() {
         { charset: "UTF-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1.0" },
         { name: "description", content: pageDescription },
-        { name: "keywords", content: "Harish Cousal, ToneVault, music producer, EDM producer, cinematic scoring, custom beats, mixing and mastering, audio to midi, stem separator" },
+        { name: "keywords", content: "Harish Cousal, ToneVault, music producer, EDM producer, cinematic scoring, custom beats, mixing and mastering, audio to midi, stem separator, thoughts to midi" },
         { name: "author", content: "Harish Cousal" },
         
         { property: "og:title", content: pageTitle },
