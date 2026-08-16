@@ -373,6 +373,15 @@
                         </select>
                     </div>
                     <div class="setting-group">
+                        <label for="instrumentSelect"><i class="fa-solid fa-compact-disc"></i> Preview Instrument</label>
+                        <select id="instrumentSelect">
+                            <option value="piano" selected>Grand Piano</option>
+                            <option value="synth">Ambient Synth</option>
+                            <option value="pluck">Plucked Synth</option>
+                            <option value="organ">Electric Organ</option>
+                        </select>
+                    </div>
+                    <div class="setting-group">
                         <label for="tempoSelect"><i class="fa-solid fa-metronome"></i> Tempo (BPM)</label>
                         <select id="tempoSelect">
                             <option value="75">75 BPM (Slow)</option>
@@ -398,7 +407,7 @@
                             <option value="B">B</option>
                         </select>
                     </div>
-                    <div class="setting-group">
+                    <div class="setting-group" style="grid-column: 1 / -1;">
                         <label for="scaleSelect"><i class="fa-solid fa-music"></i> Scale Type</label>
                         <select id="scaleSelect">
                             <option value="major">Major</option>
@@ -473,6 +482,7 @@
     <!-- CLIENT-SIDE MIDI & AUDIO LOGIC -->
     <script type="module">
         const genreSelect = document.getElementById("genreSelect");
+        const instrumentSelect = document.getElementById("instrumentSelect");
         const tempoSelect = document.getElementById("tempoSelect");
         const keySelect = document.getElementById("keySelect");
         const scaleSelect = document.getElementById("scaleSelect");
@@ -492,7 +502,6 @@
         const downloadMidiBtn = document.getElementById("downloadMidiBtn");
 
         let wavesurfer = null;
-        let synth = null;
         let midiBlobUrl = null;
 
         // Music theory intervals (semitones from root)
@@ -521,7 +530,6 @@
         previewVolume.addEventListener("input", (e) => {
             const vol = parseFloat(e.target.value);
             if (wavesurfer) wavesurfer.setVolume(vol);
-            if (synth) synth.volume.value = Tone.gainToDb(vol);
         });
 
         processBtn.addEventListener("click", async () => {
@@ -536,11 +544,12 @@
             setTimeout(async () => {
                 try {
                     progressBarFill.style.width = "70%";
-                    statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Compiling MIDI & synthesizing preview...`;
+                    statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Compiling MIDI & synthesizing with selected instrument...`;
 
                     const tempo = parseInt(tempoSelect.value);
                     const rootKey = keySelect.value;
                     const scaleType = scaleSelect.value;
+                    const instrumentType = instrumentSelect.value;
                     const rootNoteVal = 60 + noteToVal[rootKey]; // Middle C octave base
 
                     // Create MIDI Object
@@ -550,12 +559,10 @@
 
                     const intervals = scaleIntervals[scaleType];
                     let currentTime = 0;
-                    const noteDuration = 0.5; // Eighth/Quarter notes structure
+                    const noteDuration = 0.5; 
                     const totalSteps = 32; // 8 bars of 4/4
 
-                    // Generate pseudo-random pattern influenced by inputs
                     for (let i = 0; i < totalSteps; i++) {
-                        // Skip some steps for rhythm variation
                         if (Math.random() > 0.8 && i % 4 !== 0) {
                             currentTime += noteDuration;
                             continue;
@@ -583,8 +590,6 @@
                     downloadMidiBtn.href = midiBlobUrl;
                     downloadMidiBtn.download = `tonevault_${rootKey}_${scaleType}_${tempo}bpm.mid`;
 
-                    // Render a simulated audio preview track using Tone.js offline rendering or buffer simulation
-                    // For lightweight reliable rendering, we'll map midi notes into a temporary audio buffer export or waveform display
                     progressBarFill.style.width = "100%";
                     statusText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#00d4ff;"></i> Composition Ready!`;
 
@@ -596,14 +601,40 @@
                     resultsArea.style.display = "block";
                     waveformPreviewContainer.style.display = "block";
 
-                    // Generate a silent/synth audio track representation for WaveSurfer preview visualization
-                    // We can synthesize a quick audio buffer using Tone.offline to display a real waveform
+                    // Render preview buffer based on chosen instrument characteristics
                     const buffer = await Tone.Offline(async () => {
-                        const synthPart = new Tone.Synth().toDestination();
+                        let previewSynth;
+                        
+                        if (instrumentType === "piano") {
+                            // Bright synthetic mallet/piano patch using DuoSynth or PolySynth
+                            previewSynth = new Tone.PolySynth(Tone.Synth, {
+                                oscillator: { type: "triangle" },
+                                envelope: { attack: 0.02, decay: 0.3, sustain: 0.1, release: 0.8 }
+                            }).toDestination();
+                        } else if (instrumentType === "synth") {
+                            // Warm ambient pad using fatsaw oscillator
+                            previewSynth = new Tone.Synth({
+                                oscillator: { type: "fatsawtooth" },
+                                envelope: { attack: 0.4, decay: 0.5, sustain: 0.5, release: 1.2 }
+                            }).toDestination();
+                        } else if (instrumentType === "pluck") {
+                            // Crisp plucked strings patch
+                            previewSynth = new Tone.Synth({
+                                oscillator: { type: "sine" },
+                                envelope: { attack: 0.005, decay: 0.2, sustain: 0.0, release: 0.2 }
+                            }).toDestination();
+                        } else if (instrumentType === "organ") {
+                            // Classic electric organ harmonic square patch
+                            previewSynth = new Tone.Synth({
+                                oscillator: { type: "square8" },
+                                envelope: { attack: 0.05, decay: 0.1, sustain: 0.9, release: 0.3 }
+                            }).toDestination();
+                        }
+
                         track.notes.forEach(note => {
-                            synthPart.triggerAttackRelease(note.name, note.duration, note.time, note.velocity);
+                            previewSynth.triggerAttackRelease(note.name, note.duration, note.time, note.velocity);
                         });
-                    }, 16); // 16 seconds preview
+                    }, 16); 
 
                     // Convert Tone AudioBuffer to WAV blob URL for WaveSurfer
                     const wavBlob = bufferToWave(buffer.get(), buffer.length);
@@ -624,6 +655,7 @@
 
                     wavesurfer.on('ready', () => {
                         audioDurationText.textContent = formatTime(wavesurfer.getDuration());
+                        wavesurfer.setVolume(parseFloat(previewVolume.value));
                     });
                     wavesurfer.on('play', () => { previewPlayIcon.className = "fa-solid fa-pause"; });
                     wavesurfer.on('pause', () => { previewPlayIcon.className = "fa-solid fa-play"; });
