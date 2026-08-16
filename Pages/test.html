@@ -386,7 +386,7 @@
         <!-- PAGE HEADER -->
         <div class="page-header">
             <h1>Thoughts to <span>MIDI</span></h1>
-            <p>Generate algorithmic MIDI compositions with physically-modeled acoustic instrument previews and instant DAW exports.</p>
+            <p>Generate rhytmic, structured melodic patterns with precise bar lengths and physical modeling preview instruments.</p>
         </div>
 
         <!-- CUSTOM THEMED API INTERFACE WRAPPER -->
@@ -438,8 +438,8 @@
                         </select>
                     </div>
                     <div class="setting-group" style="grid-column: 1 / -1;">
-                        <label for="barsInput"><i class="fa-solid fa-arrows-split-up-and-left"></i> Length (Bars)</label>
-                        <input type="number" id="barsInput" value="8" min="1" max="64" placeholder="e.g. 8, 16, 32">
+                        <label for="barsInput"><i class="fa-solid fa-arrows-split-up-and-left"></i> Exact Length (Bars)</label>
+                        <input type="number" id="barsInput" value="8" min="1" max="64" placeholder="e.g. 8, 12, 16">
                     </div>
                     <div class="setting-group" style="grid-column: 1 / -1;">
                         <label for="scaleSelect"><i class="fa-solid fa-music"></i> Scale Type</label>
@@ -455,7 +455,7 @@
                 <!-- THOUGHTS & WORDS TEXTAREA -->
                 <div class="setting-group" style="margin-bottom: 25px;">
                     <label for="thoughtsInput"><i class="fa-solid fa-brain"></i> Thoughts / Inspiration / Keywords</label>
-                    <textarea id="thoughtsInput" rows="3" placeholder="e.g. expressive plucks, warm strings resonance, atmospheric vibe..."></textarea>
+                    <textarea id="thoughtsInput" rows="3" placeholder="e.g. groovy arpeggio, rhythmic drive, melodic hook..."></textarea>
                 </div>
 
                 <!-- SUBMIT BUTTON -->
@@ -465,7 +465,7 @@
 
                 <!-- STATUS MESSAGE & PROGRESS BAR -->
                 <div id="statusMessage">
-                    <div class="status-text" id="statusText"><i class="fa-solid fa-spinner fa-spin"></i> Processing Algorithmic Generation...</div>
+                    <div class="status-text" id="statusText"><i class="fa-solid fa-spinner fa-spin"></i> Processing Rhythmic Groove...</div>
                     <div class="progress-bar-container">
                         <div class="progress-bar-fill" id="progressBarFill"></div>
                     </div>
@@ -485,7 +485,7 @@
                             <div class="waveform-box" id="waveform"></div>
                         </div>
 
-                        <!-- POST-GENERATION PREVIEW TOOLBAR (Physical Modeling Instruments) -->
+                        <!-- POST-GENERATION PREVIEW TOOLBAR -->
                         <div class="preview-toolbar">
                             <div class="preview-instrument-select">
                                 <label for="postInstrumentSelect"><i class="fa-solid fa-sliders"></i> Preview Instrument:</label>
@@ -526,7 +526,7 @@
     <!-- UNIVERSAL HTML COMPONENT EDITOR -->
     <script src="/components.js"></script>
 
-    <!-- CLIENT-SIDE PHYSICAL MODELING & MIDI LOGIC -->
+    <!-- CLIENT-SIDE RHYTHMIC GROOVE & MIDI LOGIC -->
     <script type="module">
         const tempoInput = document.getElementById("tempoInput");
         const barsInput = document.getElementById("barsInput");
@@ -553,6 +553,7 @@
         let midiBlobUrl = null;
         let generatedNotes = []; 
         let currentTempo = 120;
+        let exactMaxTime = 8; 
 
         const scaleIntervals = {
             major: [0, 2, 4, 5, 7, 9, 11],
@@ -579,10 +580,9 @@
             if (wavesurfer) wavesurfer.setVolume(vol);
         });
 
-        // Instantly re-render offline audio preview when instrument changes post-generation
         postInstrumentSelect.addEventListener("change", async () => {
             if (generatedNotes.length > 0) {
-                await renderAcousticAudioPreview(generatedNotes, currentTempo, postInstrumentSelect.value);
+                await renderAcousticAudioPreview(generatedNotes, exactMaxTime, postInstrumentSelect.value);
             }
         });
 
@@ -593,12 +593,12 @@
             waveformPreviewContainer.style.display = "none";
             
             progressBarFill.style.width = "30%";
-            statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Calculating structure & bar length...`;
+            statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Building rhythmic chord structure...`;
 
             setTimeout(async () => {
                 try {
                     progressBarFill.style.width = "60%";
-                    statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Composing algorithmic notes...`;
+                    statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Quantizing groove patterns...`;
 
                     currentTempo = parseInt(tempoInput.value) || 120;
                     const totalBars = parseInt(barsInput.value) || 8;
@@ -606,45 +606,80 @@
                     const scaleType = scaleSelect.value;
                     const timeSig = timeSigSelect.value; 
                     const [beatsPerBar] = timeSig.split('/').map(Number);
-                    const rootNoteVal = 60 + noteToVal[rootKey];
+                    const rootNoteVal = 48 + noteToVal[rootKey]; // Lower register root for chord grounding
 
-                    // Create MIDI Object
+                    const secondsPerBeat = 60 / currentTempo;
+                    const barDuration = beatsPerBar * secondsPerBeat;
+                    exactMaxTime = totalBars * barDuration;
+
                     const midi = new Midi();
                     midi.header.setTempo(currentTempo);
                     const track = midi.addTrack();
 
                     const intervals = scaleIntervals[scaleType];
+                    const stepDuration = secondsPerBeat * 0.5; // Eighth note grid for rhythmic placement
                     let currentTime = 0;
-                    const noteDuration = 0.5; 
-                    const totalSteps = totalBars * beatsPerBar;
-
                     generatedNotes = [];
 
-                    for (let i = 0; i < totalSteps; i++) {
-                        if (Math.random() > 0.82 && i % beatsPerBar !== 0) {
-                            currentTime += noteDuration;
-                            continue;
+                    // Progression root offsets (e.g., I - vi - IV - V structure)
+                    const chordProgression = [0, 5, 3, 4]; 
+                    let currentChordIdx = 0;
+                    let barCounter = 0;
+
+                    while (currentTime < exactMaxTime) {
+                        // Switch chord every 2 bars for musical coherence
+                        if (Math.floor(currentTime / (barDuration * 2)) !== currentChordIdx) {
+                            currentChordIdx = Math.floor(currentTime / (barDuration * 2)) % chordProgression.length;
                         }
-                        const scaleDegree = intervals[Math.floor(Math.random() * intervals.length)];
-                        const octaveOffset = Math.random() > 0.7 ? 12 : (Math.random() > 0.9 ? -12 : 0);
-                        const midiNote = rootNoteVal + scaleDegree + octaveOffset;
 
-                        const noteObj = {
-                            midi: midiNote,
-                            time: currentTime,
-                            duration: noteDuration,
-                            velocity: 0.7 + Math.random() * 0.3
-                        };
+                        const baseDegree = chordProgression[currentChordIdx];
 
-                        track.addNote(noteObj);
-                        generatedNotes.push({
-                            name: Tone.Midi(midiNote).toNote(),
-                            duration: noteDuration,
-                            time: currentTime,
-                            velocity: noteObj.velocity
-                        });
+                        // Create a structured rhythmic motif (Downbeats get chords/roots, offbeats get melodic steps)
+                        const beatPositionInBar = (currentTime % barDuration) / secondsPerBeat;
+                        const isDownbeat = beatPositionInBar % 1 === 0;
 
-                        currentTime += noteDuration;
+                        if (isDownbeat) {
+                            // Play root/chord note on downbeats for rhythm
+                            let duration = Math.min(barDuration * 0.8, exactMaxTime - currentTime);
+                            const midiNote = rootNoteVal + intervals[baseDegree % intervals.length];
+
+                            const noteObj = {
+                                midi: midiNote,
+                                time: currentTime,
+                                duration: duration,
+                                velocity: 0.85
+                            };
+                            track.addNote(noteObj);
+                            generatedNotes.push({
+                                name: Tone.Midi(midiNote).toNote(),
+                                duration: duration,
+                                time: currentTime,
+                                velocity: 0.85
+                            });
+                        } else {
+                            // Play rhythmic arpeggio/melodic steps on offbeats
+                            if (Math.random() > 0.3) {
+                                let duration = Math.min(stepDuration * 0.9, exactMaxTime - currentTime);
+                                const randomInterval = intervals[(baseDegree + Math.floor(Math.random() * 3) * 2) % intervals.length];
+                                const midiNote = rootNoteVal + 12 + randomInterval; // Higher octave melody
+
+                                const noteObj = {
+                                    midi: midiNote,
+                                    time: currentTime,
+                                    duration: duration,
+                                    velocity: 0.65
+                                };
+                                track.addNote(noteObj);
+                                generatedNotes.push({
+                                    name: Tone.Midi(midiNote).toNote(),
+                                    duration: duration,
+                                    time: currentTime,
+                                    velocity: 0.65
+                                });
+                            }
+                        }
+
+                        currentTime += stepDuration;
                     }
 
                     // Export MIDI Blob
@@ -666,8 +701,7 @@
                     resultsArea.style.display = "block";
                     waveformPreviewContainer.style.display = "block";
 
-                    // Render preview using physical modeling
-                    await renderAcousticAudioPreview(generatedNotes, currentTempo, postInstrumentSelect.value);
+                    await renderAcousticAudioPreview(generatedNotes, exactMaxTime, postInstrumentSelect.value);
 
                     processBtn.removeAttribute("disabled");
                     resultsArea.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -681,46 +715,38 @@
             }, 500);
         });
 
-        // Function to render rich organic previews using Tone.js physical modeling & effects
-        async function renderAcousticAudioPreview(notes, bpm, instrumentType) {
-            const totalDuration = notes.length > 0 ? notes[notes.length - 1].time + 4 : 10;
-
+        async function renderAcousticAudioPreview(notes, totalDuration, instrumentType) {
             const buffer = await Tone.Offline(async () => {
-                // Studio Reverb and Delay chain for natural acoustic space
-                const reverb = new Tone.Reverb({ decay: 2.5, wet: 0.35 }).toDestination();
-                const delay = new Tone.FeedbackDelay({ delayTime: "8n", feedback: 0.2, wet: 0.2 }).connect(reverb);
+                const reverb = new Tone.Reverb({ decay: 2.2, wet: 0.3 }).toDestination();
+                const delay = new Tone.FeedbackDelay({ delayTime: "8n", feedback: 0.15, wet: 0.15 }).connect(reverb);
                 const masterBus = new Tone.Gain(0.8).connect(delay);
 
                 let instrument;
 
-                if (instrumentType === "plucked" || instrumentType === "pluck") {
-                    // Karplus-Strong string physical modeling
+                if (instrumentType === "pluck") {
                     instrument = new Tone.PluckSynth({
                         attackNoise: 1.2,
                         dampening: 4000,
                         resonance: 0.98
                     }).connect(masterBus);
                 } else if (instrumentType === "strings") {
-                    // Ensemble strings using layered warm chorused oscillators with slow attack
                     instrument = new Tone.PolySynth(Tone.Synth, {
                         oscillator: { type: "fatsawtooth" },
-                        envelope: { attack: 0.35, decay: 0.4, sustain: 0.7, release: 1.5 }
+                        envelope: { attack: 0.2, decay: 0.3, sustain: 0.6, release: 1.0 }
                     }).connect(masterBus);
                 } else if (instrumentType === "chime") {
-                    // Metallic bell physical modeling
                     instrument = new Tone.MetalSynth({
                         frequency: 200,
-                        envelope: { attack: 0.001, decay: 1.4, release: 1.4 },
+                        envelope: { attack: 0.001, decay: 1.0, release: 1.0 },
                         harmonicity: 5.1,
                         modulationIndex: 32,
                         resonance: 4000,
                         octaves: 1.5
                     }).connect(masterBus);
                 } else {
-                    // Warm cinematic keys / electric piano emulation
                     instrument = new Tone.PolySynth(Tone.Synth, {
                         oscillator: { type: "sine" },
-                        envelope: { attack: 0.02, decay: 0.5, sustain: 0.2, release: 1.0 }
+                        envelope: { attack: 0.02, decay: 0.4, sustain: 0.2, release: 0.8 }
                     }).connect(masterBus);
                 }
 
@@ -731,7 +757,7 @@
                         instrument.triggerAttackRelease(note.name, note.duration, note.time, note.velocity);
                     }
                 });
-            }, totalDuration);
+            }, totalDuration + 1);
 
             const wavBlob = bufferToWave(buffer.get(), buffer.length);
             const wavUrl = URL.createObjectURL(wavBlob);
@@ -758,7 +784,6 @@
             wavesurfer.on('finish', () => { previewPlayIcon.className = "fa-solid fa-play"; });
         }
 
-        // Helper function to convert AudioBuffer to WAV Blob for browser preview waveform
         function bufferToWave(abuffer, len) {
             let numOfChan = abuffer.numberOfChannels,
                 length = len * numOfChan * 2 + 44,
