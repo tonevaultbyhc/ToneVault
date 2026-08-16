@@ -155,7 +155,7 @@
             width: 100%;
         }
 
-        /* PREVIEW TOOLBAR FOR POST-GENERATION INSTRUMENT */
+        /* POST-GENERATION PREVIEW TOOLBAR */
         .preview-toolbar {
             display: flex;
             justify-content: space-between;
@@ -386,7 +386,7 @@
         <!-- PAGE HEADER -->
         <div class="page-header">
             <h1>Thoughts to <span>MIDI</span></h1>
-            <p>Generate custom algorithmic MIDI compositions instantly in your browser. Type your custom tempo, time signature, and preview with different instruments after generation.</p>
+            <p>Generate algorithmic MIDI compositions with custom lengths (bars), typing tempo, time signatures, and acoustic preview instruments.</p>
         </div>
 
         <!-- CUSTOM THEMED API INTERFACE WRAPPER -->
@@ -440,6 +440,10 @@
                         </select>
                     </div>
                     <div class="setting-group" style="grid-column: 1 / -1;">
+                        <label for="barsInput"><i class="fa-solid fa-arrows-split-up-and-left"></i> Length (Bars)</label>
+                        <input type="number" id="barsInput" value="8" min="1" max="64" placeholder="e.g. 8, 16, 32">
+                    </div>
+                    <div class="setting-group" style="grid-column: 1 / -1;">
                         <label for="scaleSelect"><i class="fa-solid fa-music"></i> Scale Type</label>
                         <select id="scaleSelect">
                             <option value="major">Major</option>
@@ -453,7 +457,7 @@
                 <!-- THOUGHTS & WORDS TEXTAREA -->
                 <div class="setting-group" style="margin-bottom: 25px;">
                     <label for="thoughtsInput"><i class="fa-solid fa-brain"></i> Thoughts / Inspiration / Keywords</label>
-                    <textarea id="thoughtsInput" rows="3" placeholder="e.g. rich rhythm, ambient atmosphere, driving groove..."></textarea>
+                    <textarea id="thoughtsInput" rows="3" placeholder="e.g. emotional progression, driving groove, spacious pads..."></textarea>
                 </div>
 
                 <!-- SUBMIT BUTTON -->
@@ -488,10 +492,11 @@
                             <div class="preview-instrument-select">
                                 <label for="postInstrumentSelect"><i class="fa-solid fa-sliders"></i> Preview Instrument:</label>
                                 <select id="postInstrumentSelect">
-                                    <option value="sine" selected>Clean Sine Synth</option>
-                                    <option value="triangle">Warm Triangle Synth</option>
-                                    <option value="square">Retro Square Synth</option>
-                                    <option value="sawtooth">Aggressive Saw Synth</option>
+                                    <option value="piano" selected>Acoustic Grand Piano</option>
+                                    <option value="guitar">Acoustic Guitar Style</option>
+                                    <option value="bass">Electric Bass</option>
+                                    <option value="strings">Orchestral Strings</option>
+                                    <option value="synth">Ambient Pad Synth</option>
                                 </select>
                             </div>
                             <div class="volume-control-wrapper">
@@ -527,6 +532,7 @@
     <!-- CLIENT-SIDE SYNTHESIS & MIDI LOGIC -->
     <script type="module">
         const tempoInput = document.getElementById("tempoInput");
+        const barsInput = document.getElementById("barsInput");
         const keySelect = document.getElementById("keySelect");
         const scaleSelect = document.getElementById("scaleSelect");
         const timeSigSelect = document.getElementById("timeSigSelect");
@@ -548,7 +554,7 @@
 
         let wavesurfer = null;
         let midiBlobUrl = null;
-        let generatedNotes = []; // Stores notes for instant re-rendering on instrument change
+        let generatedNotes = []; 
         let currentTempo = 120;
 
         const scaleIntervals = {
@@ -576,7 +582,7 @@
             if (wavesurfer) wavesurfer.setVolume(vol);
         });
 
-        // Re-synthesize audio preview instantly when user changes the instrument dropdown *after* generation
+        // Instantly re-synthesize audio preview when instrument changes post-generation
         postInstrumentSelect.addEventListener("change", async () => {
             if (generatedNotes.length > 0) {
                 await renderAudioPreview(generatedNotes, currentTempo, postInstrumentSelect.value);
@@ -590,7 +596,7 @@
             waveformPreviewContainer.style.display = "none";
             
             progressBarFill.style.width = "30%";
-            statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Parsing custom time signature & tempo...`;
+            statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Calculating structure & bar length...`;
 
             setTimeout(async () => {
                 try {
@@ -598,9 +604,10 @@
                     statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Composing algorithmic notes...`;
 
                     currentTempo = parseInt(tempoInput.value) || 120;
+                    const totalBars = parseInt(barsInput.value) || 8;
                     const rootKey = keySelect.value;
                     const scaleType = scaleSelect.value;
-                    const timeSig = timeSigSelect.value; // e.g., "3/4", "6/8", "4/4"
+                    const timeSig = timeSigSelect.value; 
                     const [beatsPerBar] = timeSig.split('/').map(Number);
                     const rootNoteVal = 60 + noteToVal[rootKey];
 
@@ -612,7 +619,6 @@
                     const intervals = scaleIntervals[scaleType];
                     let currentTime = 0;
                     const noteDuration = 0.5; 
-                    const totalBars = 8;
                     const totalSteps = totalBars * beatsPerBar;
 
                     generatedNotes = [];
@@ -650,7 +656,7 @@
                     if (midiBlobUrl) URL.revokeObjectURL(midiBlobUrl);
                     midiBlobUrl = URL.createObjectURL(midiBlob);
                     downloadMidiBtn.href = midiBlobUrl;
-                    downloadMidiBtn.download = `tonevault_${rootKey}_${scaleType}_${currentTempo}bpm_${timeSig.replace('/', '-')}.mid`;
+                    downloadMidiBtn.download = `tonevault_${rootKey}_${scaleType}_${totalBars}bars_${currentTempo}bpm.mid`;
 
                     progressBarFill.style.width = "100%";
                     statusText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#00d4ff;"></i> Composition Ready!`;
@@ -663,7 +669,7 @@
                     resultsArea.style.display = "block";
                     waveformPreviewContainer.style.display = "block";
 
-                    // Render initial preview with selected instrument
+                    // Render initial preview with selected post-instrument
                     await renderAudioPreview(generatedNotes, currentTempo, postInstrumentSelect.value);
 
                     processBtn.removeAttribute("disabled");
@@ -678,18 +684,47 @@
             }, 500);
         });
 
-        // Function to render offline audio using Tone.js synth waveforms dynamically
-        async function renderAudioPreview(notes, bpm, waveType) {
-            const totalDuration = notes.length > 0 ? notes[notes.length - 1].time + 2 : 10;
+        // Function to render rich multi-instrument previews offline using Tone.js
+        async function renderAudioPreview(notes, bpm, instrumentType) {
+            const totalDuration = notes.length > 0 ? notes[notes.length - 1].time + 3 : 10;
 
             const buffer = await Tone.Offline(async () => {
-                const synth = new Tone.PolySynth(Tone.Synth, {
-                    oscillator: { type: waveType },
-                    envelope: { attack: 0.05, decay: 0.2, sustain: 0.4, release: 0.8 }
-                }).toDestination();
+                let instrumentSynth;
+
+                if (instrumentType === "piano") {
+                    // Rich multi-oscillator piano simulation with gentle hammer decay
+                    instrumentSynth = new Tone.PolySynth(Tone.Synth, {
+                        oscillator: { type: "triangle8" },
+                        envelope: { attack: 0.01, decay: 0.4, sustain: 0.05, release: 0.8 }
+                    }).toDestination();
+                } else if (instrumentType === "guitar") {
+                    // Plucked acoustic guitar style synthesis
+                    instrumentSynth = new Tone.PolySynth(Tone.Synth, {
+                        oscillator: { type: "sine" },
+                        envelope: { attack: 0.005, decay: 0.25, sustain: 0.1, release: 0.3 }
+                    }).toDestination();
+                } else if (instrumentType === "bass") {
+                    // Deep punchy electric bass style
+                    instrumentSynth = new Tone.Synth({
+                        oscillator: { type: "sawtooth" },
+                        envelope: { attack: 0.02, decay: 0.3, sustain: 0.2, release: 0.4 }
+                    }).toDestination();
+                } else if (instrumentType === "strings") {
+                    // Lush strings ensemble with slow attack
+                    instrumentSynth = new Tone.PolySynth(Tone.Synth, {
+                        oscillator: { type: "fatsawtooth" },
+                        envelope: { attack: 0.3, decay: 0.5, sustain: 0.8, release: 1.2 }
+                    }).toDestination();
+                } else {
+                    // Default ambient pad synth
+                    instrumentSynth = new Tone.PolySynth(Tone.Synth, {
+                        oscillator: { type: "sine" },
+                        envelope: { attack: 0.1, decay: 0.3, sustain: 0.5, release: 1.0 }
+                    }).toDestination();
+                }
 
                 notes.forEach(note => {
-                    synth.triggerAttackRelease(note.name, note.duration, note.time, note.velocity);
+                    instrumentSynth.triggerAttackRelease(note.name, note.duration, note.time, note.velocity);
                 });
             }, totalDuration);
 
