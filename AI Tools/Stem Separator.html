@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToneVault - Stem Separator</title>
+    <title>Stem Separator | ToneVault</title>
     
     <!-- FONTAWESOME ICONS CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -49,7 +49,8 @@
             width: 100%;
             max-width: 900px;
             margin: 0 auto 50px auto;
-            padding: 0 20px;
+            padding: 0 15px;
+            box-sizing: border-box;
         }
 
         .stem-card {
@@ -58,6 +59,7 @@
             border-radius: 18px;
             padding: 35px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            box-sizing: border-box;
         }
 
         /* SETTINGS SECTION (MODEL & STEM SELECTION) */
@@ -88,6 +90,7 @@
             font-size: 1rem;
             outline: none;
             transition: border-color 0.2s ease;
+            box-sizing: border-box;
         }
 
         .setting-group select:focus {
@@ -103,6 +106,7 @@
             cursor: pointer;
             transition: all 0.3s ease;
             margin-bottom: 25px;
+            box-sizing: border-box;
         }
 
         .upload-dropzone:hover {
@@ -131,6 +135,7 @@
             color: #00d4ff;
             font-weight: 600;
             font-size: 0.9rem;
+            word-break: break-all;
         }
 
         /* WAVEFORM CONTAINER PREVIEW */
@@ -141,6 +146,7 @@
             padding: 15px;
             margin-bottom: 25px;
             display: none;
+            box-sizing: border-box;
         }
 
         .waveform-header {
@@ -158,7 +164,7 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            flex-direction: row; /* Play button on the left */
+            flex-direction: row;
         }
 
         .play-pause-btn {
@@ -183,6 +189,7 @@
 
         .waveform-box {
             width: 100%;
+            min-width: 0;
         }
 
         /* VOLUME CONTROL STYLES */
@@ -232,6 +239,7 @@
             cursor: pointer;
             transition: opacity 0.2s ease, transform 0.2s ease;
             box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+            box-sizing: border-box;
         }
 
         .action-btn:hover {
@@ -295,6 +303,7 @@
             border-radius: 12px;
             padding: 20px;
             margin-bottom: 20px;
+            box-sizing: border-box;
         }
 
         .stem-info-row {
@@ -302,6 +311,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 12px;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .stem-player-box label {
@@ -337,13 +348,13 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            flex-direction: row; /* Play button on the left for stem players */
+            flex-direction: row;
         }
 
         .stem-play-btn {
-            background: #00d4ff; /* Matched to theme color */
+            background: #00d4ff;
             border: none;
-            color: #000; /* Matched icon/text color */
+            color: #000;
             width: 32px;
             height: 32px;
             border-radius: 50%;
@@ -407,7 +418,7 @@
             .page-header { margin-top: 40px; }
             .page-header h1 { font-size: 2rem; }
             .page-header p { font-size: 0.95rem; }
-            .stem-card { padding: 20px; }
+            .stem-card { padding: 20px 15px; }
             .creator-credit { font-size: 0.8rem; }
         }
     </style>
