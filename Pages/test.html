@@ -11,10 +11,9 @@
     <!-- WAVESURFER.JS FOR AUDIO WAVEFORMS -->
     <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
 
-    <!-- TONE.JS, @TONEJS/MIDI & TONEJS-INSTRUMENTS FOR SAMPLED AUDIO -->
+    <!-- TONE.JS & @TONEJS/MIDI -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <script src="https://unpkg.com/@tonejs/midi@2.0.28/build/Midi.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tonejs/instrument@0.1.0/build/ Tone.Instruments.js"></script> <!-- fallback safe loader -->
 
     <!-- UNIVERSAL DESIGN EDITOR -->
     <link rel="stylesheet" href="/style.css">
@@ -83,7 +82,7 @@
             font-weight: 600;
         }
 
-        .setting-group select, .setting-group textarea {
+        .setting-group select, .setting-group input, .setting-group textarea {
             width: 100%;
             background: rgba(10, 10, 10, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -100,7 +99,7 @@
             resize: vertical;
         }
 
-        .setting-group select:focus, .setting-group textarea:focus {
+        .setting-group select:focus, .setting-group input:focus, .setting-group textarea:focus {
             border-color: #00d4ff;
         }
 
@@ -156,12 +155,47 @@
             width: 100%;
         }
 
+        /* PREVIEW TOOLBAR FOR POST-GENERATION INSTRUMENT */
+        .preview-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .preview-instrument-select {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .preview-instrument-select label {
+            color: #bbb;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+
+        .preview-instrument-select select {
+            background: rgba(10, 10, 10, 0.9);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            outline: none;
+            font-size: 0.9rem;
+        }
+
         /* VOLUME CONTROL */
         .volume-control-wrapper {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-top: 10px;
             color: #888;
             font-size: 0.85rem;
         }
@@ -172,7 +206,7 @@
 
         .volume-slider {
             -webkit-appearance: none;
-            width: 100px;
+            width: 90px;
             height: 4px;
             background: rgba(255, 255, 255, 0.15);
             border-radius: 2px;
@@ -274,7 +308,6 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            margin-left: 10px;
         }
 
         .download-btn:hover {
@@ -323,7 +356,7 @@
         /* RESPONSIVE DESIGN */
         @media (max-width: 768px) {
             .settings-grid { grid-template-columns: 1fr; gap: 15px; }
-            .volume-slider { width: 70px; }
+            .preview-toolbar { flex-direction: column; align-items: stretch; }
         }
 
         @media (max-width: 1024px) {
@@ -338,7 +371,7 @@
             .stem-card { padding: 20px; }
             .creator-credit { font-size: 0.8rem; margin-top: 50px; }
             .action-buttons-group { flex-direction: column; gap: 10px; }
-            .download-btn { margin-left: 0; justify-content: center; }
+            .download-btn { justify-content: center; }
         }
     </style>
 </head>
@@ -353,7 +386,7 @@
         <!-- PAGE HEADER -->
         <div class="page-header">
             <h1>Thoughts to <span>MIDI</span></h1>
-            <p>Generate custom algorithmic MIDI compositions instantly in your browser with real sampled acoustic preview instruments.</p>
+            <p>Generate custom algorithmic MIDI compositions instantly in your browser. Type your custom tempo, time signature, and preview with different instruments after generation.</p>
         </div>
 
         <!-- CUSTOM THEMED API INTERFACE WRAPPER -->
@@ -374,22 +407,8 @@
                         </select>
                     </div>
                     <div class="setting-group">
-                        <label for="instrumentSelect"><i class="fa-solid fa-compact-disc"></i> Preview Instrument</label>
-                        <select id="instrumentSelect">
-                            <option value="piano" selected>Acoustic Grand Piano (Sampled)</option>
-                            <option value="guitar">Acoustic Guitar (Sampled)</option>
-                            <option value="strings">Orchestral Strings (Sampled)</option>
-                            <option value="bass">Electric Bass (Sampled)</option>
-                        </select>
-                    </div>
-                    <div class="setting-group">
-                        <label for="tempoSelect"><i class="fa-solid fa-metronome"></i> Tempo (BPM)</label>
-                        <select id="tempoSelect">
-                            <option value="75">75 BPM (Slow)</option>
-                            <option value="100" selected>100 BPM (Moderate)</option>
-                            <option value="128">128 BPM (Upbeat)</option>
-                            <option value="140">140 BPM (Fast)</option>
-                        </select>
+                        <label for="tempoInput"><i class="fa-solid fa-metronome"></i> Tempo (BPM)</label>
+                        <input type="number" id="tempoInput" value="120" min="40" max="240" placeholder="e.g. 120">
                     </div>
                     <div class="setting-group">
                         <label for="keySelect"><i class="fa-solid fa-key"></i> Key Root</label>
@@ -408,6 +427,18 @@
                             <option value="B">B</option>
                         </select>
                     </div>
+                    <div class="setting-group">
+                        <label for="timeSigSelect"><i class="fa-solid fa-clock"></i> Time Signature</label>
+                        <select id="timeSigSelect">
+                            <option value="4/4" selected>4/4 (Common Time)</option>
+                            <option value="3/4">3/4 (Waltz)</option>
+                            <option value="6/8">6/8 (Compound)</option>
+                            <option value="2/4">2/4 (March)</option>
+                            <option value="5/4">5/4 (Asymmetric)</option>
+                            <option value="4/8">4/8</option>
+                            <option value="3/8">3/8</option>
+                        </select>
+                    </div>
                     <div class="setting-group" style="grid-column: 1 / -1;">
                         <label for="scaleSelect"><i class="fa-solid fa-music"></i> Scale Type</label>
                         <select id="scaleSelect">
@@ -422,7 +453,7 @@
                 <!-- THOUGHTS & WORDS TEXTAREA -->
                 <div class="setting-group" style="margin-bottom: 25px;">
                     <label for="thoughtsInput"><i class="fa-solid fa-brain"></i> Thoughts / Inspiration / Keywords</label>
-                    <textarea id="thoughtsInput" rows="3" placeholder="e.g. emotional progression, cinematic chords, rich dynamics..."></textarea>
+                    <textarea id="thoughtsInput" rows="3" placeholder="e.g. rich rhythm, ambient atmosphere, driving groove..."></textarea>
                 </div>
 
                 <!-- SUBMIT BUTTON -->
@@ -432,7 +463,7 @@
 
                 <!-- STATUS MESSAGE & PROGRESS BAR -->
                 <div id="statusMessage">
-                    <div class="status-text" id="statusText"><i class="fa-solid fa-spinner fa-spin"></i> Loading Soundfonts & Generating...</div>
+                    <div class="status-text" id="statusText"><i class="fa-solid fa-spinner fa-spin"></i> Processing Algorithmic Generation...</div>
                     <div class="progress-bar-container">
                         <div class="progress-bar-fill" id="progressBarFill"></div>
                     </div>
@@ -444,16 +475,29 @@
                     
                     <div class="waveform-preview-container" id="waveformPreviewContainer">
                         <div class="waveform-header">
-                            <span><i class="fa-solid fa-waveform-lines"></i> Sampled Audio Preview</span>
+                            <span><i class="fa-solid fa-waveform-lines"></i> Audio Preview</span>
                             <span id="audioDurationText">0:00</span>
                         </div>
                         <div class="waveform-controls">
                             <button class="play-pause-btn" id="previewPlayBtn"><i class="fa-solid fa-play" id="previewPlayIcon"></i></button>
                             <div class="waveform-box" id="waveform"></div>
                         </div>
-                        <div class="volume-control-wrapper">
-                            <i class="fa-solid fa-volume-high"></i>
-                            <input type="range" class="volume-slider" id="previewVolume" min="0" max="1" step="0.05" value="1">
+
+                        <!-- POST-GENERATION PREVIEW TOOLBAR (Instrument & Volume) -->
+                        <div class="preview-toolbar">
+                            <div class="preview-instrument-select">
+                                <label for="postInstrumentSelect"><i class="fa-solid fa-sliders"></i> Preview Instrument:</label>
+                                <select id="postInstrumentSelect">
+                                    <option value="sine" selected>Clean Sine Synth</option>
+                                    <option value="triangle">Warm Triangle Synth</option>
+                                    <option value="square">Retro Square Synth</option>
+                                    <option value="sawtooth">Aggressive Saw Synth</option>
+                                </select>
+                            </div>
+                            <div class="volume-control-wrapper">
+                                <i class="fa-solid fa-volume-high"></i>
+                                <input type="range" class="volume-slider" id="previewVolume" min="0" max="1" step="0.05" value="1">
+                            </div>
                         </div>
                         
                         <div class="action-buttons-group">
@@ -469,7 +513,7 @@
 
         <!-- CREATOR CREDIT -->
         <div class="creator-credit">
-            Sampled Soundfonts Powered by Tone.js | Integrated & Maintained by <a href="https://tonevault.qd.je" target="_blank">ToneVault by HC</a>
+            Algorithmic Engine Powered by ToneVault JS | Integrated & Maintained by <a href="https://tonevault.qd.je" target="_blank">ToneVault by HC</a>
         </div>
 
     </main>
@@ -480,12 +524,13 @@
     <!-- UNIVERSAL HTML COMPONENT EDITOR -->
     <script src="/components.js"></script>
 
-    <!-- CLIENT-SIDE SAMPLED AUDIO & MIDI LOGIC -->
+    <!-- CLIENT-SIDE SYNTHESIS & MIDI LOGIC -->
     <script type="module">
-        const instrumentSelect = document.getElementById("instrumentSelect");
-        const tempoSelect = document.getElementById("tempoSelect");
+        const tempoInput = document.getElementById("tempoInput");
         const keySelect = document.getElementById("keySelect");
         const scaleSelect = document.getElementById("scaleSelect");
+        const timeSigSelect = document.getElementById("timeSigSelect");
+        const postInstrumentSelect = document.getElementById("postInstrumentSelect");
         const thoughtsInput = document.getElementById("thoughtsInput");
         
         const processBtn = document.getElementById("processBtn");
@@ -503,6 +548,8 @@
 
         let wavesurfer = null;
         let midiBlobUrl = null;
+        let generatedNotes = []; // Stores notes for instant re-rendering on instrument change
+        let currentTempo = 120;
 
         const scaleIntervals = {
             major: [0, 2, 4, 5, 7, 9, 11],
@@ -529,38 +576,49 @@
             if (wavesurfer) wavesurfer.setVolume(vol);
         });
 
+        // Re-synthesize audio preview instantly when user changes the instrument dropdown *after* generation
+        postInstrumentSelect.addEventListener("change", async () => {
+            if (generatedNotes.length > 0) {
+                await renderAudioPreview(generatedNotes, currentTempo, postInstrumentSelect.value);
+            }
+        });
+
         processBtn.addEventListener("click", async () => {
             processBtn.setAttribute("disabled", "true");
             statusMessage.style.display = "block";
             resultsArea.style.display = "none";
             waveformPreviewContainer.style.display = "none";
             
-            progressBarFill.style.width = "20%";
-            statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Generating musical structure...`;
+            progressBarFill.style.width = "30%";
+            statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Parsing custom time signature & tempo...`;
 
             setTimeout(async () => {
                 try {
-                    progressBarFill.style.width = "50%";
-                    statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading real acoustic instrument samples...`;
+                    progressBarFill.style.width = "60%";
+                    statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Composing algorithmic notes...`;
 
-                    const tempo = parseInt(tempoSelect.value);
+                    currentTempo = parseInt(tempoInput.value) || 120;
                     const rootKey = keySelect.value;
                     const scaleType = scaleSelect.value;
-                    const instrumentType = instrumentSelect.value;
+                    const timeSig = timeSigSelect.value; // e.g., "3/4", "6/8", "4/4"
+                    const [beatsPerBar] = timeSig.split('/').map(Number);
                     const rootNoteVal = 60 + noteToVal[rootKey];
 
                     // Create MIDI Object
                     const midi = new Midi();
-                    midi.header.setTempo(tempo);
+                    midi.header.setTempo(currentTempo);
                     const track = midi.addTrack();
 
                     const intervals = scaleIntervals[scaleType];
                     let currentTime = 0;
                     const noteDuration = 0.5; 
-                    const totalSteps = 32;
+                    const totalBars = 8;
+                    const totalSteps = totalBars * beatsPerBar;
+
+                    generatedNotes = [];
 
                     for (let i = 0; i < totalSteps; i++) {
-                        if (Math.random() > 0.8 && i % 4 !== 0) {
+                        if (Math.random() > 0.82 && i % beatsPerBar !== 0) {
                             currentTime += noteDuration;
                             continue;
                         }
@@ -568,12 +626,21 @@
                         const octaveOffset = Math.random() > 0.7 ? 12 : (Math.random() > 0.9 ? -12 : 0);
                         const midiNote = rootNoteVal + scaleDegree + octaveOffset;
 
-                        track.addNote({
+                        const noteObj = {
                             midi: midiNote,
                             time: currentTime,
                             duration: noteDuration,
                             velocity: 0.7 + Math.random() * 0.3
+                        };
+
+                        track.addNote(noteObj);
+                        generatedNotes.push({
+                            name: Tone.Midi(midiNote).toNote(),
+                            duration: noteDuration,
+                            time: currentTime,
+                            velocity: noteObj.velocity
                         });
+
                         currentTime += noteDuration;
                     }
 
@@ -583,56 +650,7 @@
                     if (midiBlobUrl) URL.revokeObjectURL(midiBlobUrl);
                     midiBlobUrl = URL.createObjectURL(midiBlob);
                     downloadMidiBtn.href = midiBlobUrl;
-                    downloadMidiBtn.download = `tonevault_${rootKey}_${scaleType}_${tempo}bpm.mid`;
-
-                    progressBarFill.style.width = "80%";
-                    statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Rendering audio with sampled instrument...`;
-
-                    // Select Soundfont Sample URL based on chosen instrument via Salamander/FluidR3 CDN
-                    let sampleUrls = {};
-                    if (instrumentType === "piano") {
-                        sampleUrls = {
-                            "C4": "C4.mp3",
-                            "Ds4": "Ds4.mp3",
-                            "Fs4": "Fs4.mp3",
-                            "A4": "A4.mp3"
-                        };
-                    } else if (instrumentType === "guitar") {
-                        sampleUrls = {
-                            "E3": "E3.mp3",
-                            "E4": "E4.mp3"
-                        };
-                    } else if (instrumentType === "bass") {
-                        sampleUrls = {
-                            "C2": "C2.mp3",
-                            "C3": "C3.mp3"
-                        };
-                    } else {
-                        // Strings fallback
-                        sampleUrls = {
-                            "C4": "C4.mp3",
-                            "G4": "G4.mp3"
-                        };
-                    }
-
-                    // Base URL for open-source Tone.js soundfont samples
-                    const baseUrl = `https://tonejs.github.io/audio/salamander/`;
-
-                    // Render Offline Audio using Real Samples
-                    const buffer = await Tone.Offline(async () => {
-                        return new Promise((resolve) => {
-                            const sampler = new Tone.Sampler({
-                                urls: sampleUrls,
-                                baseUrl: baseUrl,
-                                onload: () => {
-                                    track.notes.forEach(note => {
-                                        sampler.triggerAttackRelease(note.name, note.duration, note.time, note.velocity);
-                                    });
-                                    setTimeout(resolve, 500); // allow tail release
-                                }
-                            }).toDestination();
-                        });
-                    }, 16);
+                    downloadMidiBtn.download = `tonevault_${rootKey}_${scaleType}_${currentTempo}bpm_${timeSig.replace('/', '-')}.mid`;
 
                     progressBarFill.style.width = "100%";
                     statusText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#00d4ff;"></i> Composition Ready!`;
@@ -640,35 +658,13 @@
                     setTimeout(() => {
                         statusMessage.style.display = "none";
                         progressBarFill.style.width = "0%";
-                    }, 1000);
+                    }, 800);
 
                     resultsArea.style.display = "block";
                     waveformPreviewContainer.style.display = "block";
 
-                    // Convert to WAV Blob for WaveSurfer
-                    const wavBlob = bufferToWave(buffer.get(), buffer.length);
-                    const wavUrl = URL.createObjectURL(wavBlob);
-
-                    if (wavesurfer) wavesurfer.destroy();
-                    wavesurfer = WaveSurfer.create({
-                        container: '#waveform',
-                        waveColor: '#444',
-                        progressColor: '#00d4ff',
-                        cursorColor: '#ffffff',
-                        barWidth: 3,
-                        barRadius: 3,
-                        height: 60,
-                        normalize: true,
-                    });
-                    wavesurfer.load(wavUrl);
-
-                    wavesurfer.on('ready', () => {
-                        audioDurationText.textContent = formatTime(wavesurfer.getDuration());
-                        wavesurfer.setVolume(parseFloat(previewVolume.value));
-                    });
-                    wavesurfer.on('play', () => { previewPlayIcon.className = "fa-solid fa-pause"; });
-                    wavesurfer.on('pause', () => { previewPlayIcon.className = "fa-solid fa-play"; });
-                    wavesurfer.on('finish', () => { previewPlayIcon.className = "fa-solid fa-play"; });
+                    // Render initial preview with selected instrument
+                    await renderAudioPreview(generatedNotes, currentTempo, postInstrumentSelect.value);
 
                     processBtn.removeAttribute("disabled");
                     resultsArea.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -677,10 +673,50 @@
                     console.error(err);
                     statusMessage.style.display = "none";
                     processBtn.removeAttribute("disabled");
-                    alert("Sample loading error occurred. Please check your internet connection and try again.");
+                    alert("Generation error occurred. Please check your inputs.");
                 }
-            }, 600);
+            }, 500);
         });
+
+        // Function to render offline audio using Tone.js synth waveforms dynamically
+        async function renderAudioPreview(notes, bpm, waveType) {
+            const totalDuration = notes.length > 0 ? notes[notes.length - 1].time + 2 : 10;
+
+            const buffer = await Tone.Offline(async () => {
+                const synth = new Tone.PolySynth(Tone.Synth, {
+                    oscillator: { type: waveType },
+                    envelope: { attack: 0.05, decay: 0.2, sustain: 0.4, release: 0.8 }
+                }).toDestination();
+
+                notes.forEach(note => {
+                    synth.triggerAttackRelease(note.name, note.duration, note.time, note.velocity);
+                });
+            }, totalDuration);
+
+            const wavBlob = bufferToWave(buffer.get(), buffer.length);
+            const wavUrl = URL.createObjectURL(wavBlob);
+
+            if (wavesurfer) wavesurfer.destroy();
+            wavesurfer = WaveSurfer.create({
+                container: '#waveform',
+                waveColor: '#444',
+                progressColor: '#00d4ff',
+                cursorColor: '#ffffff',
+                barWidth: 3,
+                barRadius: 3,
+                height: 60,
+                normalize: true,
+            });
+            wavesurfer.load(wavUrl);
+
+            wavesurfer.on('ready', () => {
+                audioDurationText.textContent = formatTime(wavesurfer.getDuration());
+                wavesurfer.setVolume(parseFloat(previewVolume.value));
+            });
+            wavesurfer.on('play', () => { previewPlayIcon.className = "fa-solid fa-pause"; });
+            wavesurfer.on('pause', () => { previewPlayIcon.className = "fa-solid fa-play"; });
+            wavesurfer.on('finish', () => { previewPlayIcon.className = "fa-solid fa-play"; });
+        }
 
         // Helper function to convert AudioBuffer to WAV Blob for browser preview waveform
         function bufferToWave(abuffer, len) {
