@@ -531,7 +531,7 @@
         <!-- PAGE HEADER -->
         <div class="page-header">
             <h1>Drum & Groove <span>Generator</span></h1>
-            <p>Generate highly realistic MIDI drum beats with humanization, custom swing, and dynamic fills.</p>
+            <p>Generate highly realistic MIDI drum beats with humanization, custom swing, and specific ethnic/orchestral mappings.</p>
         </div>
 
         <!-- 2-COLUMN LAYOUT WRAPPER -->
@@ -548,9 +548,10 @@
                             <option value="hiphop">Boom Bap / Hip-Hop</option>
                             <option value="trap">Modern Trap / Drill</option>
                             <option value="house">House / EDM</option>
-                            <option value="rock">Acoustic Rock</option>
+                            <option value="kuthu">South Indian (Dappan Koothu)</option>
+                            <option value="indian_classical">Indian Classical (Teen Taal)</option>
+                            <option value="orchestral">Epic Cinematic Orchestral</option>
                             <option value="lofi">Lo-Fi / Chillhop</option>
-                            <option value="cinematic">Cinematic Percussion</option>
                         </select>
                     </div>
                     <div class="setting-group">
@@ -589,6 +590,12 @@
                             </label>
                             <label class="checkbox-label">
                                 <input type="checkbox" id="elemToms"> Toms
+                            </label>
+                            <label class="checkbox-label" style="border-color: rgba(0, 212, 255, 0.4);">
+                                <input type="checkbox" id="elemIndian"> Indian Perc
+                            </label>
+                            <label class="checkbox-label" style="border-color: rgba(0, 212, 255, 0.4);">
+                                <input type="checkbox" id="elemOrch"> Orchestral
                             </label>
                         </div>
                     </div>
@@ -671,6 +678,7 @@
                                     <option value="modern808" selected>Modern 808 / Electronic</option>
                                     <option value="synthpop">Vintage Synth Pop</option>
                                     <option value="lofiroom">Lo-Fi Room Set</option>
+                                    <option value="world">World / Orchestral</option>
                                 </select>
                             </div>
                             <div class="volume-control-wrapper">
@@ -777,6 +785,8 @@
         const elemHats = document.getElementById("elemHats");
         const elemClap = document.getElementById("elemClap");
         const elemToms = document.getElementById("elemToms");
+        const elemIndian = document.getElementById("elemIndian");
+        const elemOrch = document.getElementById("elemOrch");
 
         const postInstrumentSelect = document.getElementById("postInstrumentSelect");
         const thoughtsInput = document.getElementById("thoughtsInput");
@@ -807,7 +817,12 @@
             CH: 42,   // Closed Hat
             OH: 46,   // Open Hat
             TOM_LO: 41,
-            TOM_HI: 45
+            TOM_HI: 45,
+            TABLA_HI: 62, // General MIDI Mute Conga
+            TABLA_LO: 64, // General MIDI Low Conga
+            ORCH_SNARE: 40, // Electric Snare mapped to crisp orchestral hit
+            TIMPANI: 43, // Mapped to High Floor Tom for standard GM compatibility
+            CRASH: 49
         };
 
         function formatTime(seconds) {
@@ -856,9 +871,10 @@
                     
                     // Options
                     const swingAmount = parseFloat(swingSelect.value);
-                    const humanizeAmount = parseFloat(humanizeSelect.value); // max seconds drift
+                    const humanizeAmount = parseFloat(humanizeSelect.value); 
                     const fillFreq = parseInt(fillSelect.value);
                     const density = densitySelect.value;
+                    const genre = genreSelect.value;
 
                     // Timing math
                     const secondsPerBeat = 60 / currentTempo;
@@ -882,17 +898,15 @@
 
                     // HELPER to add note with humanization bounds
                     function addDrumHit(midiNote, time, baseVelocity) {
-                        // Apply humanize (timing)
                         let humanTime = time + (Math.random() - 0.5) * humanizeAmount;
                         if (humanTime < 0) humanTime = 0;
-                        if (humanTime >= exactMaxTime) return; // don't overflow total duration
+                        if (humanTime >= exactMaxTime) return; 
                         
-                        // Apply humanize (velocity)
                         let humanVel = baseVelocity + (Math.random() - 0.5) * 0.15;
                         if (humanVel > 1) humanVel = 1;
                         if (humanVel < 0.1) humanVel = 0.1;
 
-                        const duration = 0.1; // Drums don't care much about note-off duration
+                        const duration = 0.1; 
                         
                         track.addNote({
                             midi: midiNote,
@@ -914,60 +928,39 @@
                         const isFillBar = fillFreq > 0 && ((bar + 1) % fillFreq === 0);
 
                         for (let beat = 0; beat < beatsPerBar; beat++) {
-                            for (let step = 0; step < 4; step++) { // 4 sixteenths per beat
+                            for (let step = 0; step < 4; step++) { 
                                 
                                 const baseTime = (bar * barDuration) + (beat * secondsPerTimeUnit) + (step * stepDuration);
                                 
-                                // Apply Swing: Delay the 2nd and 4th sixteenth notes (odd steps: 1, 3)
+                                // Apply Swing
                                 let stepTime = baseTime;
                                 if (step % 2 !== 0) {
                                     stepTime += (stepDuration * swingAmount);
                                 }
 
                                 const isDownbeat = (step === 0);
-                                const isBackbeat = (isDownbeat && (beat === 1 || beat === 3)); // Usually beats 2 and 4 in 4/4
-                                const inFillZone = isFillBar && (beat >= beatsPerBar - 2); // Last 2 beats of fill bar
+                                const isBackbeat = (isDownbeat && (beat === 1 || beat === 3)); 
+                                const inFillZone = isFillBar && (beat >= beatsPerBar - 2); 
 
-                                // --- KICK ---
+                                // --- STANDARD KICK ---
                                 if (elemKick.checked) {
                                     if (!inFillZone) {
-                                        // Standard Kick Pattern
-                                        if (isDownbeat && (beat === 0 || beat === 2)) {
-                                            addDrumHit(MIDI_DRUMS.KICK, stepTime, 0.9);
-                                        }
-                                        // Syncopated extra kicks based on density
-                                        if (density !== 'minimal' && beat === 1 && step === 3 && Math.random() > 0.5) {
-                                            addDrumHit(MIDI_DRUMS.KICK, stepTime, 0.7);
-                                        }
-                                        if (density === 'busy' && beat === 3 && step === 2 && Math.random() > 0.6) {
-                                            addDrumHit(MIDI_DRUMS.KICK, stepTime, 0.6);
-                                        }
+                                        if (isDownbeat && (beat === 0 || beat === 2)) addDrumHit(MIDI_DRUMS.KICK, stepTime, 0.9);
+                                        if (density !== 'minimal' && beat === 1 && step === 3 && Math.random() > 0.5) addDrumHit(MIDI_DRUMS.KICK, stepTime, 0.7);
+                                        if (density === 'busy' && beat === 3 && step === 2 && Math.random() > 0.6) addDrumHit(MIDI_DRUMS.KICK, stepTime, 0.6);
                                     } else {
-                                        // Kick during fill
                                         if (isDownbeat) addDrumHit(MIDI_DRUMS.KICK, stepTime, 0.9);
                                     }
                                 }
 
-                                // --- SNARE / CLAP ---
+                                // --- STANDARD SNARE / CLAP ---
                                 if (elemSnare.checked || elemClap.checked) {
                                     const snareTarget = elemClap.checked && !elemSnare.checked ? MIDI_DRUMS.CLAP : MIDI_DRUMS.SNARE;
-                                    
                                     if (!inFillZone) {
-                                        if (isBackbeat) {
-                                            addDrumHit(snareTarget, stepTime, 0.9);
-                                            // Layer clap and snare sometimes
-                                            if (elemClap.checked && elemSnare.checked && Math.random() > 0.5) {
-                                                addDrumHit(MIDI_DRUMS.CLAP, stepTime, 0.7);
-                                            }
-                                        }
-                                        // Ghost notes
-                                        if (density === 'busy' && !isDownbeat && Math.random() > 0.85) {
-                                            addDrumHit(MIDI_DRUMS.SNARE, stepTime, 0.3);
-                                        }
+                                        if (isBackbeat) addDrumHit(snareTarget, stepTime, 0.9);
+                                        if (density === 'busy' && !isDownbeat && Math.random() > 0.85) addDrumHit(MIDI_DRUMS.SNARE, stepTime, 0.3);
                                     } else {
-                                        // FILL LOGIC FOR SNARE
                                         if (step % 2 === 0) addDrumHit(MIDI_DRUMS.SNARE, stepTime, 0.8);
-                                        if (density === 'busy') addDrumHit(MIDI_DRUMS.SNARE, stepTime, 0.6); // machine gun fill
                                     }
                                 }
 
@@ -981,12 +974,11 @@
                                         playHat = isDownbeat; 
                                         hatVel = 0.5;
                                     } else if (density === 'standard') {
-                                        playHat = (step === 0 || step === 2); // 8th notes
+                                        playHat = (step === 0 || step === 2);
                                         hatVel = isDownbeat ? 0.7 : 0.5;
-                                        // Occasional Open Hat on upbeat
                                         if (step === 2 && Math.random() > 0.8) hatType = MIDI_DRUMS.OH;
                                     } else {
-                                        playHat = true; // 16th notes
+                                        playHat = true;
                                         hatVel = isDownbeat ? 0.7 : (step === 2 ? 0.6 : 0.4);
                                         if (step === 2 && Math.random() > 0.85) hatType = MIDI_DRUMS.OH;
                                     }
@@ -996,17 +988,42 @@
 
                                 // --- TOMS ---
                                 if (elemToms.checked) {
-                                    if (inFillZone) {
-                                        // Tom Rolls in fill zone
-                                        if (step === 0 || step === 2) {
-                                            const tomNote = Math.random() > 0.5 ? MIDI_DRUMS.TOM_HI : MIDI_DRUMS.TOM_LO;
-                                            addDrumHit(tomNote, stepTime, 0.8);
-                                        }
-                                    } else if (density === 'busy' && Math.random() > 0.95) {
-                                        // Rare tom hit in main groove
-                                        addDrumHit(MIDI_DRUMS.TOM_LO, stepTime, 0.6);
+                                    if (inFillZone && (step === 0 || step === 2)) {
+                                        const tomNote = Math.random() > 0.5 ? MIDI_DRUMS.TOM_HI : MIDI_DRUMS.TOM_LO;
+                                        addDrumHit(tomNote, stepTime, 0.8);
                                     }
                                 }
+
+                                // --- INDIAN / SOUTH INDIAN ---
+                                if (elemIndian.checked) {
+                                    if (genre === 'kuthu') {
+                                        // South Indian Dappan Koothu
+                                        if (step === 0) addDrumHit(MIDI_DRUMS.TABLA_LO, stepTime, 0.9);
+                                        if (step === 2) addDrumHit(MIDI_DRUMS.TABLA_HI, stepTime, 0.7);
+                                        if (beat % 2 !== 0 && step === 1) addDrumHit(MIDI_DRUMS.TABLA_HI, stepTime, 0.8);
+                                    } else {
+                                        // Teen Taal / Classical influence
+                                        if (isDownbeat) addDrumHit(MIDI_DRUMS.TABLA_LO, stepTime, 0.8);
+                                        if (step === 2 && Math.random() > 0.3) addDrumHit(MIDI_DRUMS.TABLA_HI, stepTime, 0.6);
+                                        if (density === 'busy' && step === 3) addDrumHit(MIDI_DRUMS.TABLA_HI, stepTime, 0.4);
+                                    }
+                                }
+
+                                // --- ORCHESTRAL / CINEMATIC ---
+                                if (elemOrch.checked) {
+                                    if (genre === 'orchestral') {
+                                        // Epic Cinematic Marches
+                                        if (isDownbeat && beat === 0) {
+                                            addDrumHit(MIDI_DRUMS.CRASH, stepTime, 0.8);
+                                            addDrumHit(MIDI_DRUMS.TIMPANI, stepTime, 1.0);
+                                        }
+                                        if (step === 0 || step === 2) addDrumHit(MIDI_DRUMS.ORCH_SNARE, stepTime, 0.7);
+                                        if (density === 'busy' && step % 2 !== 0) addDrumHit(MIDI_DRUMS.ORCH_SNARE, stepTime, 0.4);
+                                    } else {
+                                        if (isDownbeat && beat === 0) addDrumHit(MIDI_DRUMS.TIMPANI, stepTime, 0.9);
+                                    }
+                                }
+
                             }
                         }
                     }
@@ -1091,9 +1108,13 @@
                     const ch = new Tone.NoiseSynth({ noise: { type: "white" }, envelope: { attack: 0.001, decay: 0.05, sustain: 0 } }).connect(hatFilter);
                     const oh = new Tone.NoiseSynth({ noise: { type: "white" }, envelope: { attack: 0.001, decay: 0.3, sustain: 0 } }).connect(hatFilter);
 
-                    // TOMS
+                    // TOMS & ORCHESTRAL / ETHNIC 
                     const tomHi = new Tone.MembraneSynth({ pitchDecay: 0.02, octaves: 1.5, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.4, sustain: 0 } }).connect(masterBus);
                     const tomLo = new Tone.MembraneSynth({ pitchDecay: 0.02, octaves: 1.5, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.6, sustain: 0 } }).connect(masterBus);
+                    const tablaHi = new Tone.MembraneSynth({ pitchDecay: 0.005, octaves: 2, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.4, sustain: 0 } }).connect(masterBus);
+                    const tablaLo = new Tone.MembraneSynth({ pitchDecay: 0.01, octaves: 1.5, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.6, sustain: 0 } }).connect(masterBus);
+                    const crash = new Tone.MetalSynth({ frequency: 200, envelope: { attack: 0.001, decay: 3.0, release: 3.0 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5 }).connect(masterBus);
+
 
                     // 3. SCHEDULE NOTES
                     notes.forEach(note => {
@@ -1108,8 +1129,11 @@
                                 snareBody.triggerAttackRelease("G2", "16n", time, vel);
                                 snareNoise.triggerAttackRelease("16n", time, vel * 0.8);
                                 break;
+                            case MIDI_DRUMS.ORCH_SNARE:
+                                snareBody.triggerAttackRelease("C3", "16n", time, vel);
+                                snareNoise.triggerAttackRelease("16n", time, vel);
+                                break;
                             case MIDI_DRUMS.CLAP:
-                                // Simulate clap spread
                                 clapNoise.triggerAttackRelease("16n", time, vel);
                                 clapNoise.triggerAttackRelease("16n", time + 0.015, vel * 0.8);
                                 clapNoise.triggerAttackRelease("16n", time + 0.03, vel * 0.6);
@@ -1124,7 +1148,17 @@
                                 tomHi.triggerAttackRelease("A2", "8n", time, vel);
                                 break;
                             case MIDI_DRUMS.TOM_LO:
+                            case MIDI_DRUMS.TIMPANI:
                                 tomLo.triggerAttackRelease("D2", "8n", time, vel);
+                                break;
+                            case MIDI_DRUMS.TABLA_HI:
+                                tablaHi.triggerAttackRelease("C3", "8n", time, vel);
+                                break;
+                            case MIDI_DRUMS.TABLA_LO:
+                                tablaLo.triggerAttackRelease("G2", "8n", time, vel);
+                                break;
+                            case MIDI_DRUMS.CRASH:
+                                crash.triggerAttackRelease("4n", time, vel);
                                 break;
                         }
                     });
