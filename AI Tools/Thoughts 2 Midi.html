@@ -20,6 +20,17 @@
 
     <!-- Page-Specific Styles -->
     <style>
+        /* CSS RESET FOR PERFECT CENTERING */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
         .page-header {
             text-align: center;
             margin-top: 60px;
@@ -96,7 +107,6 @@
             font-size: 1rem;
             outline: none;
             transition: border-color 0.2s ease;
-            box-sizing: border-box;
         }
 
         .setting-group textarea {
@@ -418,6 +428,16 @@
             color: #888;
             font-style: italic;
             line-height: 1.5;
+        }
+
+        /* HIDE PAGE SCROLLBARS BUT ALLOW SCROLLING */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        html {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
 
         /* CREATOR CREDIT FOOTER LINK */
