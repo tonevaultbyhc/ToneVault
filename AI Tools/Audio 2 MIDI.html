@@ -3,413 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stem Separator | ToneVault</title>
     
-    <!-- FONTAWESOME ICONS CDN -->
+    <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- WAVESURFER.JS FOR AUDIO WAVEFORMS -->
-    <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+    <!-- TensorFlow.js Engine -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
 
     <!-- UNIVERSAL DESIGN EDITOR -->
     <link rel="stylesheet" href="/style.css">
 
-    <!-- Page-Specific Styles -->
+    <!-- Tool-Specific Styles Merged with ToneVault Glass Theme -->
     <style>
-        .page-header {
-            text-align: center;
-            margin-top: 60px;
-            margin-bottom: 30px;
+        .tool-wrapper {
+            max-width: 1200px;
+            margin: 40px auto;
             padding: 0 20px;
         }
 
-        .page-header h1 {
-            font-size: 3rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 15px;
-            margin-top: 0;
-            color: #ffffff;
-        }
+        .cyan-text { color: #00d4ff; }
 
-        .page-header h1 span {
-            color: #00d4ff;
-        }
-
-        .page-header p {
-            color: #bbbbbb;
-            font-size: 1.1rem;
-            max-width: 750px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-
-        /* TOOL CONTAINER CUSTOM UI THEME MATCHING */
-        .tool-wrapper {
-            width: 100%;
-            max-width: 900px;
-            margin: 0 auto 50px auto;
-            padding: 0 15px;
-            box-sizing: border-box;
-        }
-
-        .stem-card {
-            background: rgba(20, 20, 20, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 18px;
-            padding: 35px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            box-sizing: border-box;
-        }
-
-        /* SETTINGS SECTION (MODEL & STEM SELECTION) */
-        .settings-grid {
+        /* 2-Column Grid Layout */
+        .grid-container {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-            margin-bottom: 25px;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
         }
 
-        .setting-group label {
-            display: block;
-            color: #bbb;
-            font-size: 0.9rem;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-weight: 600;
+        @media (max-width: 900px) {
+            .grid-container { grid-template-columns: 1fr; }
         }
 
-        .setting-group select {
-            width: 100%;
-            background: rgba(10, 10, 10, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #ffffff;
-            padding: 12px 15px;
-            border-radius: 10px;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.2s ease;
-            box-sizing: border-box;
-        }
-
-        .setting-group select:focus {
-            border-color: #00d4ff;
-        }
-
-        .upload-dropzone {
-            border: 2px dashed rgba(0, 212, 255, 0.3);
+        /* Upload Area */
+        .upload-area {
+            background-color: rgba(5, 5, 5, 0.4);
+            border: 1px dashed rgba(0, 212, 255, 0.4);
             border-radius: 12px;
-            padding: 30px 20px;
+            padding: 40px 20px;
             text-align: center;
-            background: rgba(10, 10, 10, 0.5);
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin-bottom: 25px;
-            box-sizing: border-box;
+            transition: border-color 0.2s ease, background 0.2s ease;
+            display: block;
         }
 
-        .upload-dropzone:hover {
+        .upload-area:hover {
             border-color: #00d4ff;
-            background: rgba(0, 212, 255, 0.03);
+            background-color: rgba(0, 212, 255, 0.05);
         }
 
-        .upload-dropzone i {
-            font-size: 2.5rem;
+        .upload-icon {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
             color: #00d4ff;
-            margin-bottom: 12px;
         }
 
-        .upload-dropzone p {
-            color: #ccc;
-            margin: 0;
+        .file-info {
+            margin-top: 12px;
             font-size: 0.95rem;
-        }
-
-        .upload-dropzone input[type="file"] {
-            display: none;
-        }
-
-        .file-name-display {
-            margin-top: 8px;
             color: #00d4ff;
-            font-weight: 600;
-            font-size: 0.9rem;
+            font-weight: bold;
             word-break: break-all;
         }
 
-        /* WAVEFORM CONTAINER PREVIEW */
-        .waveform-preview-container {
-            background: rgba(10, 10, 10, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 25px;
-            display: none;
-            box-sizing: border-box;
+        .file-input { display: none; }
+
+        /* Sliders */
+        .control-group {
+            margin-bottom: 20px;
         }
 
-        .waveform-header {
+        .control-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 10px;
-            color: #bbb;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            margin-bottom: 6px;
         }
 
-        .waveform-controls {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-direction: row;
-        }
-
-        .play-pause-btn {
-            background: #00d4ff;
-            border: none;
-            color: #000;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .control-label {
             font-size: 0.9rem;
-            transition: transform 0.2s ease;
-            flex-shrink: 0;
+            color: #ffffff;
+            font-weight: 600;
         }
 
-        .play-pause-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .waveform-box {
-            width: 100%;
-            min-width: 0;
-        }
-
-        /* VOLUME CONTROL STYLES */
-        .volume-control-wrapper {
+        .control-right {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-top: 10px;
-            color: #888;
+        }
+
+        .control-val {
             font-size: 0.85rem;
-        }
-
-        .volume-control-wrapper i {
-            color: #bbb;
-        }
-
-        .volume-slider {
-            -webkit-appearance: none;
-            width: 100px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 2px;
-            outline: none;
-            accent-color: #00d4ff;
-        }
-
-        .volume-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #00d4ff;
-            cursor: pointer;
-        }
-
-        .action-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #00d4ff, #0077ff);
-            color: #ffffff;
-            border: none;
-            padding: 16px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: opacity 0.2s ease, transform 0.2s ease;
-            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
-            box-sizing: border-box;
-        }
-
-        .action-btn:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-        }
-
-        .action-btn:disabled {
-            background: #333;
-            color: #777;
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
-        }
-
-        /* STATUS & LIVE PROGRESS BAR */
-        #statusMessage {
-            margin-top: 25px;
-            display: none;
-        }
-
-        .status-text {
-            text-align: center;
             color: #00d4ff;
-            font-size: 1.05rem;
-            margin-bottom: 10px;
-        }
-
-        .progress-bar-container {
-            width: 100%;
-            height: 6px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .progress-bar-fill {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #0077ff, #00d4ff);
-            transition: width 0.4s ease;
-        }
-
-        /* RESULTS AREA */
-        #resultsArea {
-            margin-top: 30px;
-            display: none;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            padding-top: 25px;
-        }
-
-        #resultsArea h3 {
-            color: #ffffff;
-            margin-bottom: 20px;
-            font-size: 1.3rem;
-        }
-
-        .stem-player-box {
-            background: rgba(15, 15, 15, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-sizing: border-box;
-        }
-
-        .stem-info-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .stem-player-box label {
-            color: #bbb;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin: 0;
-            font-weight: 600;
-        }
-
-        .download-btn {
             background: rgba(0, 212, 255, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
             border: 1px solid rgba(0, 212, 255, 0.3);
-            color: #00d4ff;
-            padding: 6px 14px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
+            min-width: 45px;
+            text-align: center;
         }
 
-        .download-btn:hover {
-            background: #00d4ff;
-            color: #000;
-        }
-
-        .stem-waveform-container-inner {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-direction: row;
-        }
-
-        .stem-play-btn {
-            background: #00d4ff;
-            border: none;
-            color: #000;
-            width: 32px;
-            height: 32px;
+        .reset-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #aaa;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.8rem;
-            transition: transform 0.2s ease;
-            flex-shrink: 0;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
-        .stem-play-btn:hover {
-            transform: scale(1.05);
+        .reset-btn:hover {
+            background: rgba(0, 212, 255, 0.15);
+            border-color: #00d4ff;
+            color: #00d4ff;
+            transform: rotate(-45deg);
         }
 
-        /* CREATOR CREDIT FOOTER LINK */
-        .creator-credit {
-            text-align: center;
-            margin-top: 40px;
-            margin-bottom: 60px;
-            font-size: 0.9rem;
+        .control-info {
+            font-size: 0.78rem;
             color: #888;
-            padding: 0 15px;
+            margin-bottom: 8px;
         }
 
-        .creator-credit a {
+        input[type="range"] {
+            width: 100%;
+            accent-color: #00d4ff;
+            background: rgba(5, 5, 5, 0.6);
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Action Button */
+        .primary-btn {
+            width: 100%;
+            background-color: #00d4ff;
+            color: #000000;
+            border: none;
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+            border-radius: 6px;
+            padding: 16px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .primary-btn:hover:not(:disabled) {
+            background-color: #ffffff;
+            color: #000000;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .primary-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        /* System Status Terminal */
+        .terminal-box {
+            background-color: rgba(5, 5, 5, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 16px;
+            min-height: 140px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.88rem;
+            color: #00d4ff;
+            white-space: pre-wrap;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        /* Download Section */
+        .download-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: #ffffff;
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+            border-radius: 6px;
+            padding: 16px;
+            font-size: 1rem;
+            text-align: center;
+            display: none;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .download-btn:hover {
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .tool-engine-credit {
+            text-align: center;
+            font-size: 0.82rem;
+            color: #999;
+            line-height: 1.5;
+        }
+        
+        .tool-engine-link {
             color: #00d4ff;
             text-decoration: none;
-            font-weight: bold;
             transition: color 0.2s ease;
         }
-
-        .creator-credit a:hover {
+        
+        .tool-engine-link:hover {
             color: #ffffff;
             text-decoration: underline;
-        }
-
-        /* RESPONSIVE DESIGN */
-        @media (max-width: 768px) {
-            .settings-grid { grid-template-columns: 1fr; gap: 15px; }
-            .volume-slider { width: 70px; }
-        }
-
-        @media (max-width: 1024px) {
-            .page-header h1 { font-size: 2.5rem; }
-            .tool-wrapper { padding: 0 15px; }
-        }
-
-        @media (max-width: 480px) {
-            .page-header { margin-top: 40px; }
-            .page-header h1 { font-size: 2rem; }
-            .page-header p { font-size: 0.95rem; }
-            .stem-card { padding: 20px 15px; }
-            .creator-credit { font-size: 0.8rem; }
         }
     </style>
 </head>
@@ -420,87 +236,97 @@
 
     <!-- PAGE CONTENT AREA -->
     <main>
-        
-        <!-- PAGE HEADER -->
-        <div class="page-header">
-            <h1>Stem <span>Separator</span></h1>
-            <p>Isolate vocals, drums, bass, and instrumentals into clean audio tracks directly using advanced AI models.</p>
-        </div>
-
-        <!-- CUSTOM THEMED API INTERFACE WRAPPER -->
         <div class="tool-wrapper">
-            <div class="stem-card">
-                
-                <!-- MODEL & STEM OPTIONS SELECTION -->
-                <div class="settings-grid">
-                    <div class="setting-group">
-                        <label for="modelSelect"><i class="fa-solid fa-microchip"></i> AI Model</label>
-                        <select id="modelSelect">
-                            <option value="HTDemucs">HTDemucs (Best Quality)</option>
-                            <option value="Spleeter">Spleeter (Fast)</option>
-                        </select>
-                    </div>
-                </div>
-                    
-                <!-- FILE UPLOAD DROPZONE -->
-                <div class="upload-dropzone" id="dropZone">
-                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                    <p>
-                        Drag & drop your audio file here, or
-                        <span id="browseLink" style="color:#00d4ff;text-decoration:underline;cursor:pointer;">
-                            browse
-                        </span>
-                    </p>
-                    <input type="file" id="audioFileInput" accept="audio/*">
-                    <div class="file-name-display" id="fileNameDisplay"></div>
-                </div>
-
-                <!-- UPLOADED AUDIO WAVEFORM PREVIEW -->
-                <div class="waveform-preview-container" id="waveformPreviewContainer">
-                    <div class="waveform-header">
-                        <span><i class="fa-solid fa-waveform-lines"></i> Original Audio Preview</span>
-                        <span id="audioDurationText">0:00</span>
-                    </div>
-                    <div class="waveform-controls">
-                        <button class="play-pause-btn" id="previewPlayBtn"><i class="fa-solid fa-play" id="previewPlayIcon"></i></button>
-                        <div class="waveform-box" id="waveform"></div>
-                    </div>
-                    <div class="volume-control-wrapper">
-                        <i class="fa-solid fa-volume-high"></i>
-                        <input type="range" class="volume-slider" id="previewVolume" min="0" max="1" step="0.05" value="1">
-                    </div>
-                </div>
-
-                <!-- SUBMIT BUTTON -->
-                <button id="processBtn" class="action-btn" disabled>
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> Separate Stems
-                </button>
-
-                <!-- STATUS MESSAGE & PROGRESS BAR -->
-                <div id="statusMessage">
-                    <div class="status-text" id="statusText"><i class="fa-solid fa-spinner fa-spin"></i> Initializing AI Engine...</div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar-fill" id="progressBarFill"></div>
-                    </div>
-                </div>
-
-                <!-- RESULTS CONTAINER -->
-                <div id="resultsArea">
-                    <h3 id="resultsTitle">
-                        <i class="fa-solid fa-headphones"></i>
-                        Isolated Audio Tracks
-                    </h3>
-                    <div id="stemsContainer"></div>
-                </div>
-
+            
+            <!-- Page Header -->
+            <div class="page-header" style="text-align: center; margin-top: 40px; margin-bottom: 50px; max-width: 800px; margin-left: auto; margin-right: auto;">
+                <h1 style="font-size: 3rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; margin-top: 0; color: #fff;">Audio 2 <span class="cyan-text">MIDI Extractor</span></h1>
+                <p style="color: #bbb; font-size: 1.1rem; line-height: 1.6;">
+                    Upload any audio track to run polyphonic pitch detection and extract club-ready MIDI sequences directly inside your browser.
+                </p>
             </div>
-        </div>
 
-        <!-- CREATOR CREDIT -->
-        <div class="creator-credit">
-            AI Engines Created by <a href="https://github.com/deezer/spleeter" target="_blank">Spleeter</a> & <a href="https://github.com/facebookresearch/demucs" target="_blank">Demucs</a> | AI Space Created by <a href="https://huggingface.co/spaces/ahk-d/Spleeter-HT-Demucs-Stem-Separation-2025" target="_blank">ahk-d</a> | Integrated & Maintained by <a href="https://tonevault.qd.je" target="_blank">ToneVault by HC</a>
-        </div>
+            <div class="grid-container">
+                <!-- Left Column: Source & Controls -->
+                <div>
+                    <div class="glass-panel" style="margin-bottom: 24px; padding: 24px;">
+                        <h3 style="color: #ffffff; text-transform: uppercase; letter-spacing: 1.5px; font-size: 1.1rem; margin-bottom: 16px;">1. Upload Audio Source</h3>
+                        <label for="audio-file" class="upload-area">
+                            <div class="upload-icon">⇪</div>
+                            <div style="font-weight: 600; color: #f8fafc;">Drop Audio Here</div>
+                            <div style="font-size: 0.8rem; color: #888; margin-top: 4px;">- or - Click to Upload</div>
+                            <div class="file-info" id="file-name"></div>
+                            <input type="file" id="audio-file" class="file-input" accept="audio/*">
+                        </label>
+                    </div>
 
+                    <div class="glass-panel" style="padding: 24px;">
+                        <h3 style="color: #ffffff; text-transform: uppercase; letter-spacing: 1.5px; font-size: 1.1rem; margin-bottom: 16px;">2. Fine-Tune Detection</h3>
+                        
+                        <!-- Slider 1 -->
+                        <div class="control-group">
+                            <div class="control-header">
+                                <span class="control-label">Note Onset Sensitivity</span>
+                                <div class="control-right">
+                                    <span class="control-val" id="val-onset">0.50</span>
+                                    <button type="button" class="reset-btn" id="reset-onset" title="Reset to default"><i class="fa-solid fa-rotate-right"></i></button>
+                                </div>
+                            </div>
+                            <div class="control-info">Higher values = only strong note attacks.</div>
+                            <input type="range" id="slider-onset" min="0.1" max="0.9" step="0.05" value="0.5">
+                        </div>
+
+                        <!-- Slider 2 -->
+                        <div class="control-group">
+                            <div class="control-header">
+                                <span class="control-label">Frame Sensitivity Threshold</span>
+                                <div class="control-right">
+                                    <span class="control-val" id="val-frame">0.30</span>
+                                    <button type="button" class="reset-btn" id="reset-frame" title="Reset to default"><i class="fa-solid fa-rotate-right"></i></button>
+                                </div>
+                            </div>
+                            <div class="control-info">Pitch sustain tolerance across chord frames.</div>
+                            <input type="range" id="slider-frame" min="0.1" max="0.9" step="0.05" value="0.3">
+                        </div>
+
+                        <!-- Slider 3 -->
+                        <div class="control-group">
+                            <div class="control-header">
+                                <span class="control-label">Minimum Note Length (ms)</span>
+                                <div class="control-right">
+                                    <span class="control-val" id="val-minnote">110</span>
+                                    <button type="button" class="reset-btn" id="reset-minnote" title="Reset to default"><i class="fa-solid fa-rotate-right"></i></button>
+                                </div>
+                            </div>
+                            <div class="control-info">Filters out micro-glitches.</div>
+                            <input type="range" id="slider-minnote" min="30" max="300" step="10" value="110">
+                        </div>
+
+                        <button id="btn-convert" class="primary-btn" disabled>✨ Extract to MIDI</button>
+                    </div>
+                </div>
+
+                <!-- Right Column: Output Terminal & Downloads -->
+                <div>
+                    <div class="glass-panel" style="height: 100%; padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <h3 style="color: #ffffff; text-transform: uppercase; letter-spacing: 1.5px; font-size: 1.1rem; margin-bottom: 16px;">3. Output Terminal</h3>
+                            <div class="control-label" style="margin-bottom: 8px;">System Status</div>
+                            <div id="status-terminal" class="terminal-box">Waiting for input file...</div>
+                        </div>
+
+                        <div>
+                            <div class="tool-engine-credit">
+                                UI Designed & Maintained by <a href="https://tonevault.qd.je" target="_blank" class="tool-engine-link">ToneVault by HC</a><br>
+                                AI Engine Powered by <a href="https://github.com/spotify/basic-pitch" target="_blank" class="tool-engine-link">Spotify Basic Pitch</a>
+                            </div>
+                            <a id="btn-download" class="download-btn" download>📥 Download Converted .MID File</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </main>
 
     <!-- UNIVERSAL FOOTER -->
@@ -509,312 +335,141 @@
     <!-- UNIVERSAL HTML COMPONENT EDITOR -->
     <script src="/components.js"></script>
 
-    <!-- GRADIO CLIENT API & WAVESURFER SCRIPT -->
+    <!-- Audio-to-MIDI Transcription Logic -->
     <script type="module">
-        import { client } from "https://cdn.jsdelivr.net/npm/@gradio/client/+esm";
+        import { BasicPitch, noteFramesToTime, outputToNotesPoly } from 'https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/+esm';
+        import { Midi } from 'https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.28/+esm';
 
-        const dropZone = document.getElementById("dropZone");
-        const fileInput = document.getElementById("audioFileInput");
-        const fileNameDisplay = document.getElementById("fileNameDisplay");
-        const waveformPreviewContainer = document.getElementById("waveformPreviewContainer");
-        const previewPlayBtn = document.getElementById("previewPlayBtn");
-        const previewPlayIcon = document.getElementById("previewPlayIcon");
-        const audioDurationText = document.getElementById("audioDurationText");
-        const previewVolume = document.getElementById("previewVolume");
-        const browseLink = document.getElementById("browseLink");
-        
-        const processBtn = document.getElementById("processBtn");
-        const statusMessage = document.getElementById("statusMessage");
-        const statusText = document.getElementById("statusText");
-        const progressBarFill = document.getElementById("progressBarFill");
-        const resultsArea = document.getElementById("resultsArea");
-        const resultsTitle = document.getElementById("resultsTitle");
-        const stemsContainer = document.getElementById("stemsContainer");
-        const modelSelect = document.getElementById("modelSelect");
+        const fileInput = document.getElementById('audio-file');
+        const fileNameDisplay = document.getElementById('file-name');
+        const btnConvert = document.getElementById('btn-convert');
+        const statusTerminal = document.getElementById('status-terminal');
+        const btnDownload = document.getElementById('btn-download');
+
+        const sliderOnset = document.getElementById('slider-onset');
+        const sliderFrame = document.getElementById('slider-frame');
+        const sliderMinNote = document.getElementById('slider-minnote');
+
+        const valOnset = document.getElementById('val-onset');
+        const valFrame = document.getElementById('val-frame');
+        const valMinNote = document.getElementById('val-minnote');
+
+        const resetOnset = document.getElementById('reset-onset');
+        const resetFrame = document.getElementById('reset-frame');
+        const resetMinNote = document.getElementById('reset-minnote');
 
         let selectedFile = null;
-        let wavesurfer = null;
-        let processStartTime = 0;
 
-        dropZone.addEventListener("click", (e) => {
-            if (e.target.id !== "browseLink") {
-                fileInput.click();
-            }
+        // Sync Slider Value Displays & Reset Logic
+        sliderOnset.addEventListener('input', (e) => valOnset.innerText = parseFloat(e.target.value).toFixed(2));
+        resetOnset.addEventListener('click', () => {
+            sliderOnset.value = "0.5";
+            valOnset.innerText = "0.50";
         });
 
-        browseLink.addEventListener("click", (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-
-            fileInput.value = "";
-            fileInput.click();
+        sliderFrame.addEventListener('input', (e) => valFrame.innerText = parseFloat(e.target.value).toFixed(2));
+        resetFrame.addEventListener('click', () => {
+            sliderFrame.value = "0.3";
+            valFrame.innerText = "0.30";
         });
 
-        ["dragenter", "dragover"].forEach(eventName => {
-            dropZone.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                dropZone.style.borderColor = "#00d4ff";
-                dropZone.style.background = "rgba(0, 212, 255, 0.05)";
-            }, false);
+        sliderMinNote.addEventListener('input', (e) => valMinNote.innerText = e.target.value);
+        resetMinNote.addEventListener('click', () => {
+            sliderMinNote.value = "110";
+            valMinNote.innerText = "110";
         });
 
-        ["dragleave", "drop"].forEach(eventName => {
-            dropZone.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                dropZone.style.borderColor = "rgba(0, 212, 255, 0.3)";
-                dropZone.style.background = "rgba(10, 10, 10, 0.5)";
-            }, false);
-        });
-
-        dropZone.addEventListener("drop", (e) => {
-            if (e.dataTransfer.files.length > 0) {
-                handleFileSelection(e.dataTransfer.files[0]);
-            }
-        });
-
-        fileInput.addEventListener("change", (e) => {
+        fileInput.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
-                handleFileSelection(e.target.files[0]);
+                selectedFile = e.target.files[0];
+                fileNameDisplay.innerText = `Selected: ${selectedFile.name}`;
+                btnConvert.disabled = false;
+                btnDownload.style.display = 'none';
+                statusTerminal.innerText = `File loaded: ${selectedFile.name}\nReady for transcription.`;
             }
         });
 
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = Math.floor(seconds % 60);
-            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        async function resampleAndMonoAudio(file) {
+            const arrayBuffer = await file.arrayBuffer();
+            const tempContext = new (window.AudioContext || window.webkitAudioContext)();
+            const decodedBuffer = await tempContext.decodeAudioData(arrayBuffer);
+            
+            const offlineContext = new OfflineAudioContext(
+                1, 
+                Math.ceil(decodedBuffer.duration * 22050),
+                22050
+            );
+            
+            const source = offlineContext.createBufferSource();
+            source.buffer = decodedBuffer;
+            source.connect(offlineContext.destination);
+            source.start(0);
+            
+            return await offlineContext.startRendering();
         }
 
-        function handleFileSelection(file) {
-            selectedFile = file;
-            fileNameDisplay.textContent = `Selected: ${file.name}`;
-            waveformPreviewContainer.style.display = "block";
-            processBtn.removeAttribute("disabled");
-
-            if (wavesurfer) {
-                wavesurfer.destroy();
-            }
-
-            wavesurfer = WaveSurfer.create({
-                container: '#waveform',
-                waveColor: '#444',
-                progressColor: '#00d4ff',
-                cursorColor: '#ffffff',
-                barWidth: 3,
-                barRadius: 3,
-                height: 60,
-                normalize: true,
-            });
-
-            const objectUrl = URL.createObjectURL(file);
-            wavesurfer.load(objectUrl);
-
-            wavesurfer.on('ready', () => {
-                audioDurationText.textContent = formatTime(wavesurfer.getDuration());
-                wavesurfer.setVolume(parseFloat(previewVolume.value));
-            });
-
-            wavesurfer.on('play', () => {
-                previewPlayIcon.className = "fa-solid fa-pause";
-            });
-
-            wavesurfer.on('pause', () => {
-                previewPlayIcon.className = "fa-solid fa-play";
-            });
-
-            wavesurfer.on('finish', () => {
-                previewPlayIcon.className = "fa-solid fa-play";
-            });
-        }
-
-        previewPlayBtn.addEventListener("click", () => {
-            if (wavesurfer) {
-                wavesurfer.playPause();
-            }
-        });
-
-        previewVolume.addEventListener("input", (e) => {
-            if (wavesurfer) {
-                wavesurfer.setVolume(parseFloat(e.target.value));
-            }
-        });
-
-        processBtn.addEventListener("click", async () => {
+        btnConvert.addEventListener('click', async () => {
             if (!selectedFile) return;
 
-            processBtn.setAttribute("disabled", "true");
-            modelSelect.disabled = true;
-            
-            processStartTime = performance.now();
-            
-            statusMessage.style.display = "block";
-            resultsArea.style.display = "none";
-            stemsContainer.innerHTML = "";
-            progressBarFill.style.width = "15%";
-            statusText.innerHTML = `
-                <i class="fa-solid fa-spinner fa-spin"></i>
-                Uploading: <strong>${selectedFile.name}</strong>
-            `;
+            btnConvert.disabled = true;
+            btnDownload.style.display = 'none';
+            statusTerminal.innerText = '⚙️ Resampling audio stream to mono (22,050 Hz)...';
 
             try {
-                const app = await client("https://ahk-d-spleeter-ht-demucs-stem-separation-2025.hf.space");
-                
-                const selectedModel = modelSelect.value;
-                
-                progressBarFill.style.width = "40%";
-                statusText.innerHTML = `
-                    <i class="fa-solid fa-spinner fa-spin"></i>
-                    Running ${selectedModel} AI Engine...
-                `;
+                const monoAudioBuffer = await resampleAndMonoAudio(selectedFile);
 
-                const runHTDemucs = selectedModel === "HTDemucs";
-                const runSpleeter = selectedModel === "Spleeter";
+                statusTerminal.innerText += '\n🤖 Loading Basic Pitch AI Neural Model...';
+                const modelUrl = 'https://cdn.jsdelivr.net/npm/@spotify/basic-pitch@1.0.1/model/model.json';
+                const basicPitch = new BasicPitch(modelUrl);
 
-                const result = await app.predict("/separate_selected_models", [
-                    selectedFile,
-                    runHTDemucs,
-                    runSpleeter
-                ]);
+                const frames = [], onsets = [], contours = [];
 
-                progressBarFill.style.width = "100%";
-                const elapsedTime = ((performance.now() - processStartTime) / 1000).toFixed(1);
+                await basicPitch.evaluateModel(
+                    monoAudioBuffer,
+                    (f, o, c) => { frames.push(...f); onsets.push(...o); contours.push(...c); },
+                    (pct) => {
+                        const percent = Math.round(pct * 100);
+                        statusTerminal.innerText = `⚙️ Running polyphonic pitch inference...\nProgress: [${percent}%]`;
+                    }
+                );
 
-                statusText.innerHTML = `
-                    <i class="fa-solid fa-circle-check" style="color:#00d4ff;"></i>
-                    Separation Complete in <strong>${elapsedTime}s</strong>
-                `;
+                statusTerminal.innerText += '\n🎼 Processing detection thresholds & timing events...';
 
-                setTimeout(() => {
-                    statusMessage.style.display = "none";
-                    progressBarFill.style.width = "0%";
-                }, 1200);
+                const onsetThresh = parseFloat(sliderOnset.value);
+                const frameThresh = parseFloat(sliderFrame.value);
+                const minNoteMs = parseInt(sliderMinNote.value, 10);
 
-                resultsArea.style.display = "block";
+                const notes = outputToNotesPoly(frames, onsets, onsetThresh, frameThresh, minNoteMs);
+                const timeNotes = noteFramesToTime(notes);
 
-                resultsTitle.innerHTML = `
-                    <i class="fa-solid fa-headphones"></i>
-                    ${runHTDemucs ? "HTDemucs - 4 Separated Stems" : "Spleeter - 5 Separated Stems"}
-                `;
+                const midi = new Midi();
+                const track = midi.addTrack();
+                track.name = "ToneVault Pitch Extract";
 
-                processBtn.removeAttribute("disabled");
-                modelSelect.disabled = false;
-
-                resultsArea.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start"
+                timeNotes.forEach(n => {
+                    track.addNote({
+                        midi: n.pitchMidi,
+                        time: n.startTimeSeconds,
+                        duration: n.durationSeconds,
+                        velocity: n.amplitude
+                    });
                 });
 
-                let stemOutputs;
-                if (runHTDemucs) {
-                    stemOutputs = result.data.slice(0, 4);
-                } else {
-                    stemOutputs = result.data.slice(4, 9);
-                }
+                const midiArray = midi.toArray();
+                const blob = new Blob([midiArray], { type: 'audio/midi' });
                 
-                if (Array.isArray(stemOutputs)) {
-                    stemOutputs.forEach((outputItem, index) => {
-                        let audioUrl = "";
-                        let customName = "";
+                const outFileName = `${selectedFile.name.replace(/\.[^/.]+$/, "")}_basic_pitch.mid`;
+                btnDownload.href = URL.createObjectURL(blob);
+                btnDownload.download = outFileName;
+                
+                statusTerminal.innerText = `✅ Extracted ${timeNotes.length} MIDI notes successfully!\nSaved as: ${outFileName}`;
+                btnDownload.style.display = 'block';
+                btnConvert.disabled = false;
 
-                        if (typeof outputItem === "object" && outputItem !== null) {
-                            audioUrl = outputItem.url || outputItem.path || "";
-                            customName = outputItem.orig_name || outputItem.name || "";
-                        } else if (typeof outputItem === "string") {
-                            audioUrl = outputItem;
-                        }
-
-                        const demucsLabels = [
-                            "Drums",
-                            "Bass",
-                            "Instruments",
-                            "Vocals"
-                        ];
-
-                        const spleeterLabels = [
-                            "Vocals",
-                            "Drums",
-                            "Bass",
-                            "Instruments",
-                            "Piano"
-                        ];
-
-                        const trackLabels = runHTDemucs
-                            ? demucsLabels
-                            : spleeterLabels;
-
-                        const trackName = trackLabels[index] || `Stem ${index + 1}`;
-
-                        if (audioUrl) {
-                            const uniqueId = `stem_wave_${index}_${Date.now()}`;
-                            const volumeId = `vol_${uniqueId}`;
-
-                            const trackBox = document.createElement("div");
-                            trackBox.className = "stem-player-box";
-                            trackBox.innerHTML = `
-                                <div class="stem-info-row">
-                                    <label><i class="fa-solid fa-music"></i> ${trackName}</label>
-                                    <a href="${audioUrl}" class="download-btn" download="${selectedFile.name.replace(/\.[^/.]+$/, '')}_${selectedModel}_${trackName}.wav" target="_blank">
-                                        <i class="fa-solid fa-download"></i> Download
-                                    </a>
-                                </div>
-                                <div class="stem-waveform-container-inner">
-                                    <button class="stem-play-btn" id="play_btn_${uniqueId}"><i class="fa-solid fa-play" id="play_icon_${uniqueId}"></i></button>
-                                    <div id="${uniqueId}" style="width: 100%;"></div>
-                                </div>
-                                <div class="volume-control-wrapper" style="margin-top: 12px;">
-                                    <i class="fa-solid fa-volume-high"></i>
-                                    <input type="range" class="volume-slider" id="${volumeId}" min="0" max="1" step="0.05" value="1">
-                                </div>
-                            `;
-                            stemsContainer.appendChild(trackBox);
-
-                            setTimeout(() => {
-                                const stemSurfer = WaveSurfer.create({
-                                    container: `#${uniqueId}`,
-                                    waveColor: '#333',
-                                    progressColor: '#0077ff',
-                                    cursorColor: '#ffffff',
-                                    barWidth: 2,
-                                    barRadius: 2,
-                                    height: 48,
-                                    normalize: true,
-                                });
-
-                                stemSurfer.load(audioUrl);
-
-                                const playBtn = document.getElementById(`play_btn_${uniqueId}`);
-                                const playIcon = document.getElementById(`play_icon_${uniqueId}`);
-                                const volSlider = document.getElementById(volumeId);
-
-                                playBtn.addEventListener("click", () => {
-                                    stemSurfer.playPause();
-                                });
-
-                                volSlider.addEventListener("input", (e) => {
-                                    stemSurfer.setVolume(parseFloat(e.target.value));
-                                });
-
-                                stemSurfer.on('play', () => {
-                                    playIcon.className = "fa-solid fa-pause";
-                                });
-
-                                stemSurfer.on('pause', () => {
-                                    playIcon.className = "fa-solid fa-play";
-                                });
-
-                                stemSurfer.on('finish', () => {
-                                    playIcon.className = "fa-solid fa-play";
-                                });
-                            }, 100);
-                        }
-                    });
-                }
             } catch (err) {
-                console.error("API Processing Error:", err);
-                statusMessage.style.display = "none";
-                progressBarFill.style.width = "0%";
-                processBtn.removeAttribute("disabled");
-                modelSelect.disabled = false;
-                alert("Error: " + (err.message || "Failed to process audio separation. Check console for details."));
+                console.error(err);
+                statusTerminal.innerText = `❌ Error during transcription:\n${err.message || 'Failed to process audio file.'}`;
+                btnConvert.disabled = false;
             }
         });
     </script>
