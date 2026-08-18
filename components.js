@@ -13,9 +13,9 @@ class SiteHeader extends HTMLElement {
                             <li class="dropdown">
                                 <a href="#" class="drop-btn">AI Tools <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; margin-left: 4px;"></i></a>
                                 <ul class="dropdown-menu">
-                                    <li><a href="/AI Tools/Audio 2 MIDI.html"><i class="fa-solid fa-music" style="margin-right: 8px; color: #00d4ff;"></i> Audio 2 MIDI</a></li>
-                                    <li><a href="/AI Tools/Stem Separator.html"><i class="fa-solid fa-sliders" style="margin-right: 8px; color: #00d4ff;"></i> Stem Separator</a></li>
-                                    <li><a href="/AI Tools/Thoughts 2 Midi.html"><i class="fa-solid fa-brain" style="margin-right: 8px; color: #00d4ff;"></i> Thoughts to MIDI</a></li>
+                                    <li><a href="/AI Tools/Audio2MIDI.html"><i class="fa-solid fa-music" style="margin-right: 8px; color: #00d4ff;"></i> Audio2MIDI</a></li>
+                                    <li><a href="/AI Tools/StemSplitter.html"><i class="fa-solid fa-sliders" style="margin-right: 8px; color: #00d4ff;"></i> Stem Splitter</a></li>
+                                    <li><a href="/AI Tools/Thoughts2Midi.html"><i class="fa-solid fa-brain" style="margin-right: 8px; color: #00d4ff;"></i> Thoughts2MIDI</a></li>
                                 </ul>
                             </li>
                             <li><a href="/Pages/Services.html">Services</a></li>
@@ -62,14 +62,14 @@ document.addEventListener("DOMContentLoaded", function() {
     } else if (path.includes("services.html")) {
         pageTitle = "Services | ToneVault";
         pageDescription = "Explore custom music production, mixing, mastering, and scoring services by Harish Cousal.";
-    } else if (path.includes("audio 2 midi")) {
-        pageTitle = "Audio 2 MIDI | ToneVault";
+    } else if (path.includes("audio2midi") || path.includes("audio%202%20midi")) {
+        pageTitle = "Audio2MIDI | ToneVault";
         pageDescription = "Extract polyphonic MIDI sequences directly from audio tracks using our browser-based AI tool.";
-    } else if (path.includes("stem separator")) {
-        pageTitle = "Stem Separator | ToneVault";
+    } else if (path.includes("stemsplitter") || path.includes("stem%20separator")) {
+        pageTitle = "Stem Splitter | ToneVault";
         pageDescription = "Isolate vocals, drums, bass, and instruments instantly using our AI-powered stem separation tool.";
-    } else if (path.includes("thoughts 2 midi")) {
-        pageTitle = "Thoughts to MIDI | ToneVault";
+    } else if (path.includes("thoughts2midi") || path.includes("thoughts%202%20midi")) {
+        pageTitle = "Thoughts2MIDI | ToneVault";
         pageDescription = "Generate complex MIDI patterns and musical ideas from simple text descriptions using AI.";
     } else if (path.includes("about")) {
         pageTitle = "About & Contact | ToneVault";
@@ -82,7 +82,7 @@ document.addEventListener("DOMContentLoaded", function() {
         { charset: "UTF-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1.0" },
         { name: "description", content: pageDescription },
-        { name: "keywords", content: "Harish Cousal, ToneVault, music producer, EDM producer, cinematic scoring, custom beats, mixing and mastering, audio to midi, stem separator, thoughts to midi" },
+        { name: "keywords", content: "Harish Cousal, ToneVault, music producer, EDM producer, cinematic scoring, custom beats, mixing and mastering, audio to midi, stem separator, thoughts to midi, Audio2MIDI, Stem Splitter, Thoughts2MIDI" },
         { name: "author", content: "Harish Cousal" },
         
         { property: "og:title", content: pageTitle },
