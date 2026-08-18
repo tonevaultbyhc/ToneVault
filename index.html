@@ -71,13 +71,17 @@
             min-width: 0;
         }
 
+        .home-volume-wrapper {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 12px;
+        }
+
         .home-volume-control {
             display: flex;
             align-items: center;
             gap: 8px;
             color: #888;
-            flex-shrink: 0;
-            margin-left: 10px;
         }
 
         .home-volume-control input[type="range"] {
@@ -91,7 +95,7 @@
         }
 
         @media (max-width: 768px) {
-            .home-volume-control {
+            .home-volume-wrapper {
                 display: none;
             }
         }
@@ -141,7 +145,10 @@
                             </div>
                             <div class="home-waveform" id="homeWaveform"></div>
                         </div>
-
+                    </div>
+                    
+                    <!-- Volume Control Moved Below Waveform -->
+                    <div class="home-volume-wrapper">
                         <div class="home-volume-control">
                             <i class="fa-solid fa-volume-high" style="font-size: 0.85rem;"></i>
                             <input type="range" id="homeVolume" min="0" max="1" step="0.05" value="1">
@@ -175,9 +182,9 @@
                     <h3>AI Studio Tools</h3>
                     <p>Browser-based audio intelligence. Extract MIDI, isolate audio stems, or generate musical ideas from text.</p>
                     <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
-                        <a href="/AI Tools/Audio 2 MIDI.html" class="card-link"><i class="fa-solid fa-music" style="margin-right: 5px;"></i> Audio 2 MIDI &rarr;</a>
-                        <a href="/AI Tools/Stem Separator.html" class="card-link"><i class="fa-solid fa-sliders" style="margin-right: 5px;"></i> Stem Separator &rarr;</a>
-                        <a href="/AI Tools/Thoughts 2 Midi.html" class="card-link"><i class="fa-solid fa-brain" style="margin-right: 5px;"></i> Thoughts 2 MIDI &rarr;</a>
+                        <a href="/AI Tools/Audio2MIDI.html" class="card-link"><i class="fa-solid fa-music" style="margin-right: 5px;"></i> Audio2MIDI &rarr;</a>
+                        <a href="/AI Tools/StemSplitter.html" class="card-link"><i class="fa-solid fa-sliders" style="margin-right: 5px;"></i> Stem Splitter &rarr;</a>
+                        <a href="/AI Tools/Thoughts2Midi.html" class="card-link"><i class="fa-solid fa-brain" style="margin-right: 5px;"></i> Thoughts2MIDI &rarr;</a>
                     </div>
                 </div>
 
