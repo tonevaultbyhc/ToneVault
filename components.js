@@ -108,3 +108,26 @@ document.addEventListener("DOMContentLoaded", function() {
     favicon.href = "/Images/favicon.ico";
     document.head.appendChild(favicon);
 });
+
+// =========================================
+    // THINCLIENT APP REGISTRATION (PWA)
+    // =========================================
+    
+    // 1. Link the Manifest
+    let manifest = document.createElement('link');
+    manifest.rel = "manifest";
+    manifest.href = "/manifest.json";
+    document.head.appendChild(manifest);
+
+    // 2. Register the Service Worker
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => {
+                    console.log('ToneVault ThinClient App Registered Successfully');
+                })
+                .catch(error => {
+                    console.log('ToneVault ThinClient Registration Failed: ', error);
+                });
+        });
+    }
