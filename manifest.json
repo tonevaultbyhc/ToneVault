@@ -1,0 +1,16 @@
+{
+  "name": "ToneVault AI Studio",
+  "short_name": "ToneVault",
+  "description": "Your complete browser-based AI audio production suite.",
+  "start_url": "/ai-tools.html",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#00d4ff",
+  "icons": [
+    {
+      "src": "/Images/Logo White with shadow.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
