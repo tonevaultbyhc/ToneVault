@@ -322,7 +322,6 @@
             padding-bottom: 8px;
             font-size: 0.7rem;
             color: #777;
-            font-weight: bold;
             flex-shrink: 0;
         }
 
@@ -355,10 +354,24 @@
             box-shadow: 0 0 15px #0077ff;
         }
 
+        /* NEW: Stacked Note Label Formatting */
+        .pitch {
+            font-weight: bold;
+            line-height: 1.1;
+        }
+        
+        .octave {
+            font-size: 0.85em;
+            opacity: 0.75;
+            margin-bottom: 3px;
+            line-height: 1;
+        }
+
         .key-hint {
             font-size: 0.6rem;
             opacity: 0.6;
-            margin-top: 2px;
+            margin-top: 1px;
+            color: #00d4ff;
         }
 
         .waiting-badge {
@@ -432,7 +445,7 @@
             </div>
         </div>
 
-        <!-- Audio Settings Sub-Ribbon (Now with Volume Controls!) -->
+        <!-- Audio Settings Sub-Ribbon -->
         <div class="audio-ribbon">
             <div class="control-element">
                 <label for="instrumentSelect" style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-sliders"></i> Instrument:</label>
@@ -678,13 +691,13 @@
                 metronomeBus = new Tone.Gain(parseFloat(metroVolSlider.value)).toDestination();
 
                 metronomeWoodblock = new Tone.MembraneSynth({ pitchDecay: 0.008, envelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.1 } }).connect(metronomeBus);
-                metronomeWoodblock.volume.value = -5; // Base mix level
+                metronomeWoodblock.volume.value = -5;
 
                 metronomeDigital = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "square" }, envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.05 } }).connect(metronomeBus);
-                metronomeDigital.volume.value = -12; // Base mix level
+                metronomeDigital.volume.value = -12;
 
                 metronomeDrum = new Tone.MembraneSynth({ pitchDecay: 0.05, envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 } }).connect(metronomeBus);
-                metronomeDrum.volume.value = -2; // Base mix level
+                metronomeDrum.volume.value = -2;
             }
 
             if (currentInstrument) {
@@ -874,7 +887,22 @@
             pianoEl.innerHTML = "";
             keyPositions = {};
             let rangeConfig = keyboardSizeSelect.value === "auto" ? getAutoSongRange(songSelect.value) : KEYBOARD_RANGES[keyboardSizeSelect.value];
-            const whiteWidth = rangeConfig.whiteKeyWidth;
+            
+            // Calculate total white keys
+            let whiteCount = 0;
+            for (let i = rangeConfig.startMidi; i <= rangeConfig.endMidi; i++) {
+                if (!Tone.Midi(i).toNote().includes('#')) whiteCount++;
+            }
+
+            let containerWidth = canvasScrollContainer.clientWidth || 1170;
+            let whiteWidth = rangeConfig.whiteKeyWidth;
+
+            // Automatically stretch the keys to fill the empty space horizontally
+            if ((whiteCount * whiteWidth) < containerWidth) {
+                whiteWidth = containerWidth / whiteCount;
+            }
+            if (whiteWidth > 65) whiteWidth = 65; 
+
             const blackWidth = whiteWidth * 0.65;
             let whiteKeys = []; let blackKeys = []; let whiteIndex = 0;
 
@@ -886,14 +914,19 @@
 
             const totalPianoWidth = whiteIndex * whiteWidth;
             pianoEl.style.width = `${totalPianoWidth}px`;
-            canvas.width = Math.max(totalPianoWidth, canvasScrollContainer.clientWidth);
+            canvas.width = Math.max(totalPianoWidth, containerWidth);
             canvas.height = 380;
             const xOffset = Math.max(0, (canvas.width - totalPianoWidth) / 2);
 
             whiteKeys.forEach(k => {
+                // Split pitch and octave for stacked layout
+                const pitch = k.note.replace(/[0-9]/g, '');
+                const octave = k.note.replace(/[^0-9]/g, '');
+
                 const keyDiv = document.createElement("div"); keyDiv.className = "key white-key"; keyDiv.id = `key-${k.note}`; keyDiv.style.width = `${whiteWidth}px`;
                 const qwertyKey = Object.keys(QWERTY_MAP).find(key => QWERTY_MAP[key] === k.note);
-                keyDiv.innerHTML = `<span>${k.note}</span>${qwertyKey ? `<span class="key-hint">${qwertyKey.toUpperCase()}</span>` : ''}`;
+                
+                keyDiv.innerHTML = `<span class="pitch">${pitch}</span><span class="octave">${octave}</span>${qwertyKey ? `<span class="key-hint">${qwertyKey.toUpperCase()}</span>` : ''}`;
                 keyDiv.addEventListener("mousedown", () => handleUserNoteOn(k.note));
                 keyDiv.addEventListener("mouseup", () => handleUserNoteOff(k.note));
                 pianoEl.appendChild(keyDiv);
@@ -901,18 +934,23 @@
             });
 
             blackKeys.forEach(k => {
+                // Split pitch and octave for stacked layout
+                const pitch = k.note.replace(/[0-9]/g, '');
+                const octave = k.note.replace(/[^0-9]/g, '');
+
                 const keyDiv = document.createElement("div"); keyDiv.className = "key black-key"; keyDiv.id = `key-${k.note}`; keyDiv.style.width = `${blackWidth}px`;
                 const leftPos = (k.prevWhiteIndex * whiteWidth) + (whiteWidth - (blackWidth / 2)); keyDiv.style.left = `${leftPos}px`;
                 const qwertyKey = Object.keys(QWERTY_MAP).find(key => QWERTY_MAP[key] === k.note);
-                keyDiv.innerHTML = `<span>${k.note}</span>${qwertyKey ? `<span class="key-hint">${qwertyKey.toUpperCase()}</span>` : ''}`;
+                
+                keyDiv.innerHTML = `<span class="pitch">${pitch}</span><span class="octave">${octave}</span>${qwertyKey ? `<span class="key-hint">${qwertyKey.toUpperCase()}</span>` : ''}`;
                 keyDiv.addEventListener("mousedown", () => handleUserNoteOn(k.note));
                 keyDiv.addEventListener("mouseup", () => handleUserNoteOff(k.note));
                 pianoEl.appendChild(keyDiv);
                 keyPositions[k.note] = { x: xOffset + leftPos, w: blackWidth, isBlack: true };
             });
 
-            if (totalPianoWidth > canvasScrollContainer.clientWidth) {
-                const centerScroll = (totalPianoWidth - canvasScrollContainer.clientWidth) / 2;
+            if (totalPianoWidth > containerWidth) {
+                const centerScroll = (totalPianoWidth - containerWidth) / 2;
                 canvasScrollContainer.scrollLeft = centerScroll; keyboardScrollContainer.scrollLeft = centerScroll;
             }
         }
@@ -932,7 +970,6 @@
             const el = document.getElementById(`key-${note}`);
             if (el) el.classList.add("active");
 
-            // Ignore scoring if user plays during Demo Mode
             if (isPlaying && activeSong && !isDemoMode) {
                 if (isWaitingForNote && currentWaitTarget) {
                     if (currentWaitTarget.note === note) {
@@ -1007,7 +1044,6 @@
                     }
                 }
 
-                // Check Wait Mode (Bypassed if Demo Mode is active)
                 if (!isDemoMode && playModeSelect.value === "wait" && !isWaitingForNote) {
                     const upcomingNote = activeSong.notes.find(n => !n.hit && (n.time - songTimeOffset) <= 0.02);
                     if (upcomingNote) {
@@ -1021,9 +1057,7 @@
 
                 activeSong.notes.forEach(n => {
                     
-                    // --- DEMO MODE AUTO-PLAY LOGIC ---
                     if (isDemoMode) {
-                        // Note ON
                         if (!n.hit && songTimeOffset >= n.time) {
                             n.hit = true; n.demoActive = true;
                             if (currentInstrument && Tone.context.state === 'running') {
@@ -1032,7 +1066,6 @@
                             const el = document.getElementById(`key-${n.note}`);
                             if (el) el.classList.add("active");
                         }
-                        // Note OFF
                         if (n.demoActive && songTimeOffset >= n.time + n.dur) {
                             n.demoActive = false;
                             if (currentInstrument) currentInstrument.triggerRelease(n.note);
@@ -1040,7 +1073,6 @@
                             if (el) el.classList.remove("active");
                         }
                     }
-                    // ----------------------------------
 
                     const timeUntilHit = n.time - songTimeOffset;
                     const blockY = HIT_ZONE_Y - (timeUntilHit * FALL_SPEED);
@@ -1086,7 +1118,6 @@
             await Tone.start();
             if (!currentInstrument) await initAudio(instrumentSelect.value);
 
-            // UI Changes based on mode
             if (isDemoMode) {
                 btnDemo.innerHTML = '<i class="fa-solid fa-stop"></i> Stop Demo';
                 btnDemo.style.background = "#ef4444";
@@ -1142,7 +1173,6 @@
             isWaitingForNote = false; currentWaitTarget = null;
             waitingBanner.style.display = "none";
             
-            // Clean up any lingering active demo notes
             if (isDemoMode && activeSong) {
                 activeSong.notes.forEach(n => {
                     if (n.demoActive) {
