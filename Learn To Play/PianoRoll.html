@@ -22,7 +22,6 @@
         body {
             margin: 0;
             padding: 0;
-            /* Hardcoded background removed to allow style.css background to show */
             color: #ffffff;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow-x: hidden;
@@ -30,7 +29,6 @@
 
         .container {
             max-width: 1200px;
-            /* Top margin increased to 120px to prevent clash with global fixed header */
             margin: 120px auto 40px auto; 
             padding: 0 15px;
         }
@@ -125,6 +123,24 @@
             outline: none;
         }
 
+        .control-element input[type="range"] {
+            accent-color: #00d4ff;
+            cursor: pointer;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 2px;
+            -webkit-appearance: none;
+            outline: none;
+        }
+
+        .control-element input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #00d4ff;
+        }
+
         .control-element select:focus, .control-element input[type="number"]:focus {
             border-color: #00d4ff;
         }
@@ -202,7 +218,7 @@
             border-radius: 10px;
             padding: 10px 20px;
             display: flex;
-            gap: 20px;
+            gap: 25px;
             margin-bottom: 15px;
             align-items: center;
             flex-wrap: wrap;
@@ -416,7 +432,7 @@
             </div>
         </div>
 
-        <!-- Audio Settings Sub-Ribbon -->
+        <!-- Audio Settings Sub-Ribbon (Now with Volume Controls!) -->
         <div class="audio-ribbon">
             <div class="control-element">
                 <label for="instrumentSelect" style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-sliders"></i> Instrument:</label>
@@ -430,12 +446,21 @@
                 </select>
             </div>
             <div class="control-element">
-                <label for="metronomeSoundSelect" style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-wave-square"></i> Metronome Sound:</label>
+                <label for="instVolSlider" style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-volume-high"></i> Vol:</label>
+                <input type="range" id="instVolSlider" min="0" max="1.5" step="0.05" value="0.9" style="width: 70px;" title="Instrument Volume">
+            </div>
+
+            <div class="control-element" style="margin-left: 15px; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px;">
+                <label for="metronomeSoundSelect" style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-wave-square"></i> Metronome:</label>
                 <select id="metronomeSoundSelect">
                     <option value="digital" selected>Digital Click (Default)</option>
                     <option value="woodblock">Classic Woodblock</option>
                     <option value="drum">Kick Drum</option>
                 </select>
+            </div>
+            <div class="control-element">
+                <label for="metroVolSlider" style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-volume-high"></i> Vol:</label>
+                <input type="range" id="metroVolSlider" min="0" max="1.5" step="0.05" value="0.8" style="width: 70px;" title="Metronome Volume">
             </div>
         </div>
 
@@ -594,11 +619,25 @@
         // ==========================================
         let currentInstrument = null;
         let masterBus = null;
+        let metronomeBus = null;
+        
         let metronomeWoodblock, metronomeDigital, metronomeDrum;
         let pianoSamples = null;
         let pianoSamplesLoading = null;
         
         const SALAMANDER_PIANO_URL = "https://tonejs.github.io/audio/salamander/";
+
+        // Volume Sliders
+        const instVolSlider = document.getElementById("instVolSlider");
+        const metroVolSlider = document.getElementById("metroVolSlider");
+
+        instVolSlider.addEventListener("input", (e) => {
+            if (masterBus) masterBus.gain.value = parseFloat(e.target.value);
+        });
+
+        metroVolSlider.addEventListener("input", (e) => {
+            if (metronomeBus) metronomeBus.gain.value = parseFloat(e.target.value);
+        });
 
         async function loadPianoSamples() {
             if (pianoSamples) return pianoSamples;
@@ -629,19 +668,23 @@
 
         async function initAudio(instrumentType) {
             if (!masterBus) {
+                // Main Instrument FX Chain & Bus
                 const reverb = new Tone.Reverb({ decay: 2.5, preDelay: 0.01, wet: 0.2 }).toDestination();
                 const delay = new Tone.FeedbackDelay({ delayTime: "8n", feedback: 0.1, wet: 0.05 }).connect(reverb);
                 const compressor = new Tone.Compressor({ threshold: -18, ratio: 2.5 }).connect(delay);
-                masterBus = new Tone.Gain(0.9).connect(compressor);
+                masterBus = new Tone.Gain(parseFloat(instVolSlider.value)).connect(compressor);
 
-                metronomeWoodblock = new Tone.MembraneSynth({ pitchDecay: 0.008, envelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.1 } }).toDestination();
-                metronomeWoodblock.volume.value = -5;
+                // Dedicated Metronome Bus (Bypasses Reverb/Delay)
+                metronomeBus = new Tone.Gain(parseFloat(metroVolSlider.value)).toDestination();
 
-                metronomeDigital = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "square" }, envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.05 } }).toDestination();
-                metronomeDigital.volume.value = -12;
+                metronomeWoodblock = new Tone.MembraneSynth({ pitchDecay: 0.008, envelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.1 } }).connect(metronomeBus);
+                metronomeWoodblock.volume.value = -5; // Base mix level
 
-                metronomeDrum = new Tone.MembraneSynth({ pitchDecay: 0.05, envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 } }).toDestination();
-                metronomeDrum.volume.value = -2;
+                metronomeDigital = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "square" }, envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.05 } }).connect(metronomeBus);
+                metronomeDigital.volume.value = -12; // Base mix level
+
+                metronomeDrum = new Tone.MembraneSynth({ pitchDecay: 0.05, envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 } }).connect(metronomeBus);
+                metronomeDrum.volume.value = -2; // Base mix level
             }
 
             if (currentInstrument) {
