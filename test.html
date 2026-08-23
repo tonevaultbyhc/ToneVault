@@ -1498,7 +1498,19 @@
             const previewNotes = notes
                 .map(note => ({ ...note }))
                 .filter(note => Number.isFinite(note.time) && note.time >= 0 && note.time < totalDuration)
-                .sort((a, b) => a.time - b.time);
+                .sort((a, b) => a.time - b.time || a.midi - b.midi);
+
+            // Remove exact duplicate events. Cinematic phrases can intentionally
+            // layer two generators on the same beat; the preview should not send
+            // two identical events to one synth voice at the exact same time.
+            const uniquePreviewNotes = [];
+            const seenPreviewEvents = new Set();
+            for (const note of previewNotes) {
+                const key = `${note.track}|${note.midi}|${Math.round(note.time * 100000)}`;
+                if (seenPreviewEvents.has(key)) continue;
+                seenPreviewEvents.add(key);
+                uniquePreviewNotes.push(note);
+            }
 
             const buffer = await Tone.Offline(async () => {
                 const isIndian = resolved.engine === 'indian';
@@ -1602,7 +1614,7 @@
                 if (isSouth && resolved.instrument === 'parai' && !paraiSampler) {
                     console.warn(
                         'ToneVault: Authentic Parai samples are not installed. ' +
-                        'Using the non-kick procedural Parai fallback. Add /Samples/Parai/ WAV files for recorded Parai.'
+                        'Using the procedural fallback. Add /Samples/Parai/ WAV files for recorded Parai.'
                     );
                 }
 
@@ -1723,8 +1735,16 @@
                     [MIDI_DRUMS.TABLA_LOW]: 'C4'
                 };
 
-                previewNotes.forEach(note => {
-                    const t = Math.max(0, Math.min(note.time, totalDuration - 0.001));
+                const lastVoiceTime = new Map();
+
+                uniquePreviewNotes.forEach(note => {
+                    let t = Math.max(0, Math.min(note.time, totalDuration - 0.001));
+                    const voiceKey = `${resolved.engine}|${note.midi}`;
+                    const previous = lastVoiceTime.get(voiceKey);
+                    if (previous !== undefined && t <= previous) {
+                        t = Math.min(totalDuration - 0.001, previous + 0.0005);
+                    }
+                    lastVoiceTime.set(voiceKey, t);
                     const v = note.velocity;
 
                     // REAL PARAI PREVIEW
@@ -1766,7 +1786,7 @@
                     // Other generated sounds.
                     switch (note.midi) {
                         case MIDI_DRUMS.KICK:
-                            kick.triggerAttackRelease('C1', '8n', t, v);
+                            kick.triggerAttackRelease('C1', '32n', t, v);
                             break;
                         case MIDI_DRUMS.SNARE:
                             snareBody.triggerAttackRelease('G2', '16n', t, v);
@@ -1782,14 +1802,14 @@
                             clap.triggerAttackRelease('16n', t, v);
                             break;
                         case MIDI_DRUMS.TOM_HI:
-                            lowTom.triggerAttackRelease('A2', '8n', t, v);
+                            lowTom.triggerAttackRelease('A2', '32n', t, v);
                             break;
                         case MIDI_DRUMS.TOM_LO:
-                            lowTom.triggerAttackRelease('D2', '8n', t, v);
+                            lowTom.triggerAttackRelease('D2', '32n', t, v);
                             break;
                         case MIDI_DRUMS.DHOL_LOW:
                             if (resolved.instrument === 'parai') {
-                                paraiBody.triggerAttackRelease('G2', '8n', t, v * 0.9);
+                                paraiBody.triggerAttackRelease('G2', '32n', t, v * 0.9);
                                 paraiSkin.triggerAttackRelease('16n', t, v * 0.55);
                             } else {
                                 dholLow.triggerAttackRelease('D2', '8n', t, v);
@@ -1797,23 +1817,23 @@
                             break;
                         case MIDI_DRUMS.DHOL_HIGH:
                             if (resolved.instrument === 'parai') {
-                                paraiBody.triggerAttackRelease('D3', '16n', t, v * 0.8);
+                                paraiBody.triggerAttackRelease('D3', '32n', t, v * 0.8);
                                 paraiSkin.triggerAttackRelease('32n', t, v * 0.72);
                             } else {
                                 dholHigh.triggerAttackRelease('A2', '16n', t, v);
                             }
                             break;
                         case MIDI_DRUMS.TAIKO_LOW:
-                            taikoLow.triggerAttackRelease('C1', '4n', t, v);
+                            taikoLow.triggerAttackRelease('C1', '8n', t, v);
                             break;
                         case MIDI_DRUMS.LOW_TOM_CIN:
-                            lowTom.triggerAttackRelease('D2', '8n', t, v);
+                            lowTom.triggerAttackRelease('D2', '32n', t, v);
                             break;
                         case MIDI_DRUMS.HIGH_TOM_CIN:
                             lowTom.triggerAttackRelease('A2', '16n', t, v);
                             break;
                         case MIDI_DRUMS.TIMPANI:
-                            timpani.triggerAttackRelease('G1', '2n', t, v);
+                            timpani.triggerAttackRelease('G1', '4n', t, v);
                             break;
                         case MIDI_DRUMS.ORCH_SNARE:
                             orchSnare.triggerAttackRelease('C3', '16n', t, v);
