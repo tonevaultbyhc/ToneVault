@@ -408,12 +408,6 @@
             color: #000;
         }
 
-        .action-buttons-group {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 15px;
-        }
-
         /* KEYWORD GUIDE STYLES */
         .keyword-guide {
             padding: 25px 20px;
@@ -914,8 +908,6 @@
         const fillSelect = document.getElementById("fillSelect");
         const genreSelect = document.getElementById("genreSelect");
         
-        const thoughtsInput = document.getElementById("thoughtsInput");
-        
         const processBtn = document.getElementById("processBtn");
         const statusMessage = document.getElementById("statusMessage");
         const statusText = document.getElementById("statusText");
@@ -1175,10 +1167,11 @@
                         progressBarFill.style.width = "0%";
                     }, 800);
 
+                    // Show the containers so the WaveSurfer has a width to draw on
                     resultsArea.style.display = "block";
                     waveformPreviewContainer.style.display = "block";
 
-                    // Call render with the automatically selected kit based on genre
+                    // Render Audio and Build Waveform
                     await renderDrumAudioPreview(generatedNotes, exactMaxTime, kitConfig.kit);
 
                     processBtn.removeAttribute("disabled");
@@ -1200,7 +1193,7 @@
             try {
                 statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Rendering Audio Preview...`;
 
-                const buffer = await Tone.Offline(() => {
+                const buffer = await Tone.Offline(async () => {
 
                     // MASTER BUS SETUP
                     const compressor = new Tone.Compressor({
@@ -1296,31 +1289,34 @@
                 if (wavBlobUrl) URL.revokeObjectURL(wavBlobUrl);
                 wavBlobUrl = URL.createObjectURL(wavBlob);
 
-                // Create WaveSurfer exactly ONCE, wait for the container to be visible so width isn't 0
-                if (!wavesurfer) {
-                    wavesurfer = WaveSurfer.create({
-                        container: '#waveform',
-                        waveColor: '#444',
-                        progressColor: '#00d4ff',
-                        cursorColor: '#ffffff',
-                        barWidth: 3,
-                        barRadius: 3,
-                        height: 60,
-                        normalize: true
-                    });
-
-                    wavesurfer.on('ready', () => {
-                        audioDurationText.textContent = formatTime(wavesurfer.getDuration());
-                        wavesurfer.setVolume(parseFloat(previewVolume.value));
-                    });
-
-                    wavesurfer.on('play', () => previewPlayIcon.className = "fa-solid fa-pause");
-                    wavesurfer.on('pause', () => previewPlayIcon.className = "fa-solid fa-play");
-                    wavesurfer.on('finish', () => previewPlayIcon.className = "fa-solid fa-play");
+                // Destroy old instance to guarantee a completely fresh waveform visual
+                if (wavesurfer) {
+                    wavesurfer.destroy();
+                    previewPlayIcon.className = "fa-solid fa-play";
                 }
 
-                // Hot-swap the audio seamlessly
+                // Re-create the waveform
+                wavesurfer = WaveSurfer.create({
+                    container: '#waveform',
+                    waveColor: '#444',
+                    progressColor: '#00d4ff',
+                    cursorColor: '#ffffff',
+                    barWidth: 3,
+                    barRadius: 3,
+                    height: 60,
+                    normalize: true
+                });
+
                 wavesurfer.load(wavBlobUrl);
+
+                wavesurfer.on('ready', () => {
+                    audioDurationText.textContent = formatTime(wavesurfer.getDuration());
+                    wavesurfer.setVolume(parseFloat(previewVolume.value));
+                });
+
+                wavesurfer.on('play', () => previewPlayIcon.className = "fa-solid fa-pause");
+                wavesurfer.on('pause', () => previewPlayIcon.className = "fa-solid fa-play");
+                wavesurfer.on('finish', () => previewPlayIcon.className = "fa-solid fa-play");
 
             } catch (error) {
                 console.error("Audio render error:", error);
