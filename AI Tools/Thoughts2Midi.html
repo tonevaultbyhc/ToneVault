@@ -97,7 +97,7 @@
             font-weight: 600;
         }
 
-        .setting-group select, .setting-group input, .setting-group textarea {
+        .setting-group input, .setting-group textarea {
             width: 100%;
             background: rgba(10, 10, 10, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -113,8 +113,115 @@
             resize: vertical;
         }
 
-        .setting-group select:focus, .setting-group input:focus, .setting-group textarea:focus {
+        .setting-group input:focus, .setting-group textarea:focus {
             border-color: #00d4ff;
+        }
+
+        /* CUSTOM DROPDOWN STYLES */
+        .custom-select-wrapper {
+            position: relative;
+            user-select: none;
+            width: 100%;
+        }
+
+        .custom-select-wrapper.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .custom-select-trigger {
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            padding: 12px 15px;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        /* Specific tweak for the toolbar dropdown */
+        .preview-toolbar .custom-select-trigger {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+            border-radius: 8px;
+            min-width: 220px;
+        }
+
+        .custom-select-wrapper.open .custom-select-trigger {
+            border-color: #00d4ff;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            background: rgba(15, 15, 15, 0.95);
+        }
+
+        .custom-select-trigger i {
+            color: #00d4ff;
+            transition: transform 0.3s ease;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+
+        .custom-select-wrapper.open .custom-select-trigger i {
+            transform: rotate(180deg);
+        }
+
+        .custom-select-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid #00d4ff;
+            border-top: none;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            z-index: 50;
+            overflow-y: auto;
+            max-height: 250px;
+        }
+
+        /* Customized scrollbar for dropdowns */
+        .custom-select-options::-webkit-scrollbar { width: 6px; }
+        .custom-select-options::-webkit-scrollbar-thumb { background: #00d4ff; border-radius: 3px; }
+        .custom-select-options::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+
+        .custom-option {
+            padding: 12px 15px;
+            color: #bbb;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .preview-toolbar .custom-option {
+            padding: 10px 12px;
+            font-size: 0.85rem;
+        }
+
+        .custom-option:last-child {
+            border-bottom: none;
+        }
+
+        .custom-option:hover {
+            background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
+            padding-left: 20px;
+        }
+
+        .custom-option.selected {
+            color: #ffffff;
+            background: rgba(0, 212, 255, 0.05);
+            font-weight: bold;
         }
 
         /* WAVEFORM CONTAINER PREVIEW */
@@ -193,16 +300,6 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             margin: 0;
-        }
-
-        .preview-instrument-select select {
-            background: rgba(10, 10, 10, 0.9);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 8px;
-            outline: none;
-            font-size: 0.9rem;
         }
 
         /* VOLUME CONTROL */
@@ -464,6 +561,8 @@
             .settings-grid { grid-template-columns: 1fr; gap: 15px; }
             .preview-toolbar { flex-direction: column; align-items: stretch; }
             .keyword-row { flex-direction: column; align-items: flex-start; gap: 4px; }
+            .preview-instrument-select { flex-direction: column; align-items: flex-start; }
+            .preview-toolbar .custom-select-trigger { width: 100%; min-width: 0; }
         }
 
         @media (max-width: 480px) {
@@ -500,10 +599,26 @@
                 
                 <!-- MUSICAL STRUCTURE INPUTS -->
                 <div class="settings-grid">
+                    
+                    <!-- Genre Dropdown -->
                     <div class="setting-group">
-                        <label for="genreSelect"><i class="fa-solid fa-compact-disc"></i> Musical Style</label>
-                        <select id="genreSelect">
-                            <option value="electronic">Cinematic Electronic</option>
+                        <label><i class="fa-solid fa-compact-disc"></i> Musical Style</label>
+                        <div class="custom-select-wrapper" id="genreSelectWrapper">
+                            <div class="custom-select-trigger" id="genreSelectTrigger">
+                                <span>Cinematic Electronic</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="genreSelectOptions">
+                                <div class="custom-option selected" data-value="electronic">Cinematic Electronic</div>
+                                <div class="custom-option" data-value="lofi">Ambient Lo-Fi</div>
+                                <div class="custom-option" data-value="pop">Upbeat Pop</div>
+                                <div class="custom-option" data-value="rock">Heavy Rock</div>
+                                <div class="custom-option" data-value="classical">Classical Orchestral</div>
+                                <div class="custom-option" data-value="jazz">Jazz Fusion</div>
+                            </div>
+                        </div>
+                        <select id="genreSelect" style="display: none;">
+                            <option value="electronic" selected>Cinematic Electronic</option>
                             <option value="lofi">Ambient Lo-Fi</option>
                             <option value="pop">Upbeat Pop</option>
                             <option value="rock">Heavy Rock</option>
@@ -511,13 +626,37 @@
                             <option value="jazz">Jazz Fusion</option>
                         </select>
                     </div>
+
+                    <!-- Tempo Input -->
                     <div class="setting-group">
                         <label for="tempoInput"><i class="fa-solid fa-metronome"></i> Tempo (BPM)</label>
                         <input type="number" id="tempoInput" value="120" min="40" max="240" placeholder="e.g. 120">
                     </div>
+
+                    <!-- Key Root Dropdown -->
                     <div class="setting-group">
-                        <label for="keySelect"><i class="fa-solid fa-key"></i> Key Root</label>
-                        <select id="keySelect">
+                        <label><i class="fa-solid fa-key"></i> Key Root</label>
+                        <div class="custom-select-wrapper" id="keySelectWrapper">
+                            <div class="custom-select-trigger" id="keySelectTrigger">
+                                <span>G</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="keySelectOptions">
+                                <div class="custom-option" data-value="C">C</div>
+                                <div class="custom-option" data-value="C#">C#</div>
+                                <div class="custom-option" data-value="D">D</div>
+                                <div class="custom-option" data-value="D#">D#</div>
+                                <div class="custom-option" data-value="E">E</div>
+                                <div class="custom-option" data-value="F">F</div>
+                                <div class="custom-option" data-value="F#">F#</div>
+                                <div class="custom-option selected" data-value="G">G</div>
+                                <div class="custom-option" data-value="G#">G#</div>
+                                <div class="custom-option" data-value="A">A</div>
+                                <div class="custom-option" data-value="A#">A#</div>
+                                <div class="custom-option" data-value="B">B</div>
+                            </div>
+                        </div>
+                        <select id="keySelect" style="display: none;">
                             <option value="C">C</option>
                             <option value="C#">C#</option>
                             <option value="D">D</option>
@@ -532,9 +671,24 @@
                             <option value="B">B</option>
                         </select>
                     </div>
+
+                    <!-- Time Signature Dropdown -->
                     <div class="setting-group">
-                        <label for="timeSigSelect"><i class="fa-solid fa-clock"></i> Time Signature</label>
-                        <select id="timeSigSelect">
+                        <label><i class="fa-solid fa-clock"></i> Time Signature</label>
+                        <div class="custom-select-wrapper" id="timeSigSelectWrapper">
+                            <div class="custom-select-trigger" id="timeSigSelectTrigger">
+                                <span>4/4 (Common Time)</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="timeSigSelectOptions">
+                                <div class="custom-option selected" data-value="4/4">4/4 (Common Time)</div>
+                                <div class="custom-option" data-value="3/4">3/4 (Waltz)</div>
+                                <div class="custom-option" data-value="6/8">6/8 (Compound)</div>
+                                <div class="custom-option" data-value="2/4">2/4 (March)</div>
+                                <div class="custom-option" data-value="5/4">5/4 (Asymmetric)</div>
+                            </div>
+                        </div>
+                        <select id="timeSigSelect" style="display: none;">
                             <option value="4/4" selected>4/4 (Common Time)</option>
                             <option value="3/4">3/4 (Waltz)</option>
                             <option value="6/8">6/8 (Compound)</option>
@@ -542,19 +696,36 @@
                             <option value="5/4">5/4 (Asymmetric)</option>
                         </select>
                     </div>
+
+                    <!-- Exact Length Input -->
                     <div class="setting-group" style="grid-column: 1 / -1;">
                         <label for="barsInput"><i class="fa-solid fa-arrows-split-up-and-left"></i> Exact Length (Bars)</label>
                         <input type="number" id="barsInput" value="8" min="1" max="64" placeholder="e.g. 8, 12, 16">
                     </div>
+
+                    <!-- Scale Type Dropdown -->
                     <div class="setting-group" style="grid-column: 1 / -1;">
-                        <label for="scaleSelect"><i class="fa-solid fa-music"></i> Scale Type</label>
-                        <select id="scaleSelect">
+                        <label><i class="fa-solid fa-music"></i> Scale Type</label>
+                        <div class="custom-select-wrapper" id="scaleSelectWrapper">
+                            <div class="custom-select-trigger" id="scaleSelectTrigger">
+                                <span>Natural Minor</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="scaleSelectOptions">
+                                <div class="custom-option" data-value="major">Major</div>
+                                <div class="custom-option selected" data-value="minor">Natural Minor</div>
+                                <div class="custom-option" data-value="pentatonic">Pentatonic</div>
+                                <div class="custom-option" data-value="dorian">Dorian</div>
+                            </div>
+                        </div>
+                        <select id="scaleSelect" style="display: none;">
                             <option value="major">Major</option>
                             <option value="minor" selected>Natural Minor</option>
                             <option value="pentatonic">Pentatonic</option>
                             <option value="dorian">Dorian</option>
                         </select>
                     </div>
+
                 </div>
 
                 <!-- THOUGHTS & WORDS TEXTAREA -->
@@ -593,10 +764,24 @@
                         <!-- POST-GENERATION PREVIEW TOOLBAR -->
                         <div class="preview-toolbar">
                             <div class="preview-instrument-select">
-                                <label for="postInstrumentSelect">
-                                    <i class="fa-solid fa-sliders"></i> Preview Instrument:
-                                </label>
-                                <select id="postInstrumentSelect">
+                                <label><i class="fa-solid fa-sliders"></i> Preview Instrument:</label>
+                                
+                                <!-- Custom Select Dropdown -->
+                                <div class="custom-select-wrapper" id="postInstrumentSelectWrapper" style="width: auto;">
+                                    <div class="custom-select-trigger" id="postInstrumentSelectTrigger">
+                                        <span>Grand Piano — Concert</span>
+                                        <i class="fa-solid fa-chevron-down"></i>
+                                    </div>
+                                    <div class="custom-select-options" id="postInstrumentSelectOptions">
+                                        <div class="custom-option selected" data-value="grandpiano">Grand Piano — Concert</div>
+                                        <div class="custom-option" data-value="softpiano">Soft Grand Piano</div>
+                                        <div class="custom-option" data-value="electricpiano">Electric Piano</div>
+                                        <div class="custom-option" data-value="strings">Warm Strings</div>
+                                        <div class="custom-option" data-value="pad">Cinematic Pad</div>
+                                        <div class="custom-option" data-value="bell">Soft Bell</div>
+                                    </div>
+                                </div>
+                                <select id="postInstrumentSelect" style="display: none;">
                                     <option value="grandpiano" selected>Grand Piano — Concert</option>
                                     <option value="softpiano">Soft Grand Piano</option>
                                     <option value="electricpiano">Electric Piano</option>
@@ -605,6 +790,7 @@
                                     <option value="bell">Soft Bell</option>
                                 </select>
                             </div>
+                            
                             <div class="volume-control-wrapper">
                                 <i class="fa-solid fa-volume-high"></i>
                                 <input type="range" class="volume-slider" id="previewVolume" min="0" max="1" step="0.05" value="1">
@@ -704,9 +890,75 @@
 
     <!-- CLIENT-SIDE RHYTHMIC GROOVE & MIDI LOGIC -->
     <script type="module">
+        // ==========================================
+        // CUSTOM DROPDOWN LOGIC INIT
+        // ==========================================
+        function setupCustomDropdown(selectId) {
+            const hiddenSelect = document.getElementById(selectId);
+            const wrapper = document.getElementById(selectId + 'Wrapper');
+            const trigger = document.getElementById(selectId + 'Trigger');
+            const optionsContainer = document.getElementById(selectId + 'Options');
+            const customOptions = optionsContainer.querySelectorAll('.custom-option');
+            const triggerText = trigger.querySelector('span');
+
+            // Open/Close toggle
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                
+                // Close other open wrappers
+                document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+                    if (w !== wrapper) w.classList.remove('open');
+                });
+                
+                if (!wrapper.classList.contains('disabled')) {
+                    wrapper.classList.toggle('open');
+                }
+            });
+
+            // Option selection
+            customOptions.forEach(opt => {
+                opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    
+                    // Update Text
+                    triggerText.textContent = opt.textContent;
+                    
+                    // Update Active Class
+                    customOptions.forEach(o => o.classList.remove('selected'));
+                    opt.classList.add('selected');
+                    
+                    // Sync Hidden Select
+                    hiddenSelect.value = opt.getAttribute('data-value');
+                    
+                    // Close Dropdown
+                    wrapper.classList.remove('open');
+                    
+                    // Trigger native change event so Tone.js listeners fire
+                    hiddenSelect.dispatchEvent(new Event('change'));
+                });
+            });
+        }
+
+        // Close dropdowns if clicking anywhere outside
+        window.addEventListener('click', () => {
+            document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+                w.classList.remove('open');
+            });
+        });
+
+        // Initialize all Custom Dropdowns
+        setupCustomDropdown('genreSelect');
+        setupCustomDropdown('keySelect');
+        setupCustomDropdown('timeSigSelect');
+        setupCustomDropdown('scaleSelect');
+        setupCustomDropdown('postInstrumentSelect');
+
+        // ==========================================
+        // CORE TONE.JS LOGIC
+        // ==========================================
         const tempoInput = document.getElementById("tempoInput");
         const barsInput = document.getElementById("barsInput");
-        const keySelect = document.getElementById("keySelect");
+        const keySelect = document.getElementById("keySelect"); // Pulls from hidden sync'd input
         const scaleSelect = document.getElementById("scaleSelect");
         const timeSigSelect = document.getElementById("timeSigSelect");
         const postInstrumentSelect = document.getElementById("postInstrumentSelect");
@@ -764,7 +1016,6 @@
         });
 
         processBtn.addEventListener("click", async () => {
-            // Unlock Tone audio context via user click gesture
             await Tone.start();
 
             processBtn.setAttribute("disabled", "true");
@@ -793,7 +1044,6 @@
 
                     const barDuration = beatsPerBar * secondsPerTimeUnit;
                     
-                    // BUG FIX: Removing 'const' updates the global variable correctly for re-rendering!
                     exactMaxTime = totalBars * barDuration;
 
                     const midi = new Midi();
@@ -902,97 +1152,42 @@
 
         // ============================================================
         // TONEVAULT PREVIEW INSTRUMENTS
-        // High-quality sampled piano + premium synth alternatives
         // ============================================================
 
         let pianoSamples = null;
         let pianoSamplesLoading = null;
 
-        const SALAMANDER_PIANO_URL =
-            "https://tonejs.github.io/audio/salamander/";
+        const SALAMANDER_PIANO_URL = "https://tonejs.github.io/audio/salamander/";
 
-        // Load a small set of high-quality Salamander Grand Piano samples.
-        // Tone.Sampler automatically interpolates between these notes.
         async function loadPianoSamples() {
-
-            // Already loaded
-            if (pianoSamples) {
-                return pianoSamples;
-            }
-
-            // Prevent multiple simultaneous downloads
-            if (pianoSamplesLoading) {
-                return pianoSamplesLoading;
-            }
+            if (pianoSamples) return pianoSamples;
+            if (pianoSamplesLoading) return pianoSamplesLoading;
 
             pianoSamplesLoading = new Promise((resolve, reject) => {
-
                 const sampleUrls = {
-                    C3: "C3.mp3",
-                    "D#3": "Ds3.mp3",
-                    "F#3": "Fs3.mp3",
-                    A3: "A3.mp3",
-
-                    C4: "C4.mp3",
-                    "D#4": "Ds4.mp3",
-                    "F#4": "Fs4.mp3",
-                    A4: "A4.mp3",
-
-                    C5: "C5.mp3",
-                    "D#5": "Ds5.mp3",
-                    "F#5": "Fs5.mp3",
-                    A5: "A5.mp3",
-
-                    C6: "C6.mp3",
-                    "D#6": "Ds6.mp3",
-                    "F#6": "Fs6.mp3",
-                    A6: "A6.mp3"
+                    C3: "C3.mp3", "D#3": "Ds3.mp3", "F#3": "Fs3.mp3", A3: "A3.mp3",
+                    C4: "C4.mp3", "D#4": "Ds4.mp3", "F#4": "Fs4.mp3", A4: "A4.mp3",
+                    C5: "C5.mp3", "D#5": "Ds5.mp3", "F#5": "Fs5.mp3", A5: "A5.mp3",
+                    C6: "C6.mp3", "D#6": "Ds6.mp3", "F#6": "Fs6.mp3", A6: "A6.mp3"
                 };
 
                 const entries = Object.entries(sampleUrls);
-
-                Promise.all(
-                    entries.map(async ([note, filename]) => {
-
-                        const response = await fetch(
-                            SALAMANDER_PIANO_URL + filename
-                        );
-
-                        if (!response.ok) {
-                            throw new Error(
-                                `Could not load piano sample: ${filename}`
-                            );
-                        }
-
+                Promise.all(entries.map(async ([note, filename]) => {
+                        const response = await fetch(SALAMANDER_PIANO_URL + filename);
+                        if (!response.ok) throw new Error(`Could not load piano sample: ${filename}`);
                         const arrayBuffer = await response.arrayBuffer();
-
-                        const audioBuffer =
-                            await Tone.getContext().rawContext.decodeAudioData(
-                                arrayBuffer
-                            );
-
+                        const audioBuffer = await Tone.getContext().rawContext.decodeAudioData(arrayBuffer);
                         return [note, audioBuffer];
                     })
                 )
                 .then(results => {
-
                     pianoSamples = Object.fromEntries(results);
-
-                    console.log(
-                        "ToneVault: Grand Piano samples loaded."
-                    );
-
+                    console.log("ToneVault: Grand Piano samples loaded.");
                     resolve(pianoSamples);
                 })
                 .catch(error => {
-
-                    console.error(
-                        "ToneVault: Piano sample loading failed:",
-                        error
-                    );
-
+                    console.error("ToneVault: Piano sample loading failed:", error);
                     pianoSamplesLoading = null;
-
                     reject(error);
                 });
             });
@@ -1000,361 +1195,104 @@
             return pianoSamplesLoading;
         }
 
-        // ============================================================
-        // RENDER HIGH-QUALITY AUDIO PREVIEW
-        // ============================================================
-
-        async function renderAcousticAudioPreview(
-            notes,
-            totalDuration,
-            instrumentType
-        ) {
-
+        async function renderAcousticAudioPreview(notes, totalDuration, instrumentType) {
             try {
-
-                // --------------------------------------------------------
-                // Load piano samples only when a piano is requested
-                // --------------------------------------------------------
-
                 let loadedPianoSamples = null;
 
-                if (
-                    instrumentType === "grandpiano" ||
-                    instrumentType === "softpiano"
-                ) {
-
-                    statusText.innerHTML =
-                        `<i class="fa-solid fa-spinner fa-spin"></i> Loading piano samples...`;
-
+                if (instrumentType === "grandpiano" || instrumentType === "softpiano") {
+                    statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading piano samples...`;
                     loadedPianoSamples = await loadPianoSamples();
                 }
 
-                // --------------------------------------------------------
-                // Offline rendering
-                // --------------------------------------------------------
-
                 const buffer = await Tone.Offline(async () => {
-
-                    // Premium reverb
-                    const reverb = new Tone.Reverb({
-                        decay: 2.8,
-                        preDelay: 0.015,
-                        wet: 0.24
-                    }).toDestination();
-
-                    // Very subtle stereo delay
-                    const delay = new Tone.FeedbackDelay({
-                        delayTime: "8n",
-                        feedback: 0.08,
-                        wet: 0.06
-                    }).connect(reverb);
-
-                    // Gentle compressor
-                    const compressor = new Tone.Compressor({
-                        threshold: -18,
-                        ratio: 2.5,
-                        attack: 0.01,
-                        release: 0.15
-                    }).connect(delay);
-
-                    const masterBus = new Tone.Gain(0.82)
-                        .connect(compressor);
+                    const reverb = new Tone.Reverb({ decay: 2.8, preDelay: 0.015, wet: 0.24 }).toDestination();
+                    const delay = new Tone.FeedbackDelay({ delayTime: "8n", feedback: 0.08, wet: 0.06 }).connect(reverb);
+                    const compressor = new Tone.Compressor({ threshold: -18, ratio: 2.5, attack: 0.01, release: 0.15 }).connect(delay);
+                    const masterBus = new Tone.Gain(0.82).connect(compressor);
 
                     let instrument;
 
-                    // ====================================================
-                    // GRAND PIANO
-                    // ====================================================
-
                     if (instrumentType === "grandpiano") {
-
-                        instrument = new Tone.Sampler({
-
-                            urls: loadedPianoSamples,
-
-                            attack: 0.002,
-                            release: 1.8
-
-                        }).connect(masterBus);
-
-                    }
-
-                    // ====================================================
-                    // SOFT GRAND PIANO
-                    // Same real piano samples, but softer and darker
-                    // ====================================================
-
+                        instrument = new Tone.Sampler({ urls: loadedPianoSamples, attack: 0.002, release: 1.8 }).connect(masterBus);
+                    } 
                     else if (instrumentType === "softpiano") {
-
-                        const pianoFilter = new Tone.Filter({
-                            type: "lowpass",
-                            frequency: 5500,
-                            rolloff: -12
-                        }).connect(masterBus);
-
-                        instrument = new Tone.Sampler({
-
-                            urls: loadedPianoSamples,
-
-                            attack: 0.008,
-                            release: 2.2
-
-                        }).connect(pianoFilter);
-
+                        const pianoFilter = new Tone.Filter({ type: "lowpass", frequency: 5500, rolloff: -12 }).connect(masterBus);
+                        instrument = new Tone.Sampler({ urls: loadedPianoSamples, attack: 0.008, release: 2.2 }).connect(pianoFilter);
                         instrument.volume.value = -2.5;
-                    }
-
-                    // ====================================================
-                    // ELECTRIC PIANO
-                    // ====================================================
-
+                    } 
                     else if (instrumentType === "electricpiano") {
-
-                        instrument = new Tone.PolySynth(
-                            Tone.FMSynth,
-                            {
-
-                                harmonicity: 2.5,
-
-                                modulationIndex: 1.5,
-
-                                oscillator: {
-                                    type: "sine"
-                                },
-
-                                envelope: {
-                                    attack: 0.01,
-                                    decay: 1.2,
-                                    sustain: 0.45,
-                                    release: 1.8
-                                },
-
-                                modulation: {
-                                    type: "sine"
-                                },
-
-                                modulationEnvelope: {
-                                    attack: 0.01,
-                                    decay: 0.8,
-                                    sustain: 0.25,
-                                    release: 1.2
-                                }
-                            }
-                        ).connect(masterBus);
-
-                        instrument.volume.value = -4;
-                    }
-
-                    // ====================================================
-                    // WARM STRINGS
-                    // ====================================================
-
-                    else if (instrumentType === "strings") {
-
-                        instrument = new Tone.PolySynth(
-                            Tone.Synth,
-                            {
-
-                                oscillator: {
-                                    type: "triangle"
-                                },
-
-                                envelope: {
-                                    attack: 0.35,
-                                    decay: 0.5,
-                                    sustain: 0.65,
-                                    release: 2.5
-                                }
-                            }
-                        ).connect(masterBus);
-
-                        instrument.volume.value = -8;
-                    }
-
-                    // ====================================================
-                    // CINEMATIC PAD
-                    // ====================================================
-
-                    else if (instrumentType === "pad") {
-
-                        instrument = new Tone.PolySynth(
-                            Tone.Synth,
-                            {
-
-                                oscillator: {
-                                    type: "sine"
-                                },
-
-                                envelope: {
-                                    attack: 0.8,
-                                    decay: 1.2,
-                                    sustain: 0.7,
-                                    release: 3.5
-                                }
-                            }
-                        ).connect(masterBus);
-
-                        instrument.volume.value = -10;
-                    }
-
-                    // ====================================================
-                    // SOFT BELL
-                    // ====================================================
-
-                    else if (instrumentType === "bell") {
-
-                        instrument = new Tone.MetalSynth({
-
-                            frequency: 250,
-
-                            envelope: {
-                                attack: 0.001,
-                                decay: 1.8,
-                                release: 2.0
-                            },
-
-                            harmonicity: 5.1,
-
-                            modulationIndex: 12,
-
-                            resonance: 3500,
-
-                            octaves: 1.5
-
+                        instrument = new Tone.PolySynth(Tone.FMSynth, {
+                            harmonicity: 2.5, modulationIndex: 1.5, oscillator: { type: "sine" },
+                            envelope: { attack: 0.01, decay: 1.2, sustain: 0.45, release: 1.8 },
+                            modulation: { type: "sine" }, modulationEnvelope: { attack: 0.01, decay: 0.8, sustain: 0.25, release: 1.2 }
                         }).connect(masterBus);
-
+                        instrument.volume.value = -4;
+                    } 
+                    else if (instrumentType === "strings") {
+                        instrument = new Tone.PolySynth(Tone.Synth, {
+                            oscillator: { type: "triangle" },
+                            envelope: { attack: 0.35, decay: 0.5, sustain: 0.65, release: 2.5 }
+                        }).connect(masterBus);
                         instrument.volume.value = -8;
-                    }
-
-                    // ====================================================
-                    // SAFETY FALLBACK
-                    // ====================================================
-
+                    } 
+                    else if (instrumentType === "pad") {
+                        instrument = new Tone.PolySynth(Tone.Synth, {
+                            oscillator: { type: "sine" },
+                            envelope: { attack: 0.8, decay: 1.2, sustain: 0.7, release: 3.5 }
+                        }).connect(masterBus);
+                        instrument.volume.value = -10;
+                    } 
+                    else if (instrumentType === "bell") {
+                        instrument = new Tone.MetalSynth({
+                            frequency: 250, envelope: { attack: 0.001, decay: 1.8, release: 2.0 },
+                            harmonicity: 5.1, modulationIndex: 12, resonance: 3500, octaves: 1.5
+                        }).connect(masterBus);
+                        instrument.volume.value = -8;
+                    } 
                     else {
-
-                        instrument = new Tone.PolySynth(
-                            Tone.Synth,
-                            {
-
-                                oscillator: {
-                                    type: "triangle"
-                                },
-
-                                envelope: {
-                                    attack: 0.03,
-                                    decay: 0.4,
-                                    sustain: 0.4,
-                                    release: 1.2
-                                }
-                            }
-                        ).connect(masterBus);
+                        instrument = new Tone.PolySynth(Tone.Synth, {
+                            oscillator: { type: "triangle" },
+                            envelope: { attack: 0.03, decay: 0.4, sustain: 0.4, release: 1.2 }
+                        }).connect(masterBus);
                     }
-
-                    // ====================================================
-                    // SCHEDULE NOTES
-                    // ====================================================
 
                     notes.forEach(note => {
-
-                        instrument.triggerAttackRelease(
-                            note.name,
-                            note.duration,
-                            note.time,
-                            note.velocity
-                        );
-
+                        instrument.triggerAttackRelease(note.name, note.duration, note.time, note.velocity);
                     });
 
                 }, Math.max(totalDuration, 1));
 
-                // ========================================================
-                // CONVERT TO WAV
-                // ========================================================
-
-                const wavBlob = bufferToWave(
-                    buffer.get(),
-                    buffer.length
-                );
-
+                const wavBlob = bufferToWave(buffer.get(), buffer.length);
                 const wavUrl = URL.createObjectURL(wavBlob);
 
-                // Remove previous waveform
-                if (wavesurfer) {
-                    wavesurfer.destroy();
-                }
+                if (wavesurfer) { wavesurfer.destroy(); }
 
-                // Create new waveform
                 wavesurfer = WaveSurfer.create({
-
                     container: '#waveform',
-
                     waveColor: '#444',
-
                     progressColor: '#00d4ff',
-
                     cursorColor: '#ffffff',
-
                     barWidth: 3,
-
                     barRadius: 3,
-
                     height: 60,
-
                     normalize: true
-
                 });
 
                 wavesurfer.load(wavUrl);
 
-                // ========================================================
-                // WAVEFORM EVENTS
-                // ========================================================
-
                 wavesurfer.on('ready', () => {
-
-                    audioDurationText.textContent =
-                        formatTime(wavesurfer.getDuration());
-
-                    wavesurfer.setVolume(
-                        parseFloat(previewVolume.value)
-                    );
-
-                    statusText.innerHTML =
-                        `<i class="fa-solid fa-circle-check" style="color:#00d4ff;"></i> Preview Ready`;
+                    audioDurationText.textContent = formatTime(wavesurfer.getDuration());
+                    wavesurfer.setVolume(parseFloat(previewVolume.value));
+                    statusText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#00d4ff;"></i> Preview Ready`;
                 });
 
-                wavesurfer.on('play', () => {
-
-                    previewPlayIcon.className =
-                        "fa-solid fa-pause";
-
-                });
-
-                wavesurfer.on('pause', () => {
-
-                    previewPlayIcon.className =
-                        "fa-solid fa-play";
-
-                });
-
-                wavesurfer.on('finish', () => {
-
-                    previewPlayIcon.className =
-                        "fa-solid fa-play";
-
-                });
+                wavesurfer.on('play', () => { previewPlayIcon.className = "fa-solid fa-pause"; });
+                wavesurfer.on('pause', () => { previewPlayIcon.className = "fa-solid fa-play"; });
+                wavesurfer.on('finish', () => { previewPlayIcon.className = "fa-solid fa-play"; });
 
             } catch (error) {
-
-                console.error(
-                    "ToneVault preview rendering error:",
-                    error
-                );
-
-                alert(
-                    "Could not load the preview instrument. " +
-                    "Please check your internet connection and try again."
-                );
+                console.error("ToneVault preview rendering error:", error);
+                alert("Could not load the preview instrument. Please check your internet connection and try again.");
             }
         }
         
