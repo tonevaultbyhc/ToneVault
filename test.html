@@ -914,6 +914,8 @@
         const fillSelect = document.getElementById("fillSelect");
         const genreSelect = document.getElementById("genreSelect");
         
+        const thoughtsInput = document.getElementById("thoughtsInput");
+        
         const processBtn = document.getElementById("processBtn");
         const statusMessage = document.getElementById("statusMessage");
         const statusText = document.getElementById("statusText");
@@ -928,6 +930,8 @@
         const downloadMidiBtn = document.getElementById("downloadMidiBtn");
 
         let wavesurfer = null;
+        let wavBlobUrl = null;
+        let midiBlobUrl = null;
         let generatedNotes = []; 
         let exactMaxTime = 8; 
 
@@ -1156,7 +1160,10 @@
                     // Export MIDI Blob
                     const midiArray = midi.toArray();
                     const midiBlob = new Blob([midiArray], { type: "audio/midi" });
-                    const midiBlobUrl = URL.createObjectURL(midiBlob);
+                    
+                    if (midiBlobUrl) URL.revokeObjectURL(midiBlobUrl);
+                    midiBlobUrl = URL.createObjectURL(midiBlob);
+                    
                     downloadMidiBtn.href = midiBlobUrl;
                     downloadMidiBtn.download = `tonevault_drums_${genre}_${currentTempo}bpm.mid`;
 
@@ -1193,7 +1200,7 @@
             try {
                 statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Rendering Audio Preview...`;
 
-                const buffer = await Tone.Offline(async () => {
+                const buffer = await Tone.Offline(() => {
 
                     // MASTER BUS SETUP
                     const compressor = new Tone.Compressor({
@@ -1285,31 +1292,35 @@
 
                 // CONVERT TO WAV
                 const wavBlob = bufferToWave(buffer.get(), buffer.length);
-                const wavUrl = URL.createObjectURL(wavBlob);
+                
+                if (wavBlobUrl) URL.revokeObjectURL(wavBlobUrl);
+                wavBlobUrl = URL.createObjectURL(wavBlob);
 
-                if (wavesurfer) wavesurfer.destroy();
+                // Create WaveSurfer exactly ONCE, wait for the container to be visible so width isn't 0
+                if (!wavesurfer) {
+                    wavesurfer = WaveSurfer.create({
+                        container: '#waveform',
+                        waveColor: '#444',
+                        progressColor: '#00d4ff',
+                        cursorColor: '#ffffff',
+                        barWidth: 3,
+                        barRadius: 3,
+                        height: 60,
+                        normalize: true
+                    });
 
-                wavesurfer = WaveSurfer.create({
-                    container: '#waveform',
-                    waveColor: '#444',
-                    progressColor: '#00d4ff',
-                    cursorColor: '#ffffff',
-                    barWidth: 3,
-                    barRadius: 3,
-                    height: 60,
-                    normalize: true
-                });
+                    wavesurfer.on('ready', () => {
+                        audioDurationText.textContent = formatTime(wavesurfer.getDuration());
+                        wavesurfer.setVolume(parseFloat(previewVolume.value));
+                    });
 
-                wavesurfer.load(wavUrl);
+                    wavesurfer.on('play', () => previewPlayIcon.className = "fa-solid fa-pause");
+                    wavesurfer.on('pause', () => previewPlayIcon.className = "fa-solid fa-play");
+                    wavesurfer.on('finish', () => previewPlayIcon.className = "fa-solid fa-play");
+                }
 
-                wavesurfer.on('ready', () => {
-                    audioDurationText.textContent = formatTime(wavesurfer.getDuration());
-                    wavesurfer.setVolume(parseFloat(previewVolume.value));
-                });
-
-                wavesurfer.on('play', () => previewPlayIcon.className = "fa-solid fa-pause");
-                wavesurfer.on('pause', () => previewPlayIcon.className = "fa-solid fa-play");
-                wavesurfer.on('finish', () => previewPlayIcon.className = "fa-solid fa-play");
+                // Hot-swap the audio seamlessly
+                wavesurfer.load(wavBlobUrl);
 
             } catch (error) {
                 console.error("Audio render error:", error);
