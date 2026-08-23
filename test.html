@@ -885,10 +885,19 @@
                 <div class="keyword-example">
             <strong>Parai Preview</strong>
             <p style="margin-top:6px;color:#888;">
-                For authentic Dappan Koothu preview, add licensed Parai one-shots to
+                For authentic Dappan Koothu preview, add licensed recorded Parai one-shots to
                 <code>/Samples/Parai/</code>: <code>parai_low.wav</code>,
                 <code>parai_high.wav</code>, <code>parai_edge.wav</code>,
                 <code>parai_accent.wav</code>.
+            </p>
+        </div>
+
+        <div class="keyword-example">
+            <strong>Orchestra Preview</strong>
+            <p style="margin-top:6px;color:#888;">
+                Cinematic mode uses layered taiko, timpani, tom, snare and impact voices.
+                The preview is kept procedural so the MIDI remains portable; recorded orchestral
+                samples can be added later without changing the rhythm engine.
             </p>
         </div>
 
@@ -1482,6 +1491,15 @@
         // from the mrid sample repository.
         // ============================================================
         async function renderRhythmAudioPreview(notes, totalDuration, resolved) {
+            // Humanization deliberately makes note times non-monotonic. Tone.Offline
+            // schedules events in time order, so always sort a preview copy first.
+            // This also prevents the 'time must be greater than or equal to the last
+            // scheduled time' error seen with orchestral/cinematic phrases.
+            const previewNotes = notes
+                .map(note => ({ ...note }))
+                .filter(note => Number.isFinite(note.time) && note.time >= 0 && note.time < totalDuration)
+                .sort((a, b) => a.time - b.time);
+
             const buffer = await Tone.Offline(async () => {
                 const isIndian = resolved.engine === 'indian';
                 const isSouth = resolved.engine === 'south_indian';
@@ -1581,6 +1599,13 @@
                     }
                 }
 
+                if (isSouth && resolved.instrument === 'parai' && !paraiSampler) {
+                    console.warn(
+                        'ToneVault: Authentic Parai samples are not installed. ' +
+                        'Using the non-kick procedural Parai fallback. Add /Samples/Parai/ WAV files for recorded Parai.'
+                    );
+                }
+
                 // ----------------------------------------------------
                 // FALLBACK / MODERN / CINEMATIC SYNTH VOICES
                 // ----------------------------------------------------
@@ -1618,17 +1643,22 @@
                 }).connect(new Tone.Filter(1700, 'bandpass').connect(master));
 
                 // Fallback Indian voices for Dhol and any unmapped strokes.
-                const dholLow = new Tone.MembraneSynth({
-                    pitchDecay: 0.012, octaves: 1.15,
+                // Parai-like procedural fallback. This is intentionally NOT a kick:
+                // it combines a shallow membrane transient with a short noisy skin hit.
+                // For authentic Parai, use the local recorded sample bank below.
+                const paraiBody = new Tone.MembraneSynth({
+                    pitchDecay: 0.006,
+                    octaves: 0.55,
                     oscillator: { type: 'triangle' },
-                    envelope: { attack: 0.001, decay: 0.62, sustain: 0.02, release: 0.42 }
+                    envelope: { attack: 0.001, decay: 0.34, sustain: 0.015, release: 0.18 }
                 }).connect(master);
+                const paraiSkin = new Tone.NoiseSynth({
+                    noise: { type: 'pink' },
+                    envelope: { attack: 0.001, decay: 0.075, sustain: 0, release: 0.035 }
+                }).connect(new Tone.Filter(2400, 'bandpass').connect(master));
 
-                const dholHigh = new Tone.MembraneSynth({
-                    pitchDecay: 0.018, octaves: 0.85,
-                    oscillator: { type: 'triangle' },
-                    envelope: { attack: 0.001, decay: 0.22, sustain: 0.01, release: 0.12 }
-                }).connect(master);
+                const dholLow = paraiBody;
+                const dholHigh = paraiBody;
 
                 // Cinematic fallback voices.
                 const taikoLow = new Tone.MembraneSynth({
@@ -1693,8 +1723,8 @@
                     [MIDI_DRUMS.TABLA_LOW]: 'C4'
                 };
 
-                notes.forEach(note => {
-                    const t = note.time;
+                previewNotes.forEach(note => {
+                    const t = Math.max(0, Math.min(note.time, totalDuration - 0.001));
                     const v = note.velocity;
 
                     // REAL PARAI PREVIEW
@@ -1758,10 +1788,20 @@
                             lowTom.triggerAttackRelease('D2', '8n', t, v);
                             break;
                         case MIDI_DRUMS.DHOL_LOW:
-                            dholLow.triggerAttackRelease('D2', '8n', t, v);
+                            if (resolved.instrument === 'parai') {
+                                paraiBody.triggerAttackRelease('G2', '8n', t, v * 0.9);
+                                paraiSkin.triggerAttackRelease('16n', t, v * 0.55);
+                            } else {
+                                dholLow.triggerAttackRelease('D2', '8n', t, v);
+                            }
                             break;
                         case MIDI_DRUMS.DHOL_HIGH:
-                            dholHigh.triggerAttackRelease('A2', '16n', t, v);
+                            if (resolved.instrument === 'parai') {
+                                paraiBody.triggerAttackRelease('D3', '16n', t, v * 0.8);
+                                paraiSkin.triggerAttackRelease('32n', t, v * 0.72);
+                            } else {
+                                dholHigh.triggerAttackRelease('A2', '16n', t, v);
+                            }
                             break;
                         case MIDI_DRUMS.TAIKO_LOW:
                             taikoLow.triggerAttackRelease('C1', '4n', t, v);
