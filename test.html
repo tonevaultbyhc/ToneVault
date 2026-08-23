@@ -476,6 +476,36 @@
             text-align: center;
         }
 
+        .keyword-example {
+            margin-top: 20px;
+            padding: 15px;
+            border-left: 3px solid #00c8ff;
+            background: rgba(0, 200, 255, 0.04);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .keyword-example strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .keyword-example code {
+            display: block;
+            margin-bottom: 10px;
+            color: #00c8ff;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .keyword-example p {
+            margin: 0;
+            color: #999;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
         .custom-keyword-note {
             margin-top: 15px;
             padding-top: 15px;
@@ -987,7 +1017,7 @@
                     
                     <div class="waveform-preview-container" id="waveformPreviewContainer">
                         <div class="waveform-header">
-                            <span><i class="fa-solid fa-waveform-lines"></i> Audio Preview</span>
+                            <span><i class="fa-solid fa-waveform-lines"></i> Full Kit Preview</span>
                             <span id="audioDurationText">0:00</span>
                         </div>
                         <div class="waveform-controls">
@@ -1277,8 +1307,6 @@
 
                 let humanVel = Math.max(0.08, Math.min(1, velocity + (Math.random() - 0.5) * 0.12));
                 const target = track === 'orch' ? orchTrack : drumTrack;
-                
-                // Allow string tokens like 'TIMPANI' to be safely routed
                 const midiNumber = typeof midiNote === 'number' ? midiNote : 43;
 
                 target.addNote({ midi: midiNumber, time: humanTime, duration, velocity: humanVel });
@@ -1392,7 +1420,6 @@
                     }
                 }
 
-                // Add a low bayan-like anchor at the start of every phrase.
                 addHit(MIDI_DRUMS.TABLA_LOW, phraseStart, 1.0, 0.16, 'drums');
             }
         }
@@ -1443,7 +1470,6 @@
                 const energy = build ? 0.55 + progression * 0.4 : 0.75;
                 const isImpactBar = ((bar + 1) % 4 === 0 || bar === totalBars - 1);
 
-                // Low cinematic pulse: beats 1 and 3
                 for (let beat = 0; beat < 4; beat++) {
                     const beatTime = start + beat * sixteenth * 4;
                     if (beat === 0 || beat === 2) {
@@ -1451,16 +1477,15 @@
                             addHit('TIMPANI', beatTime, 0.95, 1.2, 'orch');
                             addHit(MIDI_DRUMS.TAIKO_LOW, beatTime, 0.92, 0.8, 'drums');
                         } else {
-                            addHit(MIDI_DRUMS.TAIKO_LOW, beatTime, 0.82 * energy, 0.5, 'drums');
+                            addHit(MIDI_DRUMS.TAIKO_LOW, beatTime, 0.82 * energy, 0.35, 'drums');
                             addHit('TIMPANI', beatTime, 0.72 * energy, 0.8, 'orch');
                         }
                     }
                     if (density !== 'minimal' && (beat === 1 || beat === 3)) {
-                        addHit(MIDI_DRUMS.LOW_TOM_CIN, beatTime, 0.58 * energy, 0.3, 'drums');
+                        addHit(MIDI_DRUMS.LOW_TOM_CIN, beatTime, 0.58 * energy, 0.24, 'drums');
                     }
                 }
 
-                // Cinematic snare/tom ostinato
                 const subdivision = build ? 2 : 4;
                 for (let i = 0; i < 16; i += subdivision) {
                     if ((isFillBar || (build && bar >= totalBars - 2)) && i >= 12) continue; 
@@ -1469,7 +1494,6 @@
                     else if (density === 'busy') addHit(MIDI_DRUMS.HIGH_TOM_CIN, t, 0.32 * energy, 0.1, 'drums');
                 }
 
-                // Rising fill in the final beat of build bars
                 if (isFillBar || (build && bar >= totalBars - 2)) {
                     for (let i = 12; i < 16; i++) {
                         const t = start + i * sixteenth;
@@ -1484,9 +1508,6 @@
         // ============================================================
         // GENERATED INSTRUMENT IDENTIFICATION / MIDI EXPORT
         // ============================================================
-        // The generatedNotes array is also the source for the individual
-        // MIDI downloads. This keeps every separate file synchronized with
-        // the exact notes used by the full-kit MIDI.
         function getGeneratedInstrumentName(note, resolved) {
             if (note.midi === 'TIMPANI') return 'Timpani';
 
@@ -1513,7 +1534,6 @@
                 if (n === MIDI_DRUMS.CRASH) return 'Crash Cymbal';
             }
 
-            // Modern kit mapping.
             const modernMap = {
                 [MIDI_DRUMS.KICK]: 'Kick',
                 [MIDI_DRUMS.SNARE]: 'Snare',
@@ -1563,9 +1583,6 @@
             const track = midi.addTrack();
             track.name = `ToneVault ${instrumentName}`;
 
-            // Timpani is kept on the melodic/orchestral channel exactly like
-            // the existing full-kit export. All other generated percussion
-            // remains on General MIDI channel 10.
             if (instrumentName === 'Timpani') {
                 track.channel = 0;
                 track.instrument.number = 47;
@@ -1714,9 +1731,6 @@
             generatedInstrumentSummary.textContent = `${groups.size} separate MIDI ${groups.size === 1 ? 'file' : 'files'} + audio previews generated from this kit`;
         }
 
-        // ============================================================
-        // MIDI GENERATION
-        // ============================================================
         function generateMIDI({ currentTempo, totalBars, timeSig, density, swingAmount, humanizeAmount, fillFreq, genre, rhythm, instrument, thoughts }) {
             const timing = getTiming(currentTempo, timeSig);
             const { beatsPerBar, beatUnit, barDuration, sixteenth } = timing;
@@ -1754,9 +1768,6 @@
             return { midi, resolved, timing };
         }
 
-        // ============================================================
-        // PREVIEW PLAYER
-        // ============================================================
         previewPlayBtn.addEventListener('click', async () => {
             await Tone.start();
             if (wavesurfer) wavesurfer.playPause();
@@ -1766,15 +1777,11 @@
             if (wavesurfer) wavesurfer.setVolume(parseFloat(e.target.value));
         });
 
-        // ============================================================
-        // GENERATE BUTTON
-        // ============================================================
         processBtn.addEventListener('click', async () => {
             await Tone.start();
             processBtn.disabled = true;
             statusMessage.style.display = 'block';
             
-            // HIDE OLD RESULTS PROPERLY
             resultsArea.style.display = 'none';
             waveformPreviewContainer.style.display = 'none';
             if (wavesurfer) {
@@ -1814,13 +1821,11 @@
                     downloadMidiBtn.href = midiBlobUrl;
                     downloadMidiBtn.download = `tonevault_${resolved.rhythm}_${currentTempo}bpm_full_kit.mid`;
 
-                    // Build individual MIDI downloads from the same generated notes.
                     await buildInstrumentMidiDownloads(resolved, currentTempo, timeSig, exactMaxTime);
 
                     progressBarFill.style.width = '70%';
                     statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Rendering ${resolved.instrument} preview...`;
 
-                    // REVEAL CONTAINERS SO WAVESURFER CAN MEASURE ITS WIDTH
                     resultsArea.style.display = 'block';
                     waveformPreviewContainer.style.display = 'block';
                     
@@ -1849,13 +1854,6 @@
         // ============================================================
         async function renderRhythmAudioPreview(notes, totalDuration, resolved, options = {}) {
             
-            // -------------------------------------------------------------
-            // DURATION SANITIZER
-            // Monophonic synths strictly require Attack Time >= Previous Release Time.
-            // Because humanization shifts times, overlaps are possible. This sanitizer 
-            // logically analyzes all notes per instrument and groups by 10ms windows 
-            // to drop exact duplicates to guarantee stability!
-            // -------------------------------------------------------------
             const previewNotes = notes
                 .map(note => ({ ...note }))
                 .filter(note => Number.isFinite(note.time) && note.time >= 0 && note.time < totalDuration)
@@ -1866,7 +1864,6 @@
             
             previewNotes.forEach(note => {
                 const t = Math.max(0, Math.min(note.time, totalDuration - 0.001));
-                // Round to nearest 10ms to find overlapping duplicates
                 const key = `${note.track}|${note.midi}|${Math.round(t * 100)}`;
                 if (!seenPreviewEvents.has(key)) {
                     seenPreviewEvents.add(key);
@@ -1942,7 +1939,6 @@
                     }
                 }
 
-                // SYNTH FALLBACKS
                 const kick = new Tone.MembraneSynth({
                     pitchDecay: 0.035, octaves: 3.5, oscillator: { type: 'sine' },
                     envelope: { attack: 0.001, decay: 0.5, sustain: 0, release: 0.25 }
@@ -1967,13 +1963,11 @@
                 const paraiSkin = new Tone.NoiseSynth({ noise: { type: 'pink' }, envelope: { attack: 0.001, decay: 0.075, sustain: 0, release: 0.035 } }).connect(new Tone.Filter(2400, 'bandpass').connect(master));
                 const dholLow = paraiBody; const dholHigh = paraiBody;
 
-                // WRAP OVERLAPPING CINEMATIC VOICES IN POLY-SYNTH TO GUARANTEE NO CRASHES
                 const taikoLow = new Tone.PolySynth(Tone.MembraneSynth, { pitchDecay: 0.025, octaves: 1.0, oscillator: { type: 'sine' }, envelope: { attack: 0.003, decay: 1.0, sustain: 0.08, release: 1.2 } }).connect(master);
                 const lowTom = new Tone.PolySynth(Tone.MembraneSynth, { pitchDecay: 0.02, octaves: 1.2, oscillator: { type: 'triangle' }, envelope: { attack: 0.002, decay: 0.5, sustain: 0.04, release: 0.45 } }).connect(master);
                 const timpani = new Tone.PolySynth(Tone.MembraneSynth, { pitchDecay: 0.01, octaves: 0.8, oscillator: { type: 'sine' }, envelope: { attack: 0.005, decay: 1.25, sustain: 0.1, release: 1.8 } }).connect(master);
                 const orchSnare = new Tone.PolySynth(Tone.MembraneSynth, { pitchDecay: 0.008, octaves: 0.9, oscillator: { type: 'triangle' }, envelope: { attack: 0.002, decay: 0.2, sustain: 0, release: 0.12 } }).connect(master);
                 
-                // PolySynth requires Monophonic base, use standard Synth configured for noise to simulate orchestra snare tail safely
                 const orchNoise = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "square" }, envelope: { attack: 0.002, decay: 0.24, sustain: 0, release: 0.06 } }).connect(master);
                 const crash = new Tone.PolySynth(Tone.MetalSynth, { frequency: 220, envelope: { attack: 0.001, decay: 2.8, release: 3.2 }, harmonicity: 5.1, modulationIndex: 28, resonance: 4200, octaves: 1.7 }).connect(master);
 
@@ -1994,25 +1988,13 @@
                     lastVoiceTime.set(voiceKey, t);
                     const v = note.velocity;
 
-                    // REAL PARAI PREVIEW
                     if (paraiSampler && paraiMap[note.midi]) {
                         const sampleNote = paraiMap[note.midi];
-                        const duration =
-                            note.midi === MIDI_DRUMS.DHOL_LOW ||
-                            note.midi === MIDI_DRUMS.MRIDANGAM_LOW
-                                ? '8n'
-                                : '16n';
-
-                        paraiSampler.triggerAttackRelease(
-                            sampleNote,
-                            duration,
-                            t,
-                            Math.min(1, v * 1.08)
-                        );
+                        const duration = note.midi === MIDI_DRUMS.DHOL_LOW || note.midi === MIDI_DRUMS.MRIDANGAM_LOW ? '8n' : '16n';
+                        paraiSampler.triggerAttackRelease(sampleNote, duration, t, Math.min(1, v * 1.08));
                         return;
                     }
 
-                    // REAL TABLA PREVIEW
                     if (tablaSampler && tablaMap[note.midi]) {
                         const sampleNote = tablaMap[note.midi];
                         const duration = note.midi === MIDI_DRUMS.TABLA_LOW ? '8n' : '16n';
@@ -2020,7 +2002,6 @@
                         return;
                     }
 
-                    // REAL MRIDANGAM PREVIEW
                     if (mridangamSampler && mridangamMap[note.midi]) {
                         const sampleNote = mridangamMap[note.midi];
                         const duration = note.midi === MIDI_DRUMS.MRIDANGAM_LOW ? '8n' : '16n';
@@ -2029,24 +2010,24 @@
                     }
 
                     switch (note.midi) {
-                        case MIDI_DRUMS.KICK: kick.triggerAttackRelease('C1', '32n', t, v); break;
-                        case MIDI_DRUMS.SNARE: snareBody.triggerAttackRelease('G2', '32n', t, v); snareNoise.triggerAttackRelease('32n', t, v * 0.8); break;
+                        case MIDI_DRUMS.KICK: kick.triggerAttackRelease('C1', '16n', t, v); break;
+                        case MIDI_DRUMS.SNARE: snareBody.triggerAttackRelease('G2', '16n', t, v); snareNoise.triggerAttackRelease('16n', t, v * 0.8); break;
                         case MIDI_DRUMS.CH: hat.triggerAttackRelease('32n', t, v * 0.7); break;
-                        case MIDI_DRUMS.OH: openHat.triggerAttackRelease('16n', t, v * 0.7); break;
-                        case MIDI_DRUMS.CLAP: clap.triggerAttackRelease('32n', t, v); break;
-                        case MIDI_DRUMS.TOM_HI: lowTom.triggerAttackRelease('A2', '32n', t, v); break;
-                        case MIDI_DRUMS.TOM_LO: lowTom.triggerAttackRelease('D2', '32n', t, v); break;
+                        case MIDI_DRUMS.OH: openHat.triggerAttackRelease('8n', t, v * 0.7); break;
+                        case MIDI_DRUMS.CLAP: clap.triggerAttackRelease('16n', t, v); break;
+                        case MIDI_DRUMS.TOM_HI: lowTom.triggerAttackRelease('A2', '16n', t, v); break;
+                        case MIDI_DRUMS.TOM_LO: lowTom.triggerAttackRelease('D2', '16n', t, v); break;
                         case MIDI_DRUMS.DHOL_LOW: 
-                            if (resolved.instrument === 'parai') { paraiBody.triggerAttackRelease('G2', '32n', t, v * 0.9); paraiSkin.triggerAttackRelease('16n', t, v * 0.55); } 
-                            else { dholLow.triggerAttackRelease('D2', '32n', t, v); } break;
+                            if (resolved.instrument === 'parai') { paraiBody.triggerAttackRelease('G2', '16n', t, v * 0.9); paraiSkin.triggerAttackRelease('16n', t, v * 0.55); } 
+                            else { dholLow.triggerAttackRelease('D2', '16n', t, v); } break;
                         case MIDI_DRUMS.DHOL_HIGH: 
                             if (resolved.instrument === 'parai') { paraiBody.triggerAttackRelease('D3', '32n', t, v * 0.8); paraiSkin.triggerAttackRelease('32n', t, v * 0.72); } 
                             else { dholHigh.triggerAttackRelease('A2', '32n', t, v); } break;
-                        case MIDI_DRUMS.TAIKO_LOW: taikoLow.triggerAttackRelease('C1', '16n', t, v); break;
-                        case MIDI_DRUMS.LOW_TOM_CIN: lowTom.triggerAttackRelease('D2', '32n', t, v); break;
-                        case MIDI_DRUMS.HIGH_TOM_CIN: lowTom.triggerAttackRelease('A2', '32n', t, v); break;
-                        case 'TIMPANI': timpani.triggerAttackRelease('G1', '16n', t, v); break;
-                        case MIDI_DRUMS.ORCH_SNARE: orchSnare.triggerAttackRelease('C3', '32n', t, v); orchNoise.triggerAttackRelease('C6', '32n', t, v * 0.45); break;
+                        case MIDI_DRUMS.TAIKO_LOW: taikoLow.triggerAttackRelease('C1', '8n', t, v); break;
+                        case MIDI_DRUMS.LOW_TOM_CIN: lowTom.triggerAttackRelease('D2', '8n', t, v); break;
+                        case MIDI_DRUMS.HIGH_TOM_CIN: lowTom.triggerAttackRelease('A2', '16n', t, v); break;
+                        case 'TIMPANI': timpani.triggerAttackRelease('G1', '4n', t, v); break;
+                        case MIDI_DRUMS.ORCH_SNARE: orchSnare.triggerAttackRelease('C3', '16n', t, v); orchNoise.triggerAttackRelease('C6', '32n', t, v * 0.45); break;
                         case MIDI_DRUMS.CRASH: crash.triggerAttackRelease('16n', t, v); break;
                     }
                 });
@@ -2062,27 +2043,30 @@
             if (wavesurfer) {
                 wavesurfer.destroy();
                 previewPlayIcon.className = 'fa-solid fa-play';
+                wavesurfer = null;
             }
 
-            wavesurfer = WaveSurfer.create({
-                container: '#waveform',
-                waveColor: '#444',
-                progressColor: '#00d4ff',
-                cursorColor: '#ffffff',
-                barWidth: 3,
-                barRadius: 3,
-                height: 60,
-                normalize: true
-            });
+            setTimeout(() => {
+                wavesurfer = WaveSurfer.create({
+                    container: '#waveform',
+                    waveColor: '#444',
+                    progressColor: '#00d4ff',
+                    cursorColor: '#ffffff',
+                    barWidth: 3,
+                    barRadius: 3,
+                    height: 60,
+                    normalize: true
+                });
 
-            wavesurfer.load(wavBlobUrl);
-            wavesurfer.on('ready', () => {
-                audioDurationText.textContent = formatTime(wavesurfer.getDuration());
-                wavesurfer.setVolume(parseFloat(previewVolume.value));
-            });
-            wavesurfer.on('play', () => previewPlayIcon.className = 'fa-solid fa-pause');
-            wavesurfer.on('pause', () => previewPlayIcon.className = 'fa-solid fa-play');
-            wavesurfer.on('finish', () => previewPlayIcon.className = 'fa-solid fa-play');
+                wavesurfer.load(wavBlobUrl);
+                wavesurfer.on('ready', () => {
+                    audioDurationText.textContent = formatTime(wavesurfer.getDuration());
+                    wavesurfer.setVolume(parseFloat(previewVolume.value));
+                });
+                wavesurfer.on('play', () => previewPlayIcon.className = 'fa-solid fa-pause');
+                wavesurfer.on('pause', () => previewPlayIcon.className = 'fa-solid fa-play');
+                wavesurfer.on('finish', () => previewPlayIcon.className = 'fa-solid fa-play');
+            }, 50);
         }
 
         function bufferToWave(abuffer, len) {
