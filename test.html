@@ -204,6 +204,17 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
+        .custom-option-header {
+            padding: 10px 15px 5px 15px;
+            color: #00d4ff;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            pointer-events: none;
+            background: rgba(0,0,0,0.2);
+        }
+
         .custom-option:last-child {
             border-bottom: none;
         }
@@ -605,23 +616,30 @@
                                 <i class="fa-solid fa-chevron-down"></i>
                             </div>
                             <div class="custom-select-options" id="genreSelectOptions">
+                                <div class="custom-option-header">Modern Electronic</div>
                                 <div class="custom-option selected" data-value="hiphop">Boom Bap / Hip-Hop</div>
                                 <div class="custom-option" data-value="trap">Modern Trap / Drill</div>
                                 <div class="custom-option" data-value="house">House / EDM</div>
-                                <div class="custom-option" data-value="kuthu">South Indian (Dappan Koothu)</div>
-                                <div class="custom-option" data-value="indian_classical">Indian Classical (Teen Taal)</div>
-                                <div class="custom-option" data-value="orchestral">Epic Cinematic Orchestral</div>
                                 <div class="custom-option" data-value="lofi">Lo-Fi / Chillhop</div>
+                                
+                                <div class="custom-option-header">Indian Traditions</div>
+                                <div class="custom-option" data-value="indian_classical">Indian Classical (Teen Taal 16-Beat)</div>
+                                <div class="custom-option" data-value="kuthu">South Indian (Dappan Koothu)</div>
+                                
+                                <div class="custom-option-header">Cinematic Orchestral</div>
+                                <div class="custom-option" data-value="orchestral_epic">Epic Trailer (Big Hits)</div>
+                                <div class="custom-option" data-value="orchestral_dark">Dark Tension (Slow Pulse)</div>
                             </div>
                         </div>
                         <select id="genreSelect" style="display: none;">
                             <option value="hiphop" selected>Boom Bap / Hip-Hop</option>
                             <option value="trap">Modern Trap / Drill</option>
                             <option value="house">House / EDM</option>
-                            <option value="kuthu">South Indian (Dappan Koothu)</option>
-                            <option value="indian_classical">Indian Classical (Teen Taal)</option>
-                            <option value="orchestral">Epic Cinematic Orchestral</option>
                             <option value="lofi">Lo-Fi / Chillhop</option>
+                            <option value="indian_classical">Indian Classical (Teen Taal 16-Beat)</option>
+                            <option value="kuthu">South Indian (Dappan Koothu)</option>
+                            <option value="orchestral_epic">Epic Trailer (Big Hits)</option>
+                            <option value="orchestral_dark">Dark Tension (Slow Pulse)</option>
                         </select>
                     </div>
 
@@ -806,7 +824,7 @@
 
                 <!-- SUBMIT BUTTON -->
                 <button id="processBtn" class="action-btn">
-                    <i class="fa-solid fa-drum-steelpan"></i> Generate Drum MIDI
+                    <i class="fa-solid fa-drum-steelpan"></i> Generate Rhythm
                 </button>
 
                 <!-- STATUS MESSAGE & PROGRESS BAR -->
@@ -823,7 +841,7 @@
                     
                     <div class="waveform-preview-container" id="waveformPreviewContainer">
                         <div class="waveform-header">
-                            <span><i class="fa-solid fa-waveform-lines"></i> Drum Preview</span>
+                            <span><i class="fa-solid fa-waveform-lines"></i> Audio Preview</span>
                             <span id="audioDurationText">0:00</span>
                         </div>
                         <div class="waveform-controls">
@@ -851,71 +869,51 @@
             <aside class="keyword-guide">
                 <div class="keyword-guide-header">
                     <i class="fa-solid fa-book-open" style="color: #00d4ff;"></i>
-                    <strong>Rhythm Keyword Guide</strong>
+                    <strong>ToneVault Rhythm Engines</strong>
                 </div>
 
                 <div class="keyword-category">
-                    <h4>PATTERN BEHAVIOR</h4>
-                    <div class="keyword-row"><span class="keyword">driving</span><span>Stronger, more continuous pulse</span></div>
-                    <div class="keyword-row"><span class="keyword">syncopated</span><span>More off-beat and anticipatory hits</span></div>
-                    <div class="keyword-row"><span class="keyword">four-on-floor</span><span>Kick on every quarter note</span></div>
-                    <div class="keyword-row"><span class="keyword">sparse</span><span>Fewer notes and more breathing room</span></div>
-                    <div class="keyword-row"><span class="keyword">busy</span><span>More subdivisions, ghost notes and fills</span></div>
-                    <div class="keyword-row"><span class="keyword">rolling</span><span>Repeating fast subdivisions / rolls</span></div>
+                    <h4>MODERN ELECTRONIC</h4>
+                    <div class="keyword-row">
+                        <span class="keyword">Hip-Hop</span>
+                        <span>Boom Bap swing, heavy kick.</span>
+                    </div>
+                    <div class="keyword-row">
+                        <span class="keyword">Trap</span>
+                        <span>Rapid hi-hat rolls, sparse 808s.</span>
+                    </div>
+                    <div class="keyword-row">
+                        <span class="keyword">House</span>
+                        <span>Four-on-the-floor, off-beat hats.</span>
+                    </div>
                 </div>
 
                 <div class="keyword-category">
-                    <h4>INDIAN RHYTHM</h4>
-                    <div class="keyword-row"><span class="keyword">tabla</span><span>Uses Indian tabla-style phrasing</span></div>
-                    <div class="keyword-row"><span class="keyword">teen taal</span><span>16-matra classical cycle</span></div>
-                    <div class="keyword-row"><span class="keyword">kuthu</span><span>Parai-led South Indian folk / dance pulse</span></div>
-                    <div class="keyword-row"><span class="keyword">dhol</span><span>Low/high folk percussion emphasis</span></div>
-                    <div class="keyword-row"><span class="keyword">tihai</span><span>Three-part phrase resolving to the downbeat</span></div>
+                    <h4>INDIAN TRADITIONS</h4>
+                    <div class="keyword-row">
+                        <span class="keyword">Teen Taal</span>
+                        <span>True 16-beat cycle (Dha Dhin Dhin Dha) mapped to Tabla frequencies.</span>
+                    </div>
+                    <div class="keyword-row">
+                        <span class="keyword">Kuthu</span>
+                        <span>South Indian fast 4/4 syncopated folk rhythm with accents.</span>
+                    </div>
                 </div>
-
+                
                 <div class="keyword-category">
-                    <h4>CINEMATIC / ORCHESTRAL</h4>
-                    <div class="keyword-row"><span class="keyword">cinematic</span><span>Large orchestral percussion palette</span></div>
-                    <div class="keyword-row"><span class="keyword">epic</span><span>Heavy low hits and strong impacts</span></div>
-                    <div class="keyword-row"><span class="keyword">tension</span><span>Rising subdivisions and restrained hits</span></div>
-                    <div class="keyword-row"><span class="keyword">build</span><span>Increasing density toward the phrase ending</span></div>
-                    <div class="keyword-row"><span class="keyword">taiko</span><span>Large low cinematic drum character</span></div>
-                </div>
-
-                <div class="keyword-example">
-            <strong>Parai Preview</strong>
-            <p style="margin-top:6px;color:#888;">
-                For authentic Dappan Koothu preview, add licensed recorded Parai one-shots to
-                <code>/Samples/Parai/</code>: <code>parai_low.wav</code>,
-                <code>parai_high.wav</code>, <code>parai_edge.wav</code>,
-                <code>parai_accent.wav</code>.
-            </p>
-        </div>
-
-        <div class="keyword-example">
-            <strong>Orchestra Preview</strong>
-            <p style="margin-top:6px;color:#888;">
-                Cinematic mode uses layered taiko, timpani, tom, snare and impact voices.
-                The preview is kept procedural so the MIDI remains portable; recorded orchestral
-                samples can be added later without changing the rhythm engine.
-            </p>
-        </div>
-
-        <div class="keyword-example">
-                    <strong>Try this</strong>
-                    <code>tabla, teen taal, rolling, humanized, tihai</code>
-                    <p>Creates a 16-matra Indian-style rhythmic cycle with rolling subdivisions and a three-part ending phrase.</p>
-                </div>
-
-                <div class="keyword-example">
-                    <strong>Orchestral example</strong>
-                    <code>cinematic, epic, taiko, tension, build</code>
-                    <p>Creates a low cinematic pulse that grows denser toward the phrase ending with orchestral-style fills and impacts.</p>
+                    <h4>CINEMATIC ORCHESTRAL</h4>
+                    <div class="keyword-row">
+                        <span class="keyword">Epic</span>
+                        <span>Builds over time with Timpani, Taikos, and crashing cymbals.</span>
+                    </div>
+                    <div class="keyword-row">
+                        <span class="keyword">Dark</span>
+                        <span>Slow, sparse pulse with low toms for tension building.</span>
+                    </div>
                 </div>
 
                 <div class="custom-keyword-note">
-                    <i class="fa-solid fa-lightbulb" style="color: #00d4ff; margin-right: 5px;"></i>
-                    Keywords are interpreted as musical instructions. You can combine the examples or write your own words; recognized keywords change the pattern engine while unknown words are safely ignored.
+                    <i class="fa-solid fa-code-branch" style="color: #00d4ff; margin-right: 5px;"></i> Advanced Export: Orchestral generation automatically exports Timpani to a distinct Melodic MIDI Track (Ch 1) for perfect DAW integration.
                 </div>
             </aside>
 
@@ -1030,9 +1028,9 @@
             LOW_TOM_CIN: 45,
             HIGH_TOM_CIN: 47,
             TIMPANI: 47,
-            TA1: 60,       // C4 - tabla-style high hit (custom mapping)
-            TA2: 62,       // D4
-            TABLA_LOW: 64, // E4 - custom mapping; DAW users can remap to their library
+            TA1: 60,       
+            TA2: 62,       
+            TABLA_LOW: 64, 
             DHOL_LOW: 36,
             DHOL_HIGH: 45,
             MRIDANGAM_LOW: 36,
@@ -1045,12 +1043,7 @@
         // STYLE / KEYWORD RESOLUTION
         // ============================================================
         function normalizeWords(text) {
-            return String(text || '')
-                .toLowerCase()
-                .replace(/[–—]/g, '-')
-                .replace(/[^a-z0-9/ -]/g, ' ')
-                .replace(/\s+/g, ' ')
-                .trim();
+            return String(text || '').toLowerCase().replace(/[–—]/g, '-').replace(/[^a-z0-9/ -]/g, ' ').replace(/\s+/g, ' ').trim();
         }
 
         function hasKeyword(text, ...words) {
@@ -1062,7 +1055,6 @@
             let rhythm = requestedRhythm !== 'auto' ? requestedRhythm : null;
             let instrument = requestedInstrument !== 'auto' ? requestedInstrument : null;
 
-            // Keyword overrides are intentional: explicit user words win over generic style.
             if (hasKeyword(text, 'teen taal', 'teentaal', 'tabla')) rhythm = 'teen_taal';
             if (hasKeyword(text, 'kuthu', 'dappan koothu', 'koothu')) rhythm = 'kuthu';
             if (hasKeyword(text, 'cinematic build', 'orchestral build', 'build')) rhythm = 'cinematic_build';
@@ -1090,9 +1082,7 @@
             rhythm = rhythm || defaults.rhythm;
             instrument = instrument || defaults.instrument;
 
-            if (genre === 'orchestral' && hasKeyword(text, 'build', 'tension', 'rising')) {
-                rhythm = 'cinematic_build';
-            }
+            if (genre === 'orchestral' && hasKeyword(text, 'build', 'tension', 'rising')) rhythm = 'cinematic_build';
 
             let engine = 'modern';
             if (['teen_taal'].includes(rhythm) || instrument === 'tabla') engine = 'indian';
@@ -1163,7 +1153,6 @@
                             continue;
                         }
 
-                        // Boom bap / default / lofi
                         if (rhythm === 'boom_bap') {
                             if (down && (beat === 0 || beat === 2)) addHit(MIDI_DRUMS.KICK, t, 0.9);
                             if (beat === 1 && step === 3 && !text.includes('sparse')) addHit(MIDI_DRUMS.KICK, t, 0.62);
@@ -1173,7 +1162,6 @@
                             continue;
                         }
 
-                        // Trap / drill
                         if (rhythm === 'trap_roll') {
                             if (down && (beat === 0 || beat === 2)) addHit(MIDI_DRUMS.KICK, t, 0.92);
                             if (beat === 1 && step === 3) addHit(MIDI_DRUMS.KICK, t, 0.7);
@@ -1203,29 +1191,20 @@
         function generateIndianPattern(ctx) {
             const { totalBars, beatsPerBar, barDuration, sixteenth, density, fillFreq, rhythm, addHit, text } = ctx;
 
-            // Each 4/4 bar = 16 subdivisions. The pattern is deliberately phrase-based.
             const teenTaal16 = [
                 ['LOW','HI','HI','LOW'],
                 ['LOW','HI','HI','LOW'],
                 ['LOW','HI','HI','HI'],
                 ['HI','LOW','HI','LOW']
             ];
-
-            const dadra8 = ['LOW','HI','HI','LOW','HI','HI'];
             const kuthu16 = ['LOW','HI','HI','LOW','LOW','HI','LOW','HI','LOW','HI','HI','LOW','LOW','HI','HI','LOW'];
 
             for (let bar = 0; bar < totalBars; bar++) {
                 const phraseStart = bar * barDuration;
                 const isFillBar = fillFreq > 0 && ((bar + 1) % fillFreq === 0);
-                let pattern;
-
-                if (rhythm === 'kuthu') {
-                    pattern = kuthu16;
-                } else {
-                    pattern = teenTaal16.flat();
-                }
-
+                const pattern = rhythm === 'kuthu' ? kuthu16 : teenTaal16.flat();
                 const stepsPerBar = beatsPerBar * 4;
+
                 for (let i = 0; i < stepsPerBar; i++) {
                     const t = phraseStart + i * sixteenth;
                     const patternIndex = Math.min(15, Math.floor(i * 16 / stepsPerBar));
@@ -1238,7 +1217,6 @@
                         addHit(MIDI_DRUMS.TA1, t, accent ? 0.72 : 0.56, 0.1, 'drums');
                     }
 
-                    // Extra finger/hand articulation.
                     if (density !== 'minimal' && i % 4 === 1) {
                         addHit(MIDI_DRUMS.TA2, t + sixteenth * 0.45, 0.38, 0.06, 'drums');
                     }
@@ -1248,7 +1226,6 @@
                     }
                 }
 
-                // Tihai-like ending: three short phrases resolving into the next bar.
                 if (hasKeyword(text, 'tihai') || isFillBar) {
                     const phraseStartIndex = Math.max(0, stepsPerBar - 4);
                     for (let rep = 0; rep < 3; rep++) {
@@ -1257,9 +1234,6 @@
                         if (rep < 2) addHit(MIDI_DRUMS.TA2, base + sixteenth * 0.5, 0.5, 0.05, 'drums');
                     }
                 }
-
-                // Add a low bayan-like anchor at the start of every phrase.
-                addHit(MIDI_DRUMS.TABLA_LOW, phraseStart, 1.0, 0.16, 'drums');
             }
         }
 
@@ -1268,16 +1242,12 @@
         // ============================================================
         function generateSouthIndianPattern(ctx) {
             const { totalBars, barDuration, sixteenth, density, fillFreq, addHit } = ctx;
-            const pattern = [
-                'LOW','HIGH','HIGH','LOW',
-                'LOW','HIGH','LOW','HIGH',
-                'LOW','HIGH','HIGH','LOW',
-                'LOW','HIGH','HIGH','LOW'
-            ];
+            const pattern = ['LOW','HIGH','HIGH','LOW','LOW','HIGH','LOW','HIGH','LOW','HIGH','HIGH','LOW','LOW','HIGH','HIGH','LOW'];
 
             for (let bar = 0; bar < totalBars; bar++) {
                 const start = bar * barDuration;
                 const fillBar = fillFreq > 0 && ((bar + 1) % fillFreq === 0);
+                
                 for (let i = 0; i < 16; i++) {
                     const t = start + i * sixteenth;
                     const strong = i % 4 === 0;
@@ -1306,40 +1276,38 @@
                 const build = rhythm === 'cinematic_build' || hasKeyword(text, 'build', 'tension', 'rising');
                 const progression = totalBars <= 1 ? 1 : bar / (totalBars - 1);
                 const energy = build ? 0.55 + progression * 0.4 : 0.75;
+                const isImpactBar = ((bar + 1) % 4 === 0 || bar === totalBars - 1);
 
-                // Low cinematic pulse: beats 1 and 3, with occasional anticipation.
                 for (let beat = 0; beat < 4; beat++) {
                     const beatTime = start + beat * sixteenth * 4;
                     if (beat === 0 || beat === 2) {
-                        addHit(MIDI_DRUMS.TAIKO_LOW, beatTime, 0.82 * energy, 0.35, 'drums');
-                        addHit(MIDI_DRUMS.TIMPANI, beatTime, 0.72 * energy, 0.5, 'orch');
+                        if (beat === 0 && isImpactBar) {
+                            addHit(MIDI_DRUMS.TIMPANI, beatTime, 0.95, 0.9, 'orch');
+                            addHit(MIDI_DRUMS.TAIKO_LOW, beatTime, 0.92, 0.55, 'drums');
+                        } else {
+                            addHit(MIDI_DRUMS.TAIKO_LOW, beatTime, 0.82 * energy, 0.35, 'drums');
+                            addHit(MIDI_DRUMS.TIMPANI, beatTime, 0.72 * energy, 0.5, 'orch');
+                        }
                     }
                     if (density !== 'minimal' && (beat === 1 || beat === 3)) {
                         addHit(MIDI_DRUMS.LOW_TOM_CIN, beatTime, 0.58 * energy, 0.24, 'drums');
                     }
                 }
 
-                // Cinematic snare/tom ostinato.
                 const subdivision = build ? 2 : 4;
                 for (let i = 0; i < 16; i += subdivision) {
+                    if ((isFillBar || (build && bar >= totalBars - 2)) && i >= 12) continue; 
                     const t = start + i * sixteenth;
                     if (i % 4 === 0) addHit(MIDI_DRUMS.ORCH_SNARE, t, 0.5 * energy, 0.12, 'drums');
                     else if (density === 'busy') addHit(MIDI_DRUMS.HIGH_TOM_CIN, t, 0.32 * energy, 0.1, 'drums');
                 }
 
-                // Rising fill in the final beat of build bars.
                 if (isFillBar || (build && bar >= totalBars - 2)) {
                     for (let i = 12; i < 16; i++) {
                         const t = start + i * sixteenth;
                         addHit(i % 2 ? MIDI_DRUMS.HIGH_TOM_CIN : MIDI_DRUMS.LOW_TOM_CIN, t, 0.5 + (i - 12) * 0.1, 0.12, 'drums');
                     }
                     addHit(MIDI_DRUMS.CRASH, start + 16 * sixteenth, 0.85, 0.4, 'drums');
-                }
-
-                // Big phrase impact every 4 bars or at the end.
-                if ((bar + 1) % 4 === 0 || bar === totalBars - 1) {
-                    addHit(MIDI_DRUMS.TIMPANI, start, 0.95, 0.9, 'orch');
-                    addHit(MIDI_DRUMS.TAIKO_LOW, start, 0.92, 0.55, 'drums');
                 }
             }
         }
@@ -1372,17 +1340,8 @@
             const addHit = createNoteAdder({ drumTrack, orchTrack, exactMaxTime, humanizeAmount, notes: generatedNotes });
 
             const ctx = {
-                totalBars,
-                beatsPerBar,
-                barDuration,
-                sixteenth,
-                density,
-                swingAmount,
-                fillFreq,
-                rhythm: resolved.rhythm,
-                instrument: resolved.instrument,
-                text: resolved.text,
-                addHit
+                totalBars, beatsPerBar, barDuration, sixteenth, density, swingAmount, fillFreq,
+                rhythm: resolved.rhythm, instrument: resolved.instrument, text: resolved.text, addHit
             };
 
             if (resolved.engine === 'indian') generateIndianPattern(ctx);
@@ -1412,8 +1371,15 @@
             await Tone.start();
             processBtn.disabled = true;
             statusMessage.style.display = 'block';
+            
+            // HIDE OLD RESULTS PROPERLY
             resultsArea.style.display = 'none';
             waveformPreviewContainer.style.display = 'none';
+            if (wavesurfer) {
+                wavesurfer.destroy();
+                wavesurfer = null;
+            }
+            
             progressBarFill.style.width = '20%';
             statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Reading musical intent...`;
 
@@ -1449,12 +1415,15 @@
                     progressBarFill.style.width = '70%';
                     statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Rendering ${resolved.instrument} preview...`;
 
+                    // REVEAL CONTAINERS SO WAVESURFER CAN MEASURE ITS WIDTH
                     resultsArea.style.display = 'block';
                     waveformPreviewContainer.style.display = 'block';
+                    
                     await renderRhythmAudioPreview(generatedNotes, exactMaxTime, resolved);
 
                     progressBarFill.style.width = '100%';
                     statusText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#00d4ff;"></i> ${resolved.rhythm.replaceAll('_',' ')} ready`;
+                    
                     setTimeout(() => {
                         statusMessage.style.display = 'none';
                         progressBarFill.style.width = '0%';
@@ -1472,45 +1441,31 @@
         });
 
         // ============================================================
-        // HIGHER-QUALITY PROCEDURAL PREVIEW
-        // ============================================================
-        // These are still browser-generated sounds, not commercial samples.
-        // For true recorded tabla / taiko / orchestral sounds, replace the
-        // corresponding synth voices with local Tone.Sampler sample sets.
-        // ============================================================
-        // AUTHENTIC INDIAN SAMPLE PREVIEW
-        // ============================================================
-        // The previous version used FM/MembraneSynth voices for Indian
-        // percussion. That can imitate a drum, but it cannot sound like
-        // a real tabla or mridangam. This version uses actual recorded
-        // samples for the Indian preview while keeping synth fallback
-        // for instruments for which no sample bank is configured.
-        //
-        // Tabla samples: TidalCycles Dirt-Samples (permissive sample set)
-        // Mridangam samples: Arthur Carabott / Harishankar V Menon set
-        // from the mrid sample repository.
+        // TONEVAULT AUDIO SYNTHESIS & SANITIZER
         // ============================================================
         async function renderRhythmAudioPreview(notes, totalDuration, resolved) {
-            // Humanization deliberately makes note times non-monotonic. Tone.Offline
-            // schedules events in time order, so always sort a preview copy first.
-            // This also prevents the 'time must be greater than or equal to the last
-            // scheduled time' error seen with orchestral/cinematic phrases.
+            
+            // SANITIZER: Prevent exact overlapping notes from crashing Monophonic Synths
             const previewNotes = notes
                 .map(note => ({ ...note }))
                 .filter(note => Number.isFinite(note.time) && note.time >= 0 && note.time < totalDuration)
-                .sort((a, b) => a.time - b.time || a.midi - b.midi);
+                .sort((a, b) => a.time - b.time);
 
-            // Remove exact duplicate events. Cinematic phrases can intentionally
-            // layer two generators on the same beat; the preview should not send
-            // two identical events to one synth voice at the exact same time.
-            const uniquePreviewNotes = [];
-            const seenPreviewEvents = new Set();
-            for (const note of previewNotes) {
-                const key = `${note.track}|${note.midi}|${Math.round(note.time * 100000)}`;
-                if (seenPreviewEvents.has(key)) continue;
-                seenPreviewEvents.add(key);
-                uniquePreviewNotes.push(note);
-            }
+            const sanitizedNotes = [];
+            const lastTimes = {};
+            
+            previewNotes.forEach(note => {
+                const t = Math.max(0, Math.min(note.time, totalDuration - 0.001));
+                const minGap = 0.035; // 35ms minimum gap
+
+                // If this specific instrument was hit too recently, skip the overlapping trigger
+                if (lastTimes[note.midi] !== undefined && (t - lastTimes[note.midi]) < minGap) {
+                    return; 
+                }
+                
+                lastTimes[note.midi] = t;
+                sanitizedNotes.push({ ...note, time: t });
+            });
 
             const buffer = await Tone.Offline(async () => {
                 const isIndian = resolved.engine === 'indian';
@@ -1526,11 +1481,6 @@
                 });
                 master.chain(compressor, reverb, Tone.getDestination());
 
-                // ----------------------------------------------------
-                // REAL INDIAN SAMPLE BANKS
-                // ----------------------------------------------------
-                // These are loaded inside Tone.Offline so the rendered
-                // WAV contains the actual instrument recordings.
                 let tablaSampler = null;
                 let mridangamSampler = null;
                 let paraiSampler = null;
@@ -1570,278 +1520,94 @@
                     await Tone.loaded();
                 }
 
-                // ----------------------------------------------------
-                // REAL PARAI SAMPLE BANK
-                // ----------------------------------------------------
-                // Put your licensed Parai one-shots in:
-                // /Samples/Parai/
-                //
-                // Required files:
-                //   parai_low.wav
-                //   parai_high.wav
-                //   parai_edge.wav
-                //   parai_accent.wav
-                //
-                // The generator deliberately uses LOCAL samples here
-                // instead of hot-linking a third-party sample library.
-                // This keeps the production version reliable and lets
-                // you choose samples whose license permits ToneVault use.
                 if (isSouth && resolved.instrument === 'parai') {
                     paraiSampler = new Tone.Sampler({
                         urls: {
-                            C4: 'parai_low.wav',
-                            D4: 'parai_high.wav',
-                            E4: 'parai_edge.wav',
-                            F4: 'parai_accent.wav'
+                            C4: 'parai_low.wav', D4: 'parai_high.wav', E4: 'parai_edge.wav', F4: 'parai_accent.wav'
                         },
                         baseUrl: '/Samples/Parai/',
-                        release: 0.9,
-                        curve: 'exponential'
+                        release: 0.9, curve: 'exponential'
                     }).connect(master);
 
-                    try {
-                        await Tone.loaded();
-                    } catch (sampleError) {
-                        console.warn(
-                            'ToneVault: Parai samples could not be loaded. ' +
-                            'Using the procedural Parai fallback instead.',
-                            sampleError
-                        );
+                    try { await Tone.loaded(); } catch (sampleError) {
+                        console.warn('ToneVault: Parai samples could not be loaded. Using procedural fallback.');
                         paraiSampler = null;
                     }
                 }
 
-                if (isSouth && resolved.instrument === 'parai' && !paraiSampler) {
-                    console.warn(
-                        'ToneVault: Authentic Parai samples are not installed. ' +
-                        'Using the procedural fallback. Add /Samples/Parai/ WAV files for recorded Parai.'
-                    );
-                }
-
-                // ----------------------------------------------------
-                // FALLBACK / MODERN / CINEMATIC SYNTH VOICES
-                // ----------------------------------------------------
+                // SYNTH FALLBACKS
                 const kick = new Tone.MembraneSynth({
-                    pitchDecay: 0.035, octaves: 3.5,
-                    oscillator: { type: 'sine' },
+                    pitchDecay: 0.035, octaves: 3.5, oscillator: { type: 'sine' },
                     envelope: { attack: 0.001, decay: 0.5, sustain: 0, release: 0.25 }
                 }).connect(master);
 
                 const snareBody = new Tone.MembraneSynth({
-                    pitchDecay: 0.008, octaves: 1.2,
-                    oscillator: { type: 'triangle' },
+                    pitchDecay: 0.008, octaves: 1.2, oscillator: { type: 'triangle' },
                     envelope: { attack: 0.001, decay: 0.16, sustain: 0, release: 0.12 }
                 }).connect(master);
 
                 const snareNoise = new Tone.NoiseSynth({
-                    noise: { type: 'pink' },
-                    envelope: { attack: 0.001, decay: 0.18, sustain: 0, release: 0.05 }
+                    noise: { type: 'pink' }, envelope: { attack: 0.001, decay: 0.18, sustain: 0, release: 0.05 }
                 }).connect(master);
 
                 const hatFilter = new Tone.Filter(7500, 'highpass').connect(master);
-                const hat = new Tone.NoiseSynth({
-                    noise: { type: 'white' },
-                    envelope: { attack: 0.001, decay: 0.045, sustain: 0, release: 0.02 }
-                }).connect(hatFilter);
+                const hat = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.001, decay: 0.045, sustain: 0, release: 0.02 } }).connect(hatFilter);
+                const openHat = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.001, decay: 0.28, sustain: 0, release: 0.06 } }).connect(hatFilter);
 
-                const openHat = new Tone.NoiseSynth({
-                    noise: { type: 'white' },
-                    envelope: { attack: 0.001, decay: 0.28, sustain: 0, release: 0.06 }
-                }).connect(hatFilter);
+                const clap = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.001, decay: 0.22, sustain: 0, release: 0.03 } }).connect(new Tone.Filter(1700, 'bandpass').connect(master));
 
-                const clap = new Tone.NoiseSynth({
-                    noise: { type: 'white' },
-                    envelope: { attack: 0.001, decay: 0.22, sustain: 0, release: 0.03 }
-                }).connect(new Tone.Filter(1700, 'bandpass').connect(master));
+                const paraiBody = new Tone.MembraneSynth({ pitchDecay: 0.006, octaves: 0.55, oscillator: { type: 'triangle' }, envelope: { attack: 0.001, decay: 0.34, sustain: 0.015, release: 0.18 } }).connect(master);
+                const paraiSkin = new Tone.NoiseSynth({ noise: { type: 'pink' }, envelope: { attack: 0.001, decay: 0.075, sustain: 0, release: 0.035 } }).connect(new Tone.Filter(2400, 'bandpass').connect(master));
+                const dholLow = paraiBody; const dholHigh = paraiBody;
 
-                // Fallback Indian voices for Dhol and any unmapped strokes.
-                // Parai-like procedural fallback. This is intentionally NOT a kick:
-                // it combines a shallow membrane transient with a short noisy skin hit.
-                // For authentic Parai, use the local recorded sample bank below.
-                const paraiBody = new Tone.MembraneSynth({
-                    pitchDecay: 0.006,
-                    octaves: 0.55,
-                    oscillator: { type: 'triangle' },
-                    envelope: { attack: 0.001, decay: 0.34, sustain: 0.015, release: 0.18 }
-                }).connect(master);
-                const paraiSkin = new Tone.NoiseSynth({
-                    noise: { type: 'pink' },
-                    envelope: { attack: 0.001, decay: 0.075, sustain: 0, release: 0.035 }
-                }).connect(new Tone.Filter(2400, 'bandpass').connect(master));
+                const taikoLow = new Tone.MembraneSynth({ pitchDecay: 0.025, octaves: 1.0, oscillator: { type: 'sine' }, envelope: { attack: 0.003, decay: 1.0, sustain: 0.08, release: 1.2 } }).connect(master);
+                const lowTom = new Tone.MembraneSynth({ pitchDecay: 0.02, octaves: 1.2, oscillator: { type: 'triangle' }, envelope: { attack: 0.002, decay: 0.5, sustain: 0.04, release: 0.45 } }).connect(master);
+                const timpani = new Tone.MembraneSynth({ pitchDecay: 0.01, octaves: 0.8, oscillator: { type: 'sine' }, envelope: { attack: 0.005, decay: 1.25, sustain: 0.1, release: 1.8 } }).connect(master);
+                const orchSnare = new Tone.MembraneSynth({ pitchDecay: 0.008, octaves: 0.9, oscillator: { type: 'triangle' }, envelope: { attack: 0.002, decay: 0.2, sustain: 0, release: 0.12 } }).connect(master);
+                const orchNoise = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.002, decay: 0.24, sustain: 0, release: 0.06 } }).connect(master);
+                const crash = new Tone.MetalSynth({ frequency: 220, envelope: { attack: 0.001, decay: 2.8, release: 3.2 }, harmonicity: 5.1, modulationIndex: 28, resonance: 4200, octaves: 1.7 }).connect(master);
 
-                const dholLow = paraiBody;
-                const dholHigh = paraiBody;
+                const tablaMap = { [MIDI_DRUMS.TA1]: 'C4', [MIDI_DRUMS.TA2]: 'D4', [MIDI_DRUMS.TABLA_LOW]: 'E4' };
+                const mridangamMap = { [MIDI_DRUMS.MRIDANGAM_HIGH]: 'C4', [MIDI_DRUMS.MRIDANGAM_LOW]: 'G4', [MIDI_DRUMS.TA1]: 'D4', [MIDI_DRUMS.TA2]: 'E4', [MIDI_DRUMS.TABLA_LOW]: 'G4' };
+                const paraiMap = { [MIDI_DRUMS.DHOL_LOW]: 'C4', [MIDI_DRUMS.DHOL_HIGH]: 'D4', [MIDI_DRUMS.MRIDANGAM_HIGH]: 'E4', [MIDI_DRUMS.MRIDANGAM_LOW]: 'F4', [MIDI_DRUMS.TA1]: 'D4', [MIDI_DRUMS.TA2]: 'E4', [MIDI_DRUMS.TABLA_LOW]: 'C4' };
 
-                // Cinematic fallback voices.
-                const taikoLow = new Tone.MembraneSynth({
-                    pitchDecay: 0.025, octaves: 1.0,
-                    oscillator: { type: 'sine' },
-                    envelope: { attack: 0.003, decay: 1.0, sustain: 0.08, release: 1.2 }
-                }).connect(master);
-
-                const lowTom = new Tone.MembraneSynth({
-                    pitchDecay: 0.02, octaves: 1.2,
-                    oscillator: { type: 'triangle' },
-                    envelope: { attack: 0.002, decay: 0.5, sustain: 0.04, release: 0.45 }
-                }).connect(master);
-
-                const timpani = new Tone.MembraneSynth({
-                    pitchDecay: 0.01, octaves: 0.8,
-                    oscillator: { type: 'sine' },
-                    envelope: { attack: 0.005, decay: 1.25, sustain: 0.1, release: 1.8 }
-                }).connect(master);
-
-                const orchSnare = new Tone.MembraneSynth({
-                    pitchDecay: 0.008, octaves: 0.9,
-                    oscillator: { type: 'triangle' },
-                    envelope: { attack: 0.002, decay: 0.2, sustain: 0, release: 0.12 }
-                }).connect(master);
-
-                const orchNoise = new Tone.NoiseSynth({
-                    noise: { type: 'white' },
-                    envelope: { attack: 0.002, decay: 0.24, sustain: 0, release: 0.06 }
-                }).connect(master);
-
-                const crash = new Tone.MetalSynth({
-                    frequency: 220,
-                    envelope: { attack: 0.001, decay: 2.8, release: 3.2 },
-                    harmonicity: 5.1, modulationIndex: 28, resonance: 4200, octaves: 1.7
-                }).connect(master);
-
-                // Map generated MIDI drum notes to real sample articulations.
-                // Using different sample notes gives the preview actual
-                // changes in timbre instead of pitch-changing one synth.
-                const tablaMap = {
-                    [MIDI_DRUMS.TA1]: 'C4',
-                    [MIDI_DRUMS.TA2]: 'D4',
-                    [MIDI_DRUMS.TABLA_LOW]: 'E4'
-                };
-
-                const mridangamMap = {
-                    [MIDI_DRUMS.MRIDANGAM_HIGH]: 'C4',
-                    [MIDI_DRUMS.MRIDANGAM_LOW]: 'G4',
-                    [MIDI_DRUMS.TA1]: 'D4',
-                    [MIDI_DRUMS.TA2]: 'E4',
-                    [MIDI_DRUMS.TABLA_LOW]: 'G4'
-                };
-
-                const paraiMap = {
-                    [MIDI_DRUMS.DHOL_LOW]: 'C4',
-                    [MIDI_DRUMS.DHOL_HIGH]: 'D4',
-                    [MIDI_DRUMS.MRIDANGAM_HIGH]: 'E4',
-                    [MIDI_DRUMS.MRIDANGAM_LOW]: 'F4',
-                    [MIDI_DRUMS.TA1]: 'D4',
-                    [MIDI_DRUMS.TA2]: 'E4',
-                    [MIDI_DRUMS.TABLA_LOW]: 'C4'
-                };
-
-                const lastVoiceTime = new Map();
-
-                uniquePreviewNotes.forEach(note => {
-                    let t = Math.max(0, Math.min(note.time, totalDuration - 0.001));
-                    const voiceKey = `${resolved.engine}|${note.midi}`;
-                    const previous = lastVoiceTime.get(voiceKey);
-                    if (previous !== undefined && t <= previous) {
-                        t = Math.min(totalDuration - 0.001, previous + 0.0005);
-                    }
-                    lastVoiceTime.set(voiceKey, t);
+                sanitizedNotes.forEach(note => {
+                    const t = note.time;
                     const v = note.velocity;
 
-                    // REAL PARAI PREVIEW
-                    // Dappan Koothu is Parai-led here; it no longer
-                    // routes its main hits through tabla/mridangam.
                     if (paraiSampler && paraiMap[note.midi]) {
-                        const sampleNote = paraiMap[note.midi];
-                        const duration =
-                            note.midi === MIDI_DRUMS.DHOL_LOW ||
-                            note.midi === MIDI_DRUMS.MRIDANGAM_LOW
-                                ? '8n'
-                                : '16n';
-
-                        paraiSampler.triggerAttackRelease(
-                            sampleNote,
-                            duration,
-                            t,
-                            Math.min(1, v * 1.08)
-                        );
+                        paraiSampler.triggerAttackRelease(paraiMap[note.midi], (note.midi === MIDI_DRUMS.DHOL_LOW || note.midi === MIDI_DRUMS.MRIDANGAM_LOW) ? '8n' : '16n', t, Math.min(1, v * 1.08));
                         return;
                     }
-
-                    // REAL TABLA PREVIEW
                     if (tablaSampler && tablaMap[note.midi]) {
-                        const sampleNote = tablaMap[note.midi];
-                        const duration = note.midi === MIDI_DRUMS.TABLA_LOW ? '8n' : '16n';
-                        tablaSampler.triggerAttackRelease(sampleNote, duration, t, Math.min(1, v * 1.08));
+                        tablaSampler.triggerAttackRelease(tablaMap[note.midi], note.midi === MIDI_DRUMS.TABLA_LOW ? '8n' : '16n', t, Math.min(1, v * 1.08));
                         return;
                     }
-
-                    // REAL MRIDANGAM PREVIEW
                     if (mridangamSampler && mridangamMap[note.midi]) {
-                        const sampleNote = mridangamMap[note.midi];
-                        const duration = note.midi === MIDI_DRUMS.MRIDANGAM_LOW ? '8n' : '16n';
-                        mridangamSampler.triggerAttackRelease(sampleNote, duration, t, Math.min(1, v * 1.05));
+                        mridangamSampler.triggerAttackRelease(mridangamMap[note.midi], note.midi === MIDI_DRUMS.MRIDANGAM_LOW ? '8n' : '16n', t, Math.min(1, v * 1.05));
                         return;
                     }
 
-                    // Other generated sounds.
                     switch (note.midi) {
-                        case MIDI_DRUMS.KICK:
-                            kick.triggerAttackRelease('C1', '32n', t, v);
-                            break;
-                        case MIDI_DRUMS.SNARE:
-                            snareBody.triggerAttackRelease('G2', '16n', t, v);
-                            snareNoise.triggerAttackRelease('16n', t, v * 0.8);
-                            break;
-                        case MIDI_DRUMS.CH:
-                            hat.triggerAttackRelease('32n', t, v * 0.7);
-                            break;
-                        case MIDI_DRUMS.OH:
-                            openHat.triggerAttackRelease('8n', t, v * 0.7);
-                            break;
-                        case MIDI_DRUMS.CLAP:
-                            clap.triggerAttackRelease('16n', t, v);
-                            break;
-                        case MIDI_DRUMS.TOM_HI:
-                            lowTom.triggerAttackRelease('A2', '32n', t, v);
-                            break;
-                        case MIDI_DRUMS.TOM_LO:
-                            lowTom.triggerAttackRelease('D2', '32n', t, v);
-                            break;
-                        case MIDI_DRUMS.DHOL_LOW:
-                            if (resolved.instrument === 'parai') {
-                                paraiBody.triggerAttackRelease('G2', '32n', t, v * 0.9);
-                                paraiSkin.triggerAttackRelease('16n', t, v * 0.55);
-                            } else {
-                                dholLow.triggerAttackRelease('D2', '8n', t, v);
-                            }
-                            break;
-                        case MIDI_DRUMS.DHOL_HIGH:
-                            if (resolved.instrument === 'parai') {
-                                paraiBody.triggerAttackRelease('D3', '32n', t, v * 0.8);
-                                paraiSkin.triggerAttackRelease('32n', t, v * 0.72);
-                            } else {
-                                dholHigh.triggerAttackRelease('A2', '16n', t, v);
-                            }
-                            break;
-                        case MIDI_DRUMS.TAIKO_LOW:
-                            taikoLow.triggerAttackRelease('C1', '8n', t, v);
-                            break;
-                        case MIDI_DRUMS.LOW_TOM_CIN:
-                            lowTom.triggerAttackRelease('D2', '32n', t, v);
-                            break;
-                        case MIDI_DRUMS.HIGH_TOM_CIN:
-                            lowTom.triggerAttackRelease('A2', '16n', t, v);
-                            break;
-                        case MIDI_DRUMS.TIMPANI:
-                            timpani.triggerAttackRelease('G1', '4n', t, v);
-                            break;
-                        case MIDI_DRUMS.ORCH_SNARE:
-                            orchSnare.triggerAttackRelease('C3', '16n', t, v);
-                            orchNoise.triggerAttackRelease('16n', t, v * 0.65);
-                            break;
-                        case MIDI_DRUMS.CRASH:
-                            crash.triggerAttackRelease('4n', t, v);
-                            break;
+                        case MIDI_DRUMS.KICK: kick.triggerAttackRelease('C1', '8n', t, v); break;
+                        case MIDI_DRUMS.SNARE: snareBody.triggerAttackRelease('G2', '16n', t, v); snareNoise.triggerAttackRelease('16n', t, v * 0.8); break;
+                        case MIDI_DRUMS.CH: hat.triggerAttackRelease('32n', t, v * 0.7); break;
+                        case MIDI_DRUMS.OH: openHat.triggerAttackRelease('8n', t, v * 0.7); break;
+                        case MIDI_DRUMS.CLAP: clap.triggerAttackRelease('16n', t, v); break;
+                        case MIDI_DRUMS.TOM_HI: lowTom.triggerAttackRelease('A2', '8n', t, v); break;
+                        case MIDI_DRUMS.TOM_LO: lowTom.triggerAttackRelease('D2', '8n', t, v); break;
+                        case MIDI_DRUMS.DHOL_LOW: 
+                            if (resolved.instrument === 'parai') { paraiBody.triggerAttackRelease('G2', '8n', t, v * 0.9); paraiSkin.triggerAttackRelease('16n', t, v * 0.55); } 
+                            else { dholLow.triggerAttackRelease('D2', '8n', t, v); } break;
+                        case MIDI_DRUMS.DHOL_HIGH: 
+                            if (resolved.instrument === 'parai') { paraiBody.triggerAttackRelease('D3', '16n', t, v * 0.8); paraiSkin.triggerAttackRelease('32n', t, v * 0.72); } 
+                            else { dholHigh.triggerAttackRelease('A2', '16n', t, v); } break;
+                        case MIDI_DRUMS.TAIKO_LOW: taikoLow.triggerAttackRelease('C1', '4n', t, v); break;
+                        case MIDI_DRUMS.LOW_TOM_CIN: lowTom.triggerAttackRelease('D2', '8n', t, v); break;
+                        case MIDI_DRUMS.HIGH_TOM_CIN: lowTom.triggerAttackRelease('A2', '16n', t, v); break;
+                        case 'TIMPANI': timpani.triggerAttackRelease('G1', '2n', t, v); break;
+                        case MIDI_DRUMS.ORCH_SNARE: orchSnare.triggerAttackRelease('C3', '16n', t, v); orchNoise.triggerAttackRelease('16n', t, v * 0.65); break;
+                        case MIDI_DRUMS.CRASH: crash.triggerAttackRelease('4n', t, v); break;
                     }
                 });
             }, Math.max(totalDuration, 1));
@@ -1850,30 +1616,22 @@
             if (wavBlobUrl) URL.revokeObjectURL(wavBlobUrl);
             wavBlobUrl = URL.createObjectURL(wavBlob);
 
-            if (wavesurfer) {
-                wavesurfer.destroy();
-                previewPlayIcon.className = 'fa-solid fa-play';
-            }
+            // Fresh rendering instance
+            setTimeout(() => {
+                wavesurfer = WaveSurfer.create({
+                    container: '#waveform', waveColor: '#444', progressColor: '#00d4ff',
+                    cursorColor: '#ffffff', barWidth: 3, barRadius: 3, height: 60, normalize: true
+                });
 
-            wavesurfer = WaveSurfer.create({
-                container: '#waveform',
-                waveColor: '#444',
-                progressColor: '#00d4ff',
-                cursorColor: '#ffffff',
-                barWidth: 3,
-                barRadius: 3,
-                height: 60,
-                normalize: true
-            });
-
-            wavesurfer.load(wavBlobUrl);
-            wavesurfer.on('ready', () => {
-                audioDurationText.textContent = formatTime(wavesurfer.getDuration());
-                wavesurfer.setVolume(parseFloat(previewVolume.value));
-            });
-            wavesurfer.on('play', () => previewPlayIcon.className = 'fa-solid fa-pause');
-            wavesurfer.on('pause', () => previewPlayIcon.className = 'fa-solid fa-play');
-            wavesurfer.on('finish', () => previewPlayIcon.className = 'fa-solid fa-play');
+                wavesurfer.load(wavBlobUrl);
+                wavesurfer.on('ready', () => {
+                    audioDurationText.textContent = formatTime(wavesurfer.getDuration());
+                    wavesurfer.setVolume(parseFloat(previewVolume.value));
+                });
+                wavesurfer.on('play', () => previewPlayIcon.className = 'fa-solid fa-pause');
+                wavesurfer.on('pause', () => previewPlayIcon.className = 'fa-solid fa-play');
+                wavesurfer.on('finish', () => previewPlayIcon.className = 'fa-solid fa-play');
+            }, 100);
         }
 
         function bufferToWave(abuffer, len) {
@@ -1883,25 +1641,15 @@
             const view = new DataView(buffer);
             const channels = [];
             const sampleRate = abuffer.sampleRate;
-            let offset = 0;
-            let pos = 0;
+            let offset = 0; let pos = 0;
 
             function setUint16(data) { view.setUint16(pos, data, true); pos += 2; }
             function setUint32(data) { view.setUint32(pos, data, true); pos += 4; }
 
-            setUint32(0x46464952); // RIFF
-            setUint32(length - 8);
-            setUint32(0x45564157); // WAVE
-            setUint32(0x20746d66); // fmt
-            setUint32(16);
-            setUint16(1);
-            setUint16(numOfChan);
-            setUint32(sampleRate);
-            setUint32(sampleRate * 2 * numOfChan);
-            setUint16(numOfChan * 2);
-            setUint16(16);
-            setUint32(0x61746164); // data
-            setUint32(length - pos - 4);
+            setUint32(0x46464952); setUint32(length - 8); setUint32(0x45564157); setUint32(0x20746d66);
+            setUint32(16); setUint16(1); setUint16(numOfChan); setUint32(sampleRate);
+            setUint32(sampleRate * 2 * numOfChan); setUint16(numOfChan * 2); setUint16(16);
+            setUint32(0x61746164); setUint32(length - pos - 4);
 
             for (let i = 0; i < abuffer.numberOfChannels; i++) channels.push(abuffer.getChannelData(i));
 
@@ -1909,8 +1657,7 @@
                 for (let i = 0; i < numOfChan; i++) {
                     let sample = Math.max(-1, Math.min(1, channels[i][offset] || 0));
                     sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767) | 0;
-                    view.setInt16(pos, sample, true);
-                    pos += 2;
+                    view.setInt16(pos, sample, true); pos += 2;
                 }
                 offset++;
             }
