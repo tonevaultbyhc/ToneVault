@@ -122,6 +122,12 @@
             position: relative;
             user-select: none;
             width: 100%;
+            z-index: 1; /* Baseline stack order */
+        }
+        
+        /* FIX: Push the open dropdown above all subsequent grid elements */
+        .custom-select-wrapper.open {
+            z-index: 100;
         }
 
         .custom-select-wrapper.disabled {
@@ -187,6 +193,11 @@
             z-index: 50;
             overflow-y: auto;
             max-height: 250px;
+        }
+
+        .custom-select-wrapper.open .custom-select-options {
+            opacity: 1;
+            visibility: visible;
         }
 
         /* Customized scrollbar for dropdowns */
@@ -300,6 +311,16 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             margin: 0;
+        }
+
+        .preview-instrument-select select {
+            background: rgba(10, 10, 10, 0.9);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 8px;
+            outline: none;
+            font-size: 0.9rem;
         }
 
         /* VOLUME CONTROL */
