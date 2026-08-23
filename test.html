@@ -927,6 +927,7 @@
         let generatedNotes = []; 
         let exactMaxTime = 8; 
 
+        // Core MIDI channel 10 mappings
         const MIDI_DRUMS = {
             KICK: 36,
             SNARE: 38,
@@ -935,10 +936,9 @@
             OH: 46,   
             TOM_LO: 41,
             TOM_HI: 45,
-            TABLA_HI: 62, 
-            TABLA_LO: 64, 
-            ORCH_SNARE: 40, 
-            TIMPANI: 43, 
+            TABLA_HI: 62, // GM Mute Hi Conga (Best equivalent)
+            TABLA_LO: 64, // GM Low Conga
+            ORCH_SNARE: 40, // GM Electric Snare
             CRASH: 49
         };
 
@@ -977,6 +977,8 @@
 
             processBtn.setAttribute("disabled", "true");
             statusMessage.style.display = "block";
+            
+            // Hide the old results and waveform during processing
             resultsArea.style.display = "none";
             waveformPreviewContainer.style.display = "none";
             
@@ -1017,8 +1019,15 @@
                         timeSignature: [beatsPerBar, beatUnit]
                     });
 
-                    const track = midi.addTrack();
-                    track.channel = 9; // MIDI Channel 10 for drums
+                    // Track 1: Standard Drums (Channel 10)
+                    const drumTrack = midi.addTrack();
+                    drumTrack.channel = 9; 
+
+                    // Track 2: Orchestral / Timpani (Channel 1, Program 47)
+                    // This ensures media players use a REAL Timpani patch instead of a random drum!
+                    const orchTrack = midi.addTrack();
+                    orchTrack.channel = 0; 
+                    orchTrack.instrument.number = 47; 
 
                     generatedNotes = [];
 
@@ -1031,21 +1040,36 @@
                         if (humanVel > 1) humanVel = 1;
                         if (humanVel < 0.1) humanVel = 0.1;
 
-                        const duration = 0.1; 
-                        
-                        track.addNote({
-                            midi: midiNote,
-                            time: humanTime,
-                            duration: duration,
-                            velocity: humanVel
-                        });
-
-                        generatedNotes.push({
-                            midi: midiNote,
-                            time: humanTime,
-                            duration: duration,
-                            velocity: humanVel
-                        });
+                        // Route Timpani to the Melodic Orchestral Track
+                        if (midiNote === 'TIMPANI') {
+                            orchTrack.addNote({
+                                midi: 43, // G2 pitch
+                                time: humanTime,
+                                duration: 1.0,
+                                velocity: humanVel
+                            });
+                            generatedNotes.push({
+                                midi: 'TIMPANI',
+                                time: humanTime,
+                                duration: 1.0,
+                                velocity: humanVel
+                            });
+                        } 
+                        // Route all normal drums to Channel 10
+                        else {
+                            drumTrack.addNote({
+                                midi: midiNote,
+                                time: humanTime,
+                                duration: 0.1,
+                                velocity: humanVel
+                            });
+                            generatedNotes.push({
+                                midi: midiNote,
+                                time: humanTime,
+                                duration: 0.1,
+                                velocity: humanVel
+                            });
+                        }
                     }
 
                     // GENERATION LOOP
@@ -1136,12 +1160,12 @@
                                     if (genre === 'orchestral') {
                                         if (isDownbeat && beat === 0) {
                                             addDrumHit(MIDI_DRUMS.CRASH, stepTime, 0.8);
-                                            addDrumHit(MIDI_DRUMS.TIMPANI, stepTime, 1.0);
+                                            addDrumHit('TIMPANI', stepTime, 1.0); // Uses special token
                                         }
                                         if (step === 0 || step === 2) addDrumHit(MIDI_DRUMS.ORCH_SNARE, stepTime, 0.7);
                                         if (density === 'busy' && step % 2 !== 0) addDrumHit(MIDI_DRUMS.ORCH_SNARE, stepTime, 0.4);
                                     } else {
-                                        if (isDownbeat && beat === 0) addDrumHit(MIDI_DRUMS.TIMPANI, stepTime, 0.9);
+                                        if (isDownbeat && beat === 0) addDrumHit('TIMPANI', stepTime, 0.9);
                                     }
                                 }
 
@@ -1187,7 +1211,6 @@
 
         // ============================================================
         // TONEVAULT DRUM PREVIEW SYNTHESIZER
-        // Synthesizes robust drum hits offline without needing heavy samples
         // ============================================================
         async function renderDrumAudioPreview(notes, totalDuration, kitType) {
             try {
@@ -1195,13 +1218,21 @@
 
                 const buffer = await Tone.Offline(async () => {
 
-                    // MASTER BUS SETUP
+                    // MASTER BUS SETUP (Cinematic Reverb if World/Orch)
+                    const isWorld = (kitType === "world");
+                    
+                    const reverb = new Tone.Reverb({ 
+                        decay: isWorld ? 4.0 : 1.5, 
+                        preDelay: 0.02, 
+                        wet: isWorld ? 0.35 : 0.1 
+                    }).toDestination();
+
                     const compressor = new Tone.Compressor({
                         threshold: -12,
                         ratio: 3,
                         attack: 0.005,
                         release: 0.1
-                    }).toDestination();
+                    }).connect(reverb);
 
                     let masterBus = new Tone.Gain(0.9).connect(compressor);
 
@@ -1230,8 +1261,15 @@
 
                     const tomHi = new Tone.MembraneSynth({ pitchDecay: 0.02, octaves: 1.5, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.4, sustain: 0 } }).connect(masterBus);
                     const tomLo = new Tone.MembraneSynth({ pitchDecay: 0.02, octaves: 1.5, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.6, sustain: 0 } }).connect(masterBus);
-                    const tablaHi = new Tone.MembraneSynth({ pitchDecay: 0.005, octaves: 2, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.4, sustain: 0 } }).connect(masterBus);
-                    const tablaLo = new Tone.MembraneSynth({ pitchDecay: 0.01, octaves: 1.5, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.6, sustain: 0 } }).connect(masterBus);
+                    
+                    // Orchestral / Indian Specific Synths
+                    const orchSnareBody = new Tone.MembraneSynth({ pitchDecay: 0.01, octaves: 1, oscillator: { type: "triangle" }, envelope: { attack: 0.001, decay: 0.3, sustain: 0 } }).connect(masterBus);
+                    const orchSnareNoise = new Tone.NoiseSynth({ noise: { type: "white" }, envelope: { attack: 0.005, decay: 0.3, sustain: 0 } }).connect(masterBus);
+                    
+                    const tablaHi = new Tone.MembraneSynth({ pitchDecay: 0.001, octaves: 1.5, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.8, sustain: 0, release: 0.8 } }).connect(masterBus);
+                    const tablaLo = new Tone.MembraneSynth({ pitchDecay: 0.1, octaves: 3, oscillator: { type: "sine" }, envelope: { attack: 0.005, decay: 1.5, sustain: 0, release: 1.5 } }).connect(masterBus);
+                    
+                    const timpani = new Tone.MembraneSynth({ pitchDecay: 0.05, octaves: 1.2, oscillator: { type: "sine" }, envelope: { attack: 0.02, decay: 2.0, sustain: 0.2, release: 2.5 } }).connect(masterBus);
                     const crash = new Tone.MetalSynth({ frequency: 200, envelope: { attack: 0.001, decay: 3.0, release: 3.0 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5 }).connect(masterBus);
 
                     // SCHEDULE NOTES
@@ -1248,8 +1286,8 @@
                                 snareNoise.triggerAttackRelease("16n", time, vel * 0.8);
                                 break;
                             case MIDI_DRUMS.ORCH_SNARE:
-                                snareBody.triggerAttackRelease("C3", "16n", time, vel);
-                                snareNoise.triggerAttackRelease("16n", time, vel);
+                                orchSnareBody.triggerAttackRelease("C3", "16n", time, vel);
+                                orchSnareNoise.triggerAttackRelease("16n", time, vel);
                                 break;
                             case MIDI_DRUMS.CLAP:
                                 clapNoise.triggerAttackRelease("16n", time, vel);
@@ -1266,14 +1304,16 @@
                                 tomHi.triggerAttackRelease("A2", "8n", time, vel);
                                 break;
                             case MIDI_DRUMS.TOM_LO:
-                            case MIDI_DRUMS.TIMPANI:
                                 tomLo.triggerAttackRelease("D2", "8n", time, vel);
                                 break;
                             case MIDI_DRUMS.TABLA_HI:
-                                tablaHi.triggerAttackRelease("C3", "8n", time, vel);
+                                tablaHi.triggerAttackRelease("D4", "8n", time, vel);
                                 break;
                             case MIDI_DRUMS.TABLA_LO:
                                 tablaLo.triggerAttackRelease("G2", "8n", time, vel);
+                                break;
+                            case 'TIMPANI': // Routed directly to Orchestral Timpani synth
+                                timpani.triggerAttackRelease("G2", "2n", time, vel);
                                 break;
                             case MIDI_DRUMS.CRASH:
                                 crash.triggerAttackRelease("4n", time, vel);
@@ -1289,13 +1329,12 @@
                 if (wavBlobUrl) URL.revokeObjectURL(wavBlobUrl);
                 wavBlobUrl = URL.createObjectURL(wavBlob);
 
-                // Destroy old instance to guarantee a completely fresh waveform visual
+                // EXPLICITLY DESTROY OLD WAVESURFER INSTANCE BEFORE CREATING A NEW ONE
                 if (wavesurfer) {
                     wavesurfer.destroy();
                     previewPlayIcon.className = "fa-solid fa-play";
                 }
 
-                // Re-create the waveform
                 wavesurfer = WaveSurfer.create({
                     container: '#waveform',
                     waveColor: '#444',
