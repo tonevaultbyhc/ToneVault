@@ -621,6 +621,21 @@
             flex-shrink: 0;
         }
 
+        .instrument-audio-preview {
+            width: 220px;
+            height: 34px;
+            flex-shrink: 0;
+            accent-color: #00d4ff;
+        }
+
+        .instrument-preview-label {
+            color: #777;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            white-space: nowrap;
+        }
+
         .instrument-midi-empty {
             color: #777;
             font-size: 0.82rem;
@@ -638,6 +653,8 @@
         @media (max-width: 768px) {
             .settings-grid { grid-template-columns: 1fr; gap: 15px; }
             .preview-toolbar { flex-direction: column; align-items: stretch; }
+            .instrument-midi-row { flex-wrap: wrap; }
+            .instrument-audio-preview { width: 100%; min-width: 180px; }
             .keyword-row { flex-direction: column; align-items: flex-start; gap: 4px; }
         }
 
@@ -1104,6 +1121,7 @@
         let exactMaxTime = 8;
         let currentEngine = 'modern';
         let instrumentMidiUrls = [];
+        let instrumentPreviewUrls = [];
 
         // ============================================================
         // GM + CUSTOM MIDI MAP
@@ -1495,7 +1513,9 @@
 
         function clearInstrumentMidiUrls() {
             instrumentMidiUrls.forEach(url => URL.revokeObjectURL(url));
+            instrumentPreviewUrls.forEach(url => URL.revokeObjectURL(url));
             instrumentMidiUrls = [];
+            instrumentPreviewUrls = [];
         }
 
         function createInstrumentMidiBlob(notes, instrumentName, currentTempo, timeSig) {
@@ -1537,7 +1557,7 @@
             return new Blob([midi.toArray()], { type: 'audio/midi' });
         }
 
-        function buildInstrumentMidiDownloads(resolved, currentTempo, timeSig) {
+        async function buildInstrumentMidiDownloads(resolved, currentTempo, timeSig, totalDuration) {
             clearInstrumentMidiUrls();
             instrumentMidiList.innerHTML = '';
 
@@ -1556,11 +1576,11 @@
 
             generatedInstrumentSummary.textContent = `${groups.size} separate MIDI ${groups.size === 1 ? 'file' : 'files'} generated from this kit`;
 
-            let index = 0;
+            const rows = [];
             groups.forEach((notes, name) => {
                 const blob = createInstrumentMidiBlob(notes, name, currentTempo, timeSig);
-                const url = URL.createObjectURL(blob);
-                instrumentMidiUrls.push(url);
+                const midiUrl = URL.createObjectURL(blob);
+                instrumentMidiUrls.push(midiUrl);
 
                 const row = document.createElement('div');
                 row.className = 'instrument-midi-row';
@@ -1570,17 +1590,50 @@
                 info.innerHTML = `<i class="fa-solid ${getInstrumentIcon(name)}"></i><span class="instrument-midi-name"></span><span class="instrument-midi-count">${notes.length} notes</span>`;
                 info.querySelector('.instrument-midi-name').textContent = name;
 
+                const previewLabel = document.createElement('span');
+                previewLabel.className = 'instrument-preview-label';
+                previewLabel.textContent = 'Preview';
+
+                const audio = document.createElement('audio');
+                audio.className = 'instrument-audio-preview';
+                audio.controls = true;
+                audio.preload = 'auto';
+                audio.setAttribute('aria-label', `${name} preview`);
+                audio.title = `${name} preview`;
+
                 const link = document.createElement('a');
                 link.className = 'download-btn instrument-midi-download';
-                link.href = url;
+                link.href = midiUrl;
                 link.download = `tonevault_${name.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_${currentTempo}bpm.mid`;
                 link.innerHTML = '<i class="fa-solid fa-file-music"></i> Download MIDI';
 
                 row.appendChild(info);
+                row.appendChild(previewLabel);
+                row.appendChild(audio);
                 row.appendChild(link);
                 instrumentMidiList.appendChild(row);
-                index++;
+                rows.push({ notes, name, audio });
             });
+
+            generatedInstrumentSummary.textContent = `${groups.size} instruments — rendering individual previews...`;
+
+            for (const item of rows) {
+                try {
+                    const previewBlob = await renderRhythmAudioPreview(item.notes, totalDuration, resolved, { returnBlob: true });
+                    const previewUrl = URL.createObjectURL(previewBlob);
+                    instrumentPreviewUrls.push(previewUrl);
+                    item.audio.src = previewUrl;
+                    item.audio.load();
+                } catch (previewError) {
+                    console.warn(`ToneVault: ${item.name} preview could not be rendered.`, previewError);
+                    item.audio.replaceWith(Object.assign(document.createElement('span'), {
+                        className: 'instrument-preview-label',
+                        textContent: 'Preview unavailable'
+                    }));
+                }
+            }
+
+            generatedInstrumentSummary.textContent = `${groups.size} separate MIDI ${groups.size === 1 ? 'file' : 'files'} + audio previews generated from this kit`;
         }
 
         // ============================================================
@@ -1689,7 +1742,7 @@
                     downloadMidiBtn.download = `tonevault_${resolved.rhythm}_${currentTempo}bpm_full_kit.mid`;
 
                     // Build individual MIDI downloads from the same generated notes.
-                    buildInstrumentMidiDownloads(resolved, currentTempo, timeSig);
+                    await buildInstrumentMidiDownloads(resolved, currentTempo, timeSig, exactMaxTime);
 
                     progressBarFill.style.width = '70%';
                     statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Rendering ${resolved.instrument} preview...`;
@@ -1735,7 +1788,7 @@
         // Mridangam samples: Arthur Carabott / Harishankar V Menon set
         // from the mrid sample repository.
         // ============================================================
-        async function renderRhythmAudioPreview(notes, totalDuration, resolved) {
+        async function renderRhythmAudioPreview(notes, totalDuration, resolved, options = {}) {
             // Humanization deliberately makes note times non-monotonic. Tone.Offline
             // schedules events in time order, so always sort a preview copy first.
             // This also prevents the 'time must be greater than or equal to the last
@@ -2092,6 +2145,11 @@
             }, Math.max(totalDuration, 1));
 
             const wavBlob = bufferToWave(buffer.get(), buffer.length);
+
+            // Preview-only instrument rendering: return the temporary audio blob
+            // without touching the main WaveSurfer player or exposing a WAV download.
+            if (options.returnBlob) return wavBlob;
+
             if (wavBlobUrl) URL.revokeObjectURL(wavBlobUrl);
             wavBlobUrl = URL.createObjectURL(wavBlob);
 
