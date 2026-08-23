@@ -668,7 +668,7 @@
                                 <div class="custom-option selected" data-value="auto">Auto (from Style)</div>
                                 <div class="custom-option" data-value="modern">Modern Electronic</div>
                                 <div class="custom-option" data-value="tabla">Indian Tabla</div>
-                                <div class="custom-option" data-value="south_indian">South Indian Percussion</div>
+                                <div class="custom-option" data-value="parai">Parai (Dappan Koothu)</div>
                                 <div class="custom-option" data-value="cinematic">Cinematic Orchestra</div>
                                 <div class="custom-option" data-value="hybrid">Hybrid Cinematic</div>
                             </div>
@@ -677,7 +677,7 @@
                             <option value="auto" selected>Auto (from Style)</option>
                             <option value="modern">Modern Electronic</option>
                             <option value="tabla">Indian Tabla</option>
-                            <option value="south_indian">South Indian Percussion</option>
+                            <option value="parai">Parai (Dappan Koothu)</option>
                             <option value="cinematic">Cinematic Orchestra</option>
                             <option value="hybrid">Hybrid Cinematic</option>
                         </select>
@@ -868,7 +868,7 @@
                     <h4>INDIAN RHYTHM</h4>
                     <div class="keyword-row"><span class="keyword">tabla</span><span>Uses Indian tabla-style phrasing</span></div>
                     <div class="keyword-row"><span class="keyword">teen taal</span><span>16-matra classical cycle</span></div>
-                    <div class="keyword-row"><span class="keyword">kuthu</span><span>South Indian folk / dance pulse</span></div>
+                    <div class="keyword-row"><span class="keyword">kuthu</span><span>Parai-led South Indian folk / dance pulse</span></div>
                     <div class="keyword-row"><span class="keyword">dhol</span><span>Low/high folk percussion emphasis</span></div>
                     <div class="keyword-row"><span class="keyword">tihai</span><span>Three-part phrase resolving to the downbeat</span></div>
                 </div>
@@ -883,6 +883,16 @@
                 </div>
 
                 <div class="keyword-example">
+            <strong>Parai Preview</strong>
+            <p style="margin-top:6px;color:#888;">
+                For authentic Dappan Koothu preview, add licensed Parai one-shots to
+                <code>/Samples/Parai/</code>: <code>parai_low.wav</code>,
+                <code>parai_high.wav</code>, <code>parai_edge.wav</code>,
+                <code>parai_accent.wav</code>.
+            </p>
+        </div>
+
+        <div class="keyword-example">
                     <strong>Try this</strong>
                     <code>tabla, teen taal, rolling, humanized, tihai</code>
                     <p>Creates a 16-matra Indian-style rhythmic cycle with rolling subdivisions and a three-part ending phrase.</p>
@@ -1053,7 +1063,7 @@
             if (hasKeyword(text, 'trap', 'drill', 'rolls', 'rolling')) rhythm = rhythm || 'trap_roll';
 
             if (hasKeyword(text, 'tabla', 'teen taal', 'teentaal', 'bayan')) instrument = 'tabla';
-            if (hasKeyword(text, 'dhol', 'dholak', 'mridangam', 'thavil', 'parai')) instrument = 'south_indian';
+            if (hasKeyword(text, 'parai', 'thappu', 'thappattam', 'dappan koothu', 'kuthu')) instrument = 'parai';
             if (hasKeyword(text, 'orchestra', 'orchestral', 'timpani', 'taiko', 'gran casa')) instrument = 'cinematic';
             if (hasKeyword(text, 'hybrid cinematic', 'hybrid')) instrument = 'hybrid';
 
@@ -1061,7 +1071,7 @@
                 hiphop: { rhythm: 'boom_bap', instrument: 'modern' },
                 trap: { rhythm: 'trap_roll', instrument: 'modern' },
                 house: { rhythm: 'four_floor', instrument: 'modern' },
-                kuthu: { rhythm: 'kuthu', instrument: 'south_indian' },
+                kuthu: { rhythm: 'kuthu', instrument: 'parai' },
                 indian_classical: { rhythm: 'teen_taal', instrument: 'tabla' },
                 orchestral: { rhythm: 'cinematic_pulse', instrument: 'cinematic' },
                 lofi: { rhythm: 'boom_bap', instrument: 'modern' }
@@ -1077,7 +1087,7 @@
 
             let engine = 'modern';
             if (['teen_taal'].includes(rhythm) || instrument === 'tabla') engine = 'indian';
-            else if (['kuthu'].includes(rhythm) || instrument === 'south_indian') engine = 'south_indian';
+            else if (['kuthu'].includes(rhythm) || instrument === 'parai') engine = 'south_indian';
             else if (['cinematic_pulse','cinematic_build'].includes(rhythm) || instrument === 'cinematic') engine = 'cinematic';
             else if (instrument === 'hybrid') engine = 'hybrid';
 
@@ -1250,8 +1260,10 @@
         function generateSouthIndianPattern(ctx) {
             const { totalBars, barDuration, sixteenth, density, fillFreq, addHit } = ctx;
             const pattern = [
-                'L','H','H','L', 'L','H','L','H',
-                'L','H','H','L', 'L','H','H','L'
+                'LOW','HIGH','HIGH','LOW',
+                'LOW','HIGH','LOW','HIGH',
+                'LOW','HIGH','HIGH','LOW',
+                'LOW','HIGH','HIGH','LOW'
             ];
 
             for (let bar = 0; bar < totalBars; bar++) {
@@ -1260,7 +1272,7 @@
                 for (let i = 0; i < 16; i++) {
                     const t = start + i * sixteenth;
                     const strong = i % 4 === 0;
-                    addHit(pattern[i] === 'L' ? MIDI_DRUMS.DHOL_LOW : MIDI_DRUMS.DHOL_HIGH, t, strong ? 0.94 : 0.66, 0.1, 'drums');
+                    addHit(pattern[i] === 'LOW' ? MIDI_DRUMS.DHOL_LOW : MIDI_DRUMS.DHOL_HIGH, t, strong ? 0.94 : 0.66, 0.1, 'drums');
 
                     if (density !== 'minimal' && (i === 2 || i === 6 || i === 10 || i === 14)) {
                         addHit(MIDI_DRUMS.MRIDANGAM_HIGH, t + sixteenth * 0.45, 0.42, 0.05, 'drums');
@@ -1491,6 +1503,7 @@
                 // WAV contains the actual instrument recordings.
                 let tablaSampler = null;
                 let mridangamSampler = null;
+                let paraiSampler = null;
 
                 if (isIndian) {
                     tablaSampler = new Tone.Sampler({
@@ -1509,7 +1522,7 @@
                     await Tone.loaded();
                 }
 
-                if (isSouth) {
+                if (isSouth && resolved.instrument !== 'parai') {
                     mridangamSampler = new Tone.Sampler({
                         urls: {
                             C4: 'norm_sounds/ka/ka-1.wav',
@@ -1525,6 +1538,47 @@
                         curve: 'exponential'
                     }).connect(master);
                     await Tone.loaded();
+                }
+
+                // ----------------------------------------------------
+                // REAL PARAI SAMPLE BANK
+                // ----------------------------------------------------
+                // Put your licensed Parai one-shots in:
+                // /Samples/Parai/
+                //
+                // Required files:
+                //   parai_low.wav
+                //   parai_high.wav
+                //   parai_edge.wav
+                //   parai_accent.wav
+                //
+                // The generator deliberately uses LOCAL samples here
+                // instead of hot-linking a third-party sample library.
+                // This keeps the production version reliable and lets
+                // you choose samples whose license permits ToneVault use.
+                if (isSouth && resolved.instrument === 'parai') {
+                    paraiSampler = new Tone.Sampler({
+                        urls: {
+                            C4: 'parai_low.wav',
+                            D4: 'parai_high.wav',
+                            E4: 'parai_edge.wav',
+                            F4: 'parai_accent.wav'
+                        },
+                        baseUrl: '/Samples/Parai/',
+                        release: 0.9,
+                        curve: 'exponential'
+                    }).connect(master);
+
+                    try {
+                        await Tone.loaded();
+                    } catch (sampleError) {
+                        console.warn(
+                            'ToneVault: Parai samples could not be loaded. ' +
+                            'Using the procedural Parai fallback instead.',
+                            sampleError
+                        );
+                        paraiSampler = null;
+                    }
                 }
 
                 // ----------------------------------------------------
@@ -1565,15 +1619,15 @@
 
                 // Fallback Indian voices for Dhol and any unmapped strokes.
                 const dholLow = new Tone.MembraneSynth({
-                    pitchDecay: 0.025, octaves: 1.7,
+                    pitchDecay: 0.012, octaves: 1.15,
                     oscillator: { type: 'triangle' },
-                    envelope: { attack: 0.002, decay: 0.48, sustain: 0.05, release: 0.35 }
+                    envelope: { attack: 0.001, decay: 0.62, sustain: 0.02, release: 0.42 }
                 }).connect(master);
 
                 const dholHigh = new Tone.MembraneSynth({
-                    pitchDecay: 0.035, octaves: 1.3,
-                    oscillator: { type: 'square' },
-                    envelope: { attack: 0.001, decay: 0.16, sustain: 0, release: 0.08 }
+                    pitchDecay: 0.018, octaves: 0.85,
+                    oscillator: { type: 'triangle' },
+                    envelope: { attack: 0.001, decay: 0.22, sustain: 0.01, release: 0.12 }
                 }).connect(master);
 
                 // Cinematic fallback voices.
@@ -1629,9 +1683,39 @@
                     [MIDI_DRUMS.TABLA_LOW]: 'G4'
                 };
 
+                const paraiMap = {
+                    [MIDI_DRUMS.DHOL_LOW]: 'C4',
+                    [MIDI_DRUMS.DHOL_HIGH]: 'D4',
+                    [MIDI_DRUMS.MRIDANGAM_HIGH]: 'E4',
+                    [MIDI_DRUMS.MRIDANGAM_LOW]: 'F4',
+                    [MIDI_DRUMS.TA1]: 'D4',
+                    [MIDI_DRUMS.TA2]: 'E4',
+                    [MIDI_DRUMS.TABLA_LOW]: 'C4'
+                };
+
                 notes.forEach(note => {
                     const t = note.time;
                     const v = note.velocity;
+
+                    // REAL PARAI PREVIEW
+                    // Dappan Koothu is Parai-led here; it no longer
+                    // routes its main hits through tabla/mridangam.
+                    if (paraiSampler && paraiMap[note.midi]) {
+                        const sampleNote = paraiMap[note.midi];
+                        const duration =
+                            note.midi === MIDI_DRUMS.DHOL_LOW ||
+                            note.midi === MIDI_DRUMS.MRIDANGAM_LOW
+                                ? '8n'
+                                : '16n';
+
+                        paraiSampler.triggerAttackRelease(
+                            sampleNote,
+                            duration,
+                            t,
+                            Math.min(1, v * 1.08)
+                        );
+                        return;
+                    }
 
                     // REAL TABLA PREVIEW
                     if (tablaSampler && tablaMap[note.midi]) {
