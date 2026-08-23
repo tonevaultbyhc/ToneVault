@@ -582,14 +582,18 @@
         }
 
         .instrument-midi-row {
-            display: flex;
+            display: grid;
+            grid-template-columns: 165px 38px minmax(180px, 1fr) auto;
             align-items: center;
-            justify-content: space-between;
-            gap: 15px;
+            gap: 12px;
             padding: 12px 14px;
             background: rgba(10, 10, 10, 0.65);
             border: 1px solid rgba(255, 255, 255, 0.07);
             border-radius: 10px;
+        }
+
+        .instrument-midi-row:hover {
+            border-color: rgba(0, 212, 255, 0.2);
         }
 
         .instrument-midi-info {
@@ -621,11 +625,29 @@
             flex-shrink: 0;
         }
 
-        .instrument-audio-preview {
-            width: 220px;
+        .instrument-play-btn {
+            width: 34px;
             height: 34px;
-            flex-shrink: 0;
-            accent-color: #00d4ff;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            background: rgba(0, 212, 255, 0.08);
+            color: #00d4ff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .instrument-play-btn:hover,
+        .instrument-play-btn.active {
+            background: #00d4ff;
+            color: #000;
+        }
+
+        .instrument-waveform {
+            min-width: 0;
+            height: 48px;
         }
 
         .instrument-preview-label {
@@ -653,8 +675,11 @@
         @media (max-width: 768px) {
             .settings-grid { grid-template-columns: 1fr; gap: 15px; }
             .preview-toolbar { flex-direction: column; align-items: stretch; }
-            .instrument-midi-row { flex-wrap: wrap; }
-            .instrument-audio-preview { width: 100%; min-width: 180px; }
+            .instrument-midi-row { grid-template-columns: 1fr auto; }
+            .instrument-midi-info { grid-column: 1; }
+            .instrument-play-btn { grid-column: 2; grid-row: 1; }
+            .instrument-waveform { grid-column: 1 / -1; width: 100%; }
+            .instrument-midi-download { grid-column: 1 / -1; justify-content: center; }
             .keyword-row { flex-direction: column; align-items: flex-start; gap: 4px; }
         }
 
@@ -1122,6 +1147,7 @@
         let currentEngine = 'modern';
         let instrumentMidiUrls = [];
         let instrumentPreviewUrls = [];
+        const instrumentWaveSurfers = new Map();
 
         // ============================================================
         // GM + CUSTOM MIDI MAP
@@ -1512,6 +1538,11 @@
         }
 
         function clearInstrumentMidiUrls() {
+            instrumentWaveSurfers.forEach(ws => {
+                try { ws.destroy(); } catch (e) {}
+            });
+            instrumentWaveSurfers.clear();
+
             instrumentMidiUrls.forEach(url => URL.revokeObjectURL(url));
             instrumentPreviewUrls.forEach(url => URL.revokeObjectURL(url));
             instrumentMidiUrls = [];
@@ -1577,6 +1608,8 @@
             generatedInstrumentSummary.textContent = `${groups.size} separate MIDI ${groups.size === 1 ? 'file' : 'files'} generated from this kit`;
 
             const rows = [];
+            let index = 0;
+
             groups.forEach((notes, name) => {
                 const blob = createInstrumentMidiBlob(notes, name, currentTempo, timeSig);
                 const midiUrl = URL.createObjectURL(blob);
@@ -1590,16 +1623,14 @@
                 info.innerHTML = `<i class="fa-solid ${getInstrumentIcon(name)}"></i><span class="instrument-midi-name"></span><span class="instrument-midi-count">${notes.length} notes</span>`;
                 info.querySelector('.instrument-midi-name').textContent = name;
 
-                const previewLabel = document.createElement('span');
-                previewLabel.className = 'instrument-preview-label';
-                previewLabel.textContent = 'Preview';
+                const playBtn = document.createElement('button');
+                playBtn.className = 'instrument-play-btn';
+                playBtn.title = `Play ${name}`;
+                playBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
 
-                const audio = document.createElement('audio');
-                audio.className = 'instrument-audio-preview';
-                audio.controls = true;
-                audio.preload = 'auto';
-                audio.setAttribute('aria-label', `${name} preview`);
-                audio.title = `${name} preview`;
+                const waveform = document.createElement('div');
+                waveform.className = 'instrument-waveform';
+                waveform.id = `instrumentWave_${index}`;
 
                 const link = document.createElement('a');
                 link.className = 'download-btn instrument-midi-download';
@@ -1608,28 +1639,73 @@
                 link.innerHTML = '<i class="fa-solid fa-file-music"></i> Download MIDI';
 
                 row.appendChild(info);
-                row.appendChild(previewLabel);
-                row.appendChild(audio);
+                row.appendChild(playBtn);
+                row.appendChild(waveform);
                 row.appendChild(link);
                 instrumentMidiList.appendChild(row);
-                rows.push({ notes, name, audio });
+
+                rows.push({ notes, name, playBtn, playIcon: playBtn.querySelector('i'), waveform, index });
+                index++;
             });
 
             generatedInstrumentSummary.textContent = `${groups.size} instruments — rendering individual previews...`;
 
             for (const item of rows) {
                 try {
-                    const previewBlob = await renderRhythmAudioPreview(item.notes, totalDuration, resolved, { returnBlob: true });
+                    const previewBlob = await renderRhythmAudioPreview(
+                        item.notes,
+                        totalDuration,
+                        resolved,
+                        { returnBlob: true }
+                    );
+
                     const previewUrl = URL.createObjectURL(previewBlob);
                     instrumentPreviewUrls.push(previewUrl);
-                    item.audio.src = previewUrl;
-                    item.audio.load();
+
+                    const ws = WaveSurfer.create({
+                        container: item.waveform,
+                        waveColor: '#3f3f3f',
+                        progressColor: '#00d4ff',
+                        cursorColor: '#ffffff',
+                        barWidth: 2,
+                        barRadius: 2,
+                        height: 48,
+                        normalize: true
+                    });
+
+                    instrumentWaveSurfers.set(item.name, ws);
+                    ws.load(previewUrl);
+
+                    item.playBtn.addEventListener('click', async () => {
+                        await Tone.start();
+
+                        instrumentWaveSurfers.forEach((otherWs, key) => {
+                            if (key !== item.name && otherWs.isPlaying()) {
+                                otherWs.pause();
+                            }
+                        });
+
+                        ws.playPause();
+                    });
+
+                    ws.on('play', () => {
+                        item.playBtn.classList.add('active');
+                        item.playIcon.className = 'fa-solid fa-pause';
+                    });
+
+                    ws.on('pause', () => {
+                        item.playBtn.classList.remove('active');
+                        item.playIcon.className = 'fa-solid fa-play';
+                    });
+
+                    ws.on('finish', () => {
+                        item.playBtn.classList.remove('active');
+                        item.playIcon.className = 'fa-solid fa-play';
+                    });
+
                 } catch (previewError) {
                     console.warn(`ToneVault: ${item.name} preview could not be rendered.`, previewError);
-                    item.audio.replaceWith(Object.assign(document.createElement('span'), {
-                        className: 'instrument-preview-label',
-                        textContent: 'Preview unavailable'
-                    }));
+                    item.waveform.innerHTML = '<span class="instrument-preview-label">Preview unavailable</span>';
                 }
             }
 
