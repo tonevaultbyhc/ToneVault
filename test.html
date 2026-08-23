@@ -1456,141 +1456,248 @@
         // These are still browser-generated sounds, not commercial samples.
         // For true recorded tabla / taiko / orchestral sounds, replace the
         // corresponding synth voices with local Tone.Sampler sample sets.
+        // ============================================================
+        // AUTHENTIC INDIAN SAMPLE PREVIEW
+        // ============================================================
+        // The previous version used FM/MembraneSynth voices for Indian
+        // percussion. That can imitate a drum, but it cannot sound like
+        // a real tabla or mridangam. This version uses actual recorded
+        // samples for the Indian preview while keeping synth fallback
+        // for instruments for which no sample bank is configured.
+        //
+        // Tabla samples: TidalCycles Dirt-Samples (permissive sample set)
+        // Mridangam samples: Arthur Carabott / Harishankar V Menon set
+        // from the mrid sample repository.
+        // ============================================================
         async function renderRhythmAudioPreview(notes, totalDuration, resolved) {
             const buffer = await Tone.Offline(async () => {
                 const isIndian = resolved.engine === 'indian';
                 const isSouth = resolved.engine === 'south_indian';
                 const isCinematic = resolved.engine === 'cinematic' || resolved.engine === 'hybrid';
 
-                const master = new Tone.Gain(0.82);
+                const master = new Tone.Gain(0.78);
                 const compressor = new Tone.Compressor({ threshold: -18, ratio: 2.2, attack: 0.01, release: 0.18 });
                 const reverb = new Tone.Reverb({
-                    decay: isIndian || isSouth ? 2.6 : isCinematic ? 4.8 : 1.5,
+                    decay: isIndian || isSouth ? 2.8 : isCinematic ? 4.8 : 1.5,
                     preDelay: 0.025,
-                    wet: isIndian || isSouth ? 0.24 : isCinematic ? 0.38 : 0.08
+                    wet: isIndian || isSouth ? 0.22 : isCinematic ? 0.38 : 0.08
                 });
                 master.chain(compressor, reverb, Tone.getDestination());
 
-                // Modern voices.
+                // ----------------------------------------------------
+                // REAL INDIAN SAMPLE BANKS
+                // ----------------------------------------------------
+                // These are loaded inside Tone.Offline so the rendered
+                // WAV contains the actual instrument recordings.
+                let tablaSampler = null;
+                let mridangamSampler = null;
+
+                if (isIndian) {
+                    tablaSampler = new Tone.Sampler({
+                        urls: {
+                            C4: '000_bass_flick1.wav',
+                            D4: '001_bass_flick2.wav',
+                            E4: '002_bass_lick1.wav',
+                            F4: '003_dead_hit1.wav',
+                            G4: '004_dead_hit2.wav',
+                            A4: '005_dead_hit3.wav'
+                        },
+                        baseUrl: 'https://raw.githubusercontent.com/tidalcycles/Dirt-Samples/master/tabla/',
+                        release: 0.8,
+                        curve: 'exponential'
+                    }).connect(master);
+                    await Tone.loaded();
+                }
+
+                if (isSouth) {
+                    mridangamSampler = new Tone.Sampler({
+                        urls: {
+                            C4: 'norm_sounds/ka/ka-1.wav',
+                            D4: 'norm_sounds/ta/ta-1.wav',
+                            E4: 'norm_sounds/na/na-1.wav',
+                            F4: 'norm_sounds/dhin/dhin-1.wav',
+                            G4: 'norm_sounds/dhum/dhum-1.wav',
+                            A4: 'norm_sounds/thom/thom-1.wav',
+                            B4: 'norm_sounds/chaapu/chaapu-1.wav'
+                        },
+                        baseUrl: 'https://raw.githubusercontent.com/yaxu/mrid/main/',
+                        release: 0.7,
+                        curve: 'exponential'
+                    }).connect(master);
+                    await Tone.loaded();
+                }
+
+                // ----------------------------------------------------
+                // FALLBACK / MODERN / CINEMATIC SYNTH VOICES
+                // ----------------------------------------------------
                 const kick = new Tone.MembraneSynth({
                     pitchDecay: 0.035, octaves: 3.5,
                     oscillator: { type: 'sine' },
                     envelope: { attack: 0.001, decay: 0.5, sustain: 0, release: 0.25 }
                 }).connect(master);
+
                 const snareBody = new Tone.MembraneSynth({
                     pitchDecay: 0.008, octaves: 1.2,
                     oscillator: { type: 'triangle' },
                     envelope: { attack: 0.001, decay: 0.16, sustain: 0, release: 0.12 }
                 }).connect(master);
+
                 const snareNoise = new Tone.NoiseSynth({
                     noise: { type: 'pink' },
                     envelope: { attack: 0.001, decay: 0.18, sustain: 0, release: 0.05 }
                 }).connect(master);
+
                 const hatFilter = new Tone.Filter(7500, 'highpass').connect(master);
                 const hat = new Tone.NoiseSynth({
                     noise: { type: 'white' },
                     envelope: { attack: 0.001, decay: 0.045, sustain: 0, release: 0.02 }
                 }).connect(hatFilter);
+
                 const openHat = new Tone.NoiseSynth({
                     noise: { type: 'white' },
                     envelope: { attack: 0.001, decay: 0.28, sustain: 0, release: 0.06 }
                 }).connect(hatFilter);
+
                 const clap = new Tone.NoiseSynth({
                     noise: { type: 'white' },
                     envelope: { attack: 0.001, decay: 0.22, sustain: 0, release: 0.03 }
                 }).connect(new Tone.Filter(1700, 'bandpass').connect(master));
 
-                // Indian voices: tuned FM + layered membrane for a less synthetic click/body.
-                const tablaHigh = new Tone.FMSynth({
-                    harmonicity: 2.6,
-                    modulationIndex: 5.2,
-                    oscillator: { type: 'sine' },
-                    envelope: { attack: 0.001, decay: 0.22, sustain: 0.03, release: 0.18 },
-                    modulation: { type: 'triangle' },
-                    modulationEnvelope: { attack: 0.001, decay: 0.08, sustain: 0, release: 0.06 }
-                }).connect(master);
-                const tablaLow = new Tone.MembraneSynth({
-                    pitchDecay: 0.08, octaves: 2.1,
-                    oscillator: { type: 'sine' },
-                    envelope: { attack: 0.001, decay: 0.42, sustain: 0.08, release: 0.55 }
-                }).connect(master);
-                const tablaClick = new Tone.NoiseSynth({
-                    noise: { type: 'white' },
-                    envelope: { attack: 0.001, decay: 0.025, sustain: 0, release: 0.015 }
-                }).connect(new Tone.Filter(3200, 'bandpass').connect(master));
+                // Fallback Indian voices for Dhol and any unmapped strokes.
                 const dholLow = new Tone.MembraneSynth({
                     pitchDecay: 0.025, octaves: 1.7,
                     oscillator: { type: 'triangle' },
                     envelope: { attack: 0.002, decay: 0.48, sustain: 0.05, release: 0.35 }
                 }).connect(master);
+
                 const dholHigh = new Tone.MembraneSynth({
                     pitchDecay: 0.035, octaves: 1.3,
                     oscillator: { type: 'square' },
                     envelope: { attack: 0.001, decay: 0.16, sustain: 0, release: 0.08 }
                 }).connect(master);
-                const mridangam = new Tone.FMSynth({
-                    harmonicity: 1.7, modulationIndex: 3.5,
-                    oscillator: { type: 'sine' },
-                    envelope: { attack: 0.001, decay: 0.19, sustain: 0.02, release: 0.12 },
-                    modulation: { type: 'triangle' },
-                    modulationEnvelope: { attack: 0.001, decay: 0.06, sustain: 0, release: 0.05 }
-                }).connect(master);
 
-                // Cinematic voices.
+                // Cinematic fallback voices.
                 const taikoLow = new Tone.MembraneSynth({
                     pitchDecay: 0.025, octaves: 1.0,
                     oscillator: { type: 'sine' },
                     envelope: { attack: 0.003, decay: 1.0, sustain: 0.08, release: 1.2 }
                 }).connect(master);
+
                 const lowTom = new Tone.MembraneSynth({
                     pitchDecay: 0.02, octaves: 1.2,
                     oscillator: { type: 'triangle' },
                     envelope: { attack: 0.002, decay: 0.5, sustain: 0.04, release: 0.45 }
                 }).connect(master);
+
                 const timpani = new Tone.MembraneSynth({
                     pitchDecay: 0.01, octaves: 0.8,
                     oscillator: { type: 'sine' },
                     envelope: { attack: 0.005, decay: 1.25, sustain: 0.1, release: 1.8 }
                 }).connect(master);
+
                 const orchSnare = new Tone.MembraneSynth({
                     pitchDecay: 0.008, octaves: 0.9,
                     oscillator: { type: 'triangle' },
                     envelope: { attack: 0.002, decay: 0.2, sustain: 0, release: 0.12 }
                 }).connect(master);
+
                 const orchNoise = new Tone.NoiseSynth({
                     noise: { type: 'white' },
                     envelope: { attack: 0.002, decay: 0.24, sustain: 0, release: 0.06 }
                 }).connect(master);
+
                 const crash = new Tone.MetalSynth({
                     frequency: 220,
                     envelope: { attack: 0.001, decay: 2.8, release: 3.2 },
                     harmonicity: 5.1, modulationIndex: 28, resonance: 4200, octaves: 1.7
                 }).connect(master);
 
+                // Map generated MIDI drum notes to real sample articulations.
+                // Using different sample notes gives the preview actual
+                // changes in timbre instead of pitch-changing one synth.
+                const tablaMap = {
+                    [MIDI_DRUMS.TA1]: 'C4',
+                    [MIDI_DRUMS.TA2]: 'D4',
+                    [MIDI_DRUMS.TABLA_LOW]: 'E4'
+                };
+
+                const mridangamMap = {
+                    [MIDI_DRUMS.MRIDANGAM_HIGH]: 'C4',
+                    [MIDI_DRUMS.MRIDANGAM_LOW]: 'G4',
+                    [MIDI_DRUMS.TA1]: 'D4',
+                    [MIDI_DRUMS.TA2]: 'E4',
+                    [MIDI_DRUMS.TABLA_LOW]: 'G4'
+                };
+
                 notes.forEach(note => {
                     const t = note.time;
                     const v = note.velocity;
+
+                    // REAL TABLA PREVIEW
+                    if (tablaSampler && tablaMap[note.midi]) {
+                        const sampleNote = tablaMap[note.midi];
+                        const duration = note.midi === MIDI_DRUMS.TABLA_LOW ? '8n' : '16n';
+                        tablaSampler.triggerAttackRelease(sampleNote, duration, t, Math.min(1, v * 1.08));
+                        return;
+                    }
+
+                    // REAL MRIDANGAM PREVIEW
+                    if (mridangamSampler && mridangamMap[note.midi]) {
+                        const sampleNote = mridangamMap[note.midi];
+                        const duration = note.midi === MIDI_DRUMS.MRIDANGAM_LOW ? '8n' : '16n';
+                        mridangamSampler.triggerAttackRelease(sampleNote, duration, t, Math.min(1, v * 1.05));
+                        return;
+                    }
+
+                    // Other generated sounds.
                     switch (note.midi) {
-                        case MIDI_DRUMS.KICK: kick.triggerAttackRelease('C1', '8n', t, v); break;
-                        case MIDI_DRUMS.SNARE: snareBody.triggerAttackRelease('G2', '16n', t, v); snareNoise.triggerAttackRelease('16n', t, v * 0.8); break;
-                        case MIDI_DRUMS.CH: hat.triggerAttackRelease('32n', t, v * 0.7); break;
-                        case MIDI_DRUMS.OH: openHat.triggerAttackRelease('8n', t, v * 0.7); break;
-                        case MIDI_DRUMS.CLAP: clap.triggerAttackRelease('16n', t, v); break;
-                        case MIDI_DRUMS.TOM_HI: lowTom.triggerAttackRelease('A2', '8n', t, v); break;
-                        case MIDI_DRUMS.TOM_LO: lowTom.triggerAttackRelease('D2', '8n', t, v); break;
-                        case MIDI_DRUMS.TA1: tablaHigh.triggerAttackRelease('C5', '16n', t, v); tablaClick.triggerAttackRelease('32n', t, v * 0.45); break;
-                        case MIDI_DRUMS.TA2: tablaHigh.triggerAttackRelease('E5', '16n', t, v); break;
-                        case MIDI_DRUMS.TABLA_LOW: tablaLow.triggerAttackRelease('G2', '8n', t, v); break;
-                        case MIDI_DRUMS.DHOL_LOW: dholLow.triggerAttackRelease('D2', '8n', t, v); break;
-                        case MIDI_DRUMS.DHOL_HIGH: dholHigh.triggerAttackRelease('A2', '16n', t, v); break;
-                        case MIDI_DRUMS.MRIDANGAM_HIGH: mridangam.triggerAttackRelease('C5', '16n', t, v); break;
-                        case MIDI_DRUMS.MRIDANGAM_LOW: mridangam.triggerAttackRelease('G2', '8n', t, v); break;
-                        case MIDI_DRUMS.TAIKO_LOW: taikoLow.triggerAttackRelease('C1', '4n', t, v); break;
-                        case MIDI_DRUMS.LOW_TOM_CIN: lowTom.triggerAttackRelease('D2', '8n', t, v); break;
-                        case MIDI_DRUMS.HIGH_TOM_CIN: lowTom.triggerAttackRelease('A2', '16n', t, v); break;
-                        case MIDI_DRUMS.TIMPANI: timpani.triggerAttackRelease('G1', '2n', t, v); break;
-                        case MIDI_DRUMS.ORCH_SNARE: orchSnare.triggerAttackRelease('C3', '16n', t, v); orchNoise.triggerAttackRelease('16n', t, v * 0.65); break;
-                        case MIDI_DRUMS.CRASH: crash.triggerAttackRelease('4n', t, v); break;
+                        case MIDI_DRUMS.KICK:
+                            kick.triggerAttackRelease('C1', '8n', t, v);
+                            break;
+                        case MIDI_DRUMS.SNARE:
+                            snareBody.triggerAttackRelease('G2', '16n', t, v);
+                            snareNoise.triggerAttackRelease('16n', t, v * 0.8);
+                            break;
+                        case MIDI_DRUMS.CH:
+                            hat.triggerAttackRelease('32n', t, v * 0.7);
+                            break;
+                        case MIDI_DRUMS.OH:
+                            openHat.triggerAttackRelease('8n', t, v * 0.7);
+                            break;
+                        case MIDI_DRUMS.CLAP:
+                            clap.triggerAttackRelease('16n', t, v);
+                            break;
+                        case MIDI_DRUMS.TOM_HI:
+                            lowTom.triggerAttackRelease('A2', '8n', t, v);
+                            break;
+                        case MIDI_DRUMS.TOM_LO:
+                            lowTom.triggerAttackRelease('D2', '8n', t, v);
+                            break;
+                        case MIDI_DRUMS.DHOL_LOW:
+                            dholLow.triggerAttackRelease('D2', '8n', t, v);
+                            break;
+                        case MIDI_DRUMS.DHOL_HIGH:
+                            dholHigh.triggerAttackRelease('A2', '16n', t, v);
+                            break;
+                        case MIDI_DRUMS.TAIKO_LOW:
+                            taikoLow.triggerAttackRelease('C1', '4n', t, v);
+                            break;
+                        case MIDI_DRUMS.LOW_TOM_CIN:
+                            lowTom.triggerAttackRelease('D2', '8n', t, v);
+                            break;
+                        case MIDI_DRUMS.HIGH_TOM_CIN:
+                            lowTom.triggerAttackRelease('A2', '16n', t, v);
+                            break;
+                        case MIDI_DRUMS.TIMPANI:
+                            timpani.triggerAttackRelease('G1', '2n', t, v);
+                            break;
+                        case MIDI_DRUMS.ORCH_SNARE:
+                            orchSnare.triggerAttackRelease('C3', '16n', t, v);
+                            orchNoise.triggerAttackRelease('16n', t, v * 0.65);
+                            break;
+                        case MIDI_DRUMS.CRASH:
+                            crash.triggerAttackRelease('4n', t, v);
+                            break;
                     }
                 });
             }, Math.max(totalDuration, 1));
