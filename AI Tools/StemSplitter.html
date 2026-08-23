@@ -80,21 +80,96 @@
             font-weight: 600;
         }
 
-        .setting-group select {
+        /* CUSTOM DROPDOWN STYLES */
+        .custom-select-wrapper {
+            position: relative;
+            user-select: none;
             width: 100%;
+        }
+
+        .custom-select-wrapper.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .custom-select-trigger {
             background: rgba(10, 10, 10, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.15);
             color: #ffffff;
             padding: 12px 15px;
             border-radius: 10px;
             font-size: 1rem;
-            outline: none;
-            transition: border-color 0.2s ease;
-            box-sizing: border-box;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .setting-group select:focus {
+        .custom-select-wrapper.open .custom-select-trigger {
             border-color: #00d4ff;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            background: rgba(15, 15, 15, 0.95);
+        }
+
+        .custom-select-trigger i {
+            color: #00d4ff;
+            transition: transform 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .custom-select-wrapper.open .custom-select-trigger i {
+            transform: rotate(180deg);
+        }
+
+        .custom-select-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid #00d4ff;
+            border-top: none;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            z-index: 50;
+            overflow: hidden;
+        }
+
+        .custom-select-wrapper.open .custom-select-options {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .custom-option {
+            padding: 12px 15px;
+            color: #bbb;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .custom-option:last-child {
+            border-bottom: none;
+        }
+
+        .custom-option:hover {
+            background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
+            padding-left: 20px;
+        }
+
+        .custom-option.selected {
+            color: #ffffff;
+            background: rgba(0, 212, 255, 0.05);
+            font-weight: bold;
         }
 
         .upload-dropzone {
@@ -434,9 +509,23 @@
                 <!-- MODEL & STEM OPTIONS SELECTION -->
                 <div class="settings-grid">
                     <div class="setting-group">
-                        <label for="modelSelect"><i class="fa-solid fa-microchip"></i> AI Model</label>
-                        <select id="modelSelect">
-                            <option value="HTDemucs">HTDemucs (Best Quality)</option>
+                        <label><i class="fa-solid fa-microchip"></i> AI Model</label>
+                        
+                        <!-- Custom Select Dropdown -->
+                        <div class="custom-select-wrapper" id="modelSelectWrapper">
+                            <div class="custom-select-trigger" id="modelSelectTrigger">
+                                <span>HTDemucs (Best Quality)</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="modelSelectOptions">
+                                <div class="custom-option selected" data-value="HTDemucs">HTDemucs (Best Quality)</div>
+                                <div class="custom-option" data-value="Spleeter">Spleeter (Fast)</div>
+                            </div>
+                        </div>
+
+                        <!-- Hidden Native Select (Keeps original backend logic intact) -->
+                        <select id="modelSelect" style="display: none;">
+                            <option value="HTDemucs" selected>HTDemucs (Best Quality)</option>
                             <option value="Spleeter">Spleeter (Fast)</option>
                         </select>
                     </div>
@@ -513,6 +602,54 @@
     <script type="module">
         import { client } from "https://cdn.jsdelivr.net/npm/@gradio/client/+esm";
 
+        // ==========================================
+        // CUSTOM DROPDOWN LOGIC
+        // ==========================================
+        const modelSelectWrapper = document.getElementById('modelSelectWrapper');
+        const modelSelectTrigger = document.getElementById('modelSelectTrigger');
+        const modelSelectOptions = document.getElementById('modelSelectOptions');
+        const hiddenSelect = document.getElementById('modelSelect');
+        const customOptions = modelSelectOptions.querySelectorAll('.custom-option');
+
+        // Toggle dropdown open/close
+        modelSelectTrigger.addEventListener('click', () => {
+            if (!modelSelectWrapper.classList.contains('disabled')) {
+                modelSelectWrapper.classList.toggle('open');
+            }
+        });
+
+        // Handle option click
+        customOptions.forEach(opt => {
+            opt.addEventListener('click', function() {
+                // Update trigger text
+                modelSelectTrigger.querySelector('span').textContent = this.textContent;
+                
+                // Update selected state styling
+                customOptions.forEach(o => o.classList.remove('selected'));
+                this.classList.add('selected');
+                
+                // Sync with hidden native select for Gradio API
+                hiddenSelect.value = this.getAttribute('data-value');
+                
+                // Close dropdown
+                modelSelectWrapper.classList.remove('open');
+                
+                // Dispatch change event manually in case other scripts listen to it
+                hiddenSelect.dispatchEvent(new Event('change'));
+            });
+        });
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', (e) => {
+            if (!modelSelectWrapper.contains(e.target)) {
+                modelSelectWrapper.classList.remove('open');
+            }
+        });
+
+
+        // ==========================================
+        // ORIGINAL STEM SPLITTER LOGIC
+        // ==========================================
         const dropZone = document.getElementById("dropZone");
         const fileInput = document.getElementById("audioFileInput");
         const fileNameDisplay = document.getElementById("fileNameDisplay");
@@ -530,7 +667,6 @@
         const resultsArea = document.getElementById("resultsArea");
         const resultsTitle = document.getElementById("resultsTitle");
         const stemsContainer = document.getElementById("stemsContainer");
-        const modelSelect = document.getElementById("modelSelect");
 
         let selectedFile = null;
         let wavesurfer = null;
@@ -545,7 +681,6 @@
         browseLink.addEventListener("click", (e) => {
             e.preventDefault();
             e.stopPropagation();
-
             fileInput.value = "";
             fileInput.click();
         });
@@ -642,7 +777,9 @@
             if (!selectedFile) return;
 
             processBtn.setAttribute("disabled", "true");
-            modelSelect.disabled = true;
+            
+            // Disable the new Custom Dropdown Menu
+            modelSelectWrapper.classList.add("disabled");
             
             processStartTime = performance.now();
             
@@ -658,7 +795,8 @@
             try {
                 const app = await client("https://ahk-d-spleeter-ht-demucs-stem-separation-2025.hf.space");
                 
-                const selectedModel = modelSelect.value;
+                // Pulls from the hidden native select which is updated by our custom dropdown
+                const selectedModel = hiddenSelect.value; 
                 
                 progressBarFill.style.width = "40%";
                 statusText.innerHTML = `
@@ -696,7 +834,7 @@
                 `;
 
                 processBtn.removeAttribute("disabled");
-                modelSelect.disabled = false;
+                modelSelectWrapper.classList.remove("disabled");
 
                 resultsArea.scrollIntoView({
                     behavior: "smooth",
@@ -813,7 +951,7 @@
                 statusMessage.style.display = "none";
                 progressBarFill.style.width = "0%";
                 processBtn.removeAttribute("disabled");
-                modelSelect.disabled = false;
+                modelSelectWrapper.classList.remove("disabled");
                 alert("Error: " + (err.message || "Failed to process audio separation. Check console for details."));
             }
         });
