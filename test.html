@@ -692,6 +692,57 @@
             .creator-credit { font-size: 0.8rem; margin-top: 50px; }
             .download-btn { justify-content: center; }
         }
+    
+        /* INSTRUMENT PREVIEW VOLUME */
+        .instrument-volume-control {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-left: 8px;
+            color: #888;
+        }
+
+        .instrument-volume-control i {
+            color: #aaa;
+            font-size: 0.82rem;
+        }
+
+        .instrument-volume-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 78px;
+            height: 4px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 3px;
+            outline: none;
+            accent-color: #00d4ff;
+        }
+
+        .instrument-volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00d4ff;
+            cursor: pointer;
+        }
+
+        .instrument-volume-slider::-moz-range-thumb {
+            width: 12px;
+            height: 12px;
+            border: none;
+            border-radius: 50%;
+            background: #00d4ff;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .instrument-volume-control {
+                margin-left: 0;
+            }
+        }
+
     </style>
 </head>
 <body>
