@@ -97,7 +97,7 @@
             font-weight: 600;
         }
 
-        .setting-group select, .setting-group input, .setting-group textarea {
+        .setting-group input, .setting-group textarea {
             width: 100%;
             background: rgba(10, 10, 10, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.15);
@@ -113,40 +113,111 @@
             resize: vertical;
         }
 
-        .setting-group select:focus, .setting-group input:focus, .setting-group textarea:focus {
+        .setting-group input:focus, .setting-group textarea:focus {
             border-color: #00d4ff;
         }
 
-        /* CHECKBOX GRID FOR KIT ELEMENTS */
-        .checkbox-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 10px;
+        /* CUSTOM DROPDOWN STYLES */
+        .custom-select-wrapper {
+            position: relative;
+            user-select: none;
+            width: 100%;
+            z-index: 1; /* Baseline stack order */
+        }
+        
+        .custom-select-wrapper.open {
+            z-index: 100;
         }
 
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
+        .custom-select-wrapper.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .custom-select-trigger {
             background: rgba(10, 10, 10, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 10px 15px;
-            border-radius: 8px;
+            color: #ffffff;
+            padding: 12px 15px;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .custom-select-wrapper.open .custom-select-trigger {
+            border-color: #00d4ff;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            background: rgba(15, 15, 15, 0.95);
+        }
+
+        .custom-select-trigger i {
+            color: #00d4ff;
+            transition: transform 0.3s ease;
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+
+        .custom-select-wrapper.open .custom-select-trigger i {
+            transform: rotate(180deg);
+        }
+
+        .custom-select-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid #00d4ff;
+            border-top: none;
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.6);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            z-index: 50;
+            overflow-y: auto;
+            max-height: 250px;
+        }
+
+        .custom-select-wrapper.open .custom-select-options {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .custom-select-options::-webkit-scrollbar { width: 6px; }
+        .custom-select-options::-webkit-scrollbar-thumb { background: #00d4ff; border-radius: 3px; }
+        .custom-select-options::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+
+        .custom-option {
+            padding: 12px 15px;
+            color: #bbb;
+            font-size: 0.95rem;
             cursor: pointer;
             transition: all 0.2s ease;
-            color: #fff;
-            font-size: 0.9rem;
-            user-select: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .checkbox-label:hover {
-            border-color: #00d4ff;
+        .custom-option:last-child {
+            border-bottom: none;
         }
 
-        .checkbox-label input[type="checkbox"] {
-            width: auto;
-            accent-color: #00d4ff;
-            cursor: pointer;
+        .custom-option:hover {
+            background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
+            padding-left: 20px;
+        }
+
+        .custom-option.selected {
+            color: #ffffff;
+            background: rgba(0, 212, 255, 0.05);
+            font-weight: bold;
         }
 
         /* WAVEFORM CONTAINER PREVIEW */
@@ -211,30 +282,6 @@
             border-top: 1px solid rgba(255, 255, 255, 0.08);
             gap: 15px;
             flex-wrap: wrap;
-        }
-
-        .preview-instrument-select {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .preview-instrument-select label {
-            color: #bbb;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin: 0;
-        }
-
-        .preview-instrument-select select {
-            background: rgba(10, 10, 10, 0.9);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            color: #fff;
-            padding: 6px 12px;
-            border-radius: 8px;
-            outline: none;
-            font-size: 0.9rem;
         }
 
         /* VOLUME CONTROL */
@@ -515,7 +562,6 @@
             .stem-card { padding: 20px; }
             .keyword-guide { padding: 20px 15px; }
             .creator-credit { font-size: 0.8rem; margin-top: 50px; }
-            .action-buttons-group { flex-direction: column; gap: 10px; }
             .download-btn { justify-content: center; }
         }
     </style>
@@ -542,10 +588,27 @@
                 
                 <!-- MUSICAL STRUCTURE INPUTS -->
                 <div class="settings-grid">
+                    
+                    <!-- Genre Dropdown -->
                     <div class="setting-group">
-                        <label for="genreSelect"><i class="fa-solid fa-compact-disc"></i> Groove Style</label>
-                        <select id="genreSelect">
-                            <option value="hiphop">Boom Bap / Hip-Hop</option>
+                        <label><i class="fa-solid fa-compact-disc"></i> Groove Style</label>
+                        <div class="custom-select-wrapper" id="genreSelectWrapper">
+                            <div class="custom-select-trigger" id="genreSelectTrigger">
+                                <span>Boom Bap / Hip-Hop</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="genreSelectOptions">
+                                <div class="custom-option selected" data-value="hiphop">Boom Bap / Hip-Hop</div>
+                                <div class="custom-option" data-value="trap">Modern Trap / Drill</div>
+                                <div class="custom-option" data-value="house">House / EDM</div>
+                                <div class="custom-option" data-value="kuthu">South Indian (Dappan Koothu)</div>
+                                <div class="custom-option" data-value="indian_classical">Indian Classical (Teen Taal)</div>
+                                <div class="custom-option" data-value="orchestral">Epic Cinematic Orchestral</div>
+                                <div class="custom-option" data-value="lofi">Lo-Fi / Chillhop</div>
+                            </div>
+                        </div>
+                        <select id="genreSelect" style="display: none;">
+                            <option value="hiphop" selected>Boom Bap / Hip-Hop</option>
                             <option value="trap">Modern Trap / Drill</option>
                             <option value="house">House / EDM</option>
                             <option value="kuthu">South Indian (Dappan Koothu)</option>
@@ -554,80 +617,115 @@
                             <option value="lofi">Lo-Fi / Chillhop</option>
                         </select>
                     </div>
+
+                    <!-- Tempo Input -->
                     <div class="setting-group">
                         <label for="tempoInput"><i class="fa-solid fa-metronome"></i> Tempo (BPM)</label>
                         <input type="number" id="tempoInput" value="95" min="40" max="240" placeholder="e.g. 95">
                     </div>
                     
+                    <!-- Time Signature Dropdown -->
                     <div class="setting-group">
-                        <label for="timeSigSelect"><i class="fa-solid fa-clock"></i> Time Signature</label>
-                        <select id="timeSigSelect">
+                        <label><i class="fa-solid fa-clock"></i> Time Signature</label>
+                        <div class="custom-select-wrapper" id="timeSigSelectWrapper">
+                            <div class="custom-select-trigger" id="timeSigSelectTrigger">
+                                <span>4/4 (Standard)</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="timeSigSelectOptions">
+                                <div class="custom-option selected" data-value="4/4">4/4 (Standard)</div>
+                                <div class="custom-option" data-value="3/4">3/4 (Waltz/Triplets)</div>
+                                <div class="custom-option" data-value="6/8">6/8 (Compound)</div>
+                            </div>
+                        </div>
+                        <select id="timeSigSelect" style="display: none;">
                             <option value="4/4" selected>4/4 (Standard)</option>
                             <option value="3/4">3/4 (Waltz/Triplets)</option>
                             <option value="6/8">6/8 (Compound)</option>
                         </select>
                     </div>
+
+                    <!-- Exact Length Input -->
                     <div class="setting-group">
                         <label for="barsInput"><i class="fa-solid fa-arrows-split-up-and-left"></i> Exact Length (Bars)</label>
                         <input type="number" id="barsInput" value="8" min="1" max="64" placeholder="e.g. 8, 16">
                     </div>
 
-                    <!-- DRUM KIT ELEMENTS -->
-                    <div class="setting-group" style="grid-column: 1 / -1;">
-                        <label><i class="fa-solid fa-drum"></i> Kit Elements</label>
-                        <div class="checkbox-grid">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="elemKick" checked> Kick
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="elemSnare" checked> Snare
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="elemHats" checked> Hi-Hats
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="elemClap"> Clap/Stick
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="elemToms"> Toms
-                            </label>
-                            <label class="checkbox-label" style="border-color: rgba(0, 212, 255, 0.4);">
-                                <input type="checkbox" id="elemIndian"> Indian Perc
-                            </label>
-                            <label class="checkbox-label" style="border-color: rgba(0, 212, 255, 0.4);">
-                                <input type="checkbox" id="elemOrch"> Orchestral
-                            </label>
-                        </div>
-                    </div>
-
                     <!-- ADVANCED GROOVE CONTROLS -->
                     <div class="setting-group">
-                        <label for="densitySelect"><i class="fa-solid fa-layer-group"></i> Beat Density</label>
-                        <select id="densitySelect">
+                        <label><i class="fa-solid fa-layer-group"></i> Beat Density</label>
+                        <div class="custom-select-wrapper" id="densitySelectWrapper">
+                            <div class="custom-select-trigger" id="densitySelectTrigger">
+                                <span>Standard</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="densitySelectOptions">
+                                <div class="custom-option" data-value="minimal">Minimal (Sparse)</div>
+                                <div class="custom-option selected" data-value="standard">Standard</div>
+                                <div class="custom-option" data-value="busy">Busy (Ghost Notes & Rolls)</div>
+                            </div>
+                        </div>
+                        <select id="densitySelect" style="display: none;">
                             <option value="minimal">Minimal (Sparse)</option>
                             <option value="standard" selected>Standard</option>
                             <option value="busy">Busy (Ghost Notes & Rolls)</option>
                         </select>
                     </div>
+
                     <div class="setting-group">
-                        <label for="swingSelect"><i class="fa-solid fa-water"></i> Swing / Shuffle</label>
-                        <select id="swingSelect">
+                        <label><i class="fa-solid fa-water"></i> Swing / Shuffle</label>
+                        <div class="custom-select-wrapper" id="swingSelectWrapper">
+                            <div class="custom-select-trigger" id="swingSelectTrigger">
+                                <span>Straight (0%)</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="swingSelectOptions">
+                                <div class="custom-option selected" data-value="0">Straight (0%)</div>
+                                <div class="custom-option" data-value="0.2">Light Swing (20%)</div>
+                                <div class="custom-option" data-value="0.4">Heavy Shuffle (40%)</div>
+                            </div>
+                        </div>
+                        <select id="swingSelect" style="display: none;">
                             <option value="0" selected>Straight (0%)</option>
                             <option value="0.2">Light Swing (20%)</option>
                             <option value="0.4">Heavy Shuffle (40%)</option>
                         </select>
                     </div>
+
                     <div class="setting-group">
-                        <label for="humanizeSelect"><i class="fa-solid fa-person"></i> Humanize Level</label>
-                        <select id="humanizeSelect">
+                        <label><i class="fa-solid fa-person"></i> Humanize Level</label>
+                        <div class="custom-select-wrapper" id="humanizeSelectWrapper">
+                            <div class="custom-select-trigger" id="humanizeSelectTrigger">
+                                <span>Subtle (Pro Drummer)</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="humanizeSelectOptions">
+                                <div class="custom-option" data-value="0">Robotic (Locked to Grid)</div>
+                                <div class="custom-option selected" data-value="0.02">Subtle (Pro Drummer)</div>
+                                <div class="custom-option" data-value="0.05">Loose (Lo-Fi / Drunk)</div>
+                            </div>
+                        </div>
+                        <select id="humanizeSelect" style="display: none;">
                             <option value="0">Robotic (Locked to Grid)</option>
                             <option value="0.02" selected>Subtle (Pro Drummer)</option>
                             <option value="0.05">Loose (Lo-Fi / Drunk)</option>
                         </select>
                     </div>
+
                     <div class="setting-group">
-                        <label for="fillSelect"><i class="fa-solid fa-bolt"></i> Fill Frequency</label>
-                        <select id="fillSelect">
+                        <label><i class="fa-solid fa-bolt"></i> Fill Frequency</label>
+                        <div class="custom-select-wrapper" id="fillSelectWrapper">
+                            <div class="custom-select-trigger" id="fillSelectTrigger">
+                                <span>Fills Every 4 Bars</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="fillSelectOptions">
+                                <div class="custom-option" data-value="0">No Fills</div>
+                                <div class="custom-option selected" data-value="4">Fills Every 4 Bars</div>
+                                <div class="custom-option" data-value="8">Fills Every 8 Bars</div>
+                            </div>
+                        </div>
+                        <select id="fillSelect" style="display: none;">
                             <option value="0">No Fills</option>
                             <option value="4" selected>Fills Every 4 Bars</option>
                             <option value="8">Fills Every 8 Bars</option>
@@ -670,25 +768,12 @@
 
                         <!-- POST-GENERATION PREVIEW TOOLBAR -->
                         <div class="preview-toolbar">
-                            <div class="preview-instrument-select">
-                                <label for="postInstrumentSelect">
-                                    <i class="fa-solid fa-sliders"></i> Preview Kit:
-                                </label>
-                                <select id="postInstrumentSelect">
-                                    <option value="modern808" selected>Modern 808 / Electronic</option>
-                                    <option value="synthpop">Vintage Synth Pop</option>
-                                    <option value="lofiroom">Lo-Fi Room Set</option>
-                                    <option value="world">World / Orchestral</option>
-                                </select>
-                            </div>
                             <div class="volume-control-wrapper">
                                 <i class="fa-solid fa-volume-high"></i>
                                 <input type="range" class="volume-slider" id="previewVolume" min="0" max="1" step="0.05" value="1">
                             </div>
-                        </div>
-                        
-                        <div class="action-buttons-group">
-                            <a href="#" class="download-btn" id="downloadMidiBtn" download="tonevault_drums.mid" target="_blank" style="background: #00d4ff; color: #000;">
+                            
+                            <a href="#" class="download-btn" id="downloadMidiBtn" download="tonevault_drums.mid" target="_blank">
                                 <i class="fa-solid fa-file-music"></i> Download MIDI File
                             </a>
                         </div>
@@ -768,28 +853,66 @@
 
     <!-- CLIENT-SIDE DRUM GENERATION & MIDI LOGIC -->
     <script type="module">
+        // ==========================================
+        // CUSTOM DROPDOWN LOGIC INIT
+        // ==========================================
+        function setupCustomDropdown(selectId) {
+            const hiddenSelect = document.getElementById(selectId);
+            const wrapper = document.getElementById(selectId + 'Wrapper');
+            const trigger = document.getElementById(selectId + 'Trigger');
+            const optionsContainer = document.getElementById(selectId + 'Options');
+            const customOptions = optionsContainer.querySelectorAll('.custom-option');
+            const triggerText = trigger.querySelector('span');
+
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+                    if (w !== wrapper) w.classList.remove('open');
+                });
+                if (!wrapper.classList.contains('disabled')) {
+                    wrapper.classList.toggle('open');
+                }
+            });
+
+            customOptions.forEach(opt => {
+                opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    triggerText.textContent = opt.textContent;
+                    customOptions.forEach(o => o.classList.remove('selected'));
+                    opt.classList.add('selected');
+                    hiddenSelect.value = opt.getAttribute('data-value');
+                    wrapper.classList.remove('open');
+                    hiddenSelect.dispatchEvent(new Event('change'));
+                });
+            });
+        }
+
+        window.addEventListener('click', () => {
+            document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+                w.classList.remove('open');
+            });
+        });
+
+        // Initialize Custom Dropdowns
+        setupCustomDropdown('genreSelect');
+        setupCustomDropdown('timeSigSelect');
+        setupCustomDropdown('densitySelect');
+        setupCustomDropdown('swingSelect');
+        setupCustomDropdown('humanizeSelect');
+        setupCustomDropdown('fillSelect');
+
+        // ==========================================
+        // DRUM ENGINE LOGIC
+        // ==========================================
         const tempoInput = document.getElementById("tempoInput");
         const barsInput = document.getElementById("barsInput");
         const timeSigSelect = document.getElementById("timeSigSelect");
         
-        // Settings
         const densitySelect = document.getElementById("densitySelect");
         const swingSelect = document.getElementById("swingSelect");
         const humanizeSelect = document.getElementById("humanizeSelect");
         const fillSelect = document.getElementById("fillSelect");
         const genreSelect = document.getElementById("genreSelect");
-        
-        // Checkboxes
-        const elemKick = document.getElementById("elemKick");
-        const elemSnare = document.getElementById("elemSnare");
-        const elemHats = document.getElementById("elemHats");
-        const elemClap = document.getElementById("elemClap");
-        const elemToms = document.getElementById("elemToms");
-        const elemIndian = document.getElementById("elemIndian");
-        const elemOrch = document.getElementById("elemOrch");
-
-        const postInstrumentSelect = document.getElementById("postInstrumentSelect");
-        const thoughtsInput = document.getElementById("thoughtsInput");
         
         const processBtn = document.getElementById("processBtn");
         const statusMessage = document.getElementById("statusMessage");
@@ -805,25 +928,37 @@
         const downloadMidiBtn = document.getElementById("downloadMidiBtn");
 
         let wavesurfer = null;
-        let midiBlobUrl = null;
         let generatedNotes = []; 
         let exactMaxTime = 8; 
 
-        // General MIDI Drum Map (Channel 10)
         const MIDI_DRUMS = {
             KICK: 36,
             SNARE: 38,
             CLAP: 39,
-            CH: 42,   // Closed Hat
-            OH: 46,   // Open Hat
+            CH: 42,   
+            OH: 46,   
             TOM_LO: 41,
             TOM_HI: 45,
-            TABLA_HI: 62, // General MIDI Mute Conga
-            TABLA_LO: 64, // General MIDI Low Conga
-            ORCH_SNARE: 40, // Electric Snare mapped to crisp orchestral hit
-            TIMPANI: 43, // Mapped to High Floor Tom for standard GM compatibility
+            TABLA_HI: 62, 
+            TABLA_LO: 64, 
+            ORCH_SNARE: 40, 
+            TIMPANI: 43, 
             CRASH: 49
         };
+
+        // AUTO-CONFIGURATION BASED ON GENRE
+        function getKitConfig(genre) {
+            switch(genre) {
+                case 'trap': return { kit: 'modern808', elements: { kick: true, snare: true, hats: true, clap: false, toms: false, indian: false, orch: false } };
+                case 'hiphop': return { kit: 'lofiroom', elements: { kick: true, snare: true, hats: true, clap: false, toms: false, indian: false, orch: false } };
+                case 'house': return { kit: 'synthpop', elements: { kick: true, snare: false, hats: true, clap: true, toms: false, indian: false, orch: false } };
+                case 'lofi': return { kit: 'lofiroom', elements: { kick: true, snare: true, hats: true, clap: false, toms: false, indian: false, orch: false } };
+                case 'kuthu': return { kit: 'world', elements: { kick: true, snare: true, hats: false, clap: false, toms: false, indian: true, orch: false } };
+                case 'indian_classical': return { kit: 'world', elements: { kick: false, snare: false, hats: false, clap: false, toms: false, indian: true, orch: false } };
+                case 'orchestral': return { kit: 'world', elements: { kick: false, snare: false, hats: false, clap: false, toms: false, indian: false, orch: true } };
+                default: return { kit: 'modern808', elements: { kick: true, snare: true, hats: true, clap: false, toms: false, indian: false, orch: false } };
+            }
+        }
 
         function formatTime(seconds) {
             const mins = Math.floor(seconds / 60);
@@ -839,13 +974,6 @@
         previewVolume.addEventListener("input", (e) => {
             const vol = parseFloat(e.target.value);
             if (wavesurfer) wavesurfer.setVolume(vol);
-        });
-
-        postInstrumentSelect.addEventListener("change", async () => {
-            if (generatedNotes.length > 0) {
-                await Tone.start();
-                await renderDrumAudioPreview(generatedNotes, exactMaxTime, postInstrumentSelect.value);
-            }
         });
 
         processBtn.addEventListener("click", async () => {
@@ -869,18 +997,20 @@
                     const timeSig = timeSigSelect.value; 
                     const [beatsPerBar, beatUnit] = timeSig.split('/').map(Number);
                     
-                    // Options
                     const swingAmount = parseFloat(swingSelect.value);
                     const humanizeAmount = parseFloat(humanizeSelect.value); 
                     const fillFreq = parseInt(fillSelect.value);
                     const density = densitySelect.value;
                     const genre = genreSelect.value;
 
-                    // Timing math
+                    // Automatically select drum elements based on Genre
+                    const kitConfig = getKitConfig(genre);
+                    const { kick, snare, hats, clap, toms, indian, orch } = kitConfig.elements;
+
                     const secondsPerBeat = 60 / currentTempo;
                     const secondsPerTimeUnit = secondsPerBeat * (4 / beatUnit);
                     const barDuration = beatsPerBar * secondsPerTimeUnit;
-                    const stepDuration = secondsPerTimeUnit * 0.25; // 16th note grid
+                    const stepDuration = secondsPerTimeUnit * 0.25; 
                     
                     exactMaxTime = totalBars * barDuration;
 
@@ -892,11 +1022,10 @@
                     });
 
                     const track = midi.addTrack();
-                    track.channel = 9; // MIDI Channel 10 (0-indexed) for drums
+                    track.channel = 9; // MIDI Channel 10 for drums
 
                     generatedNotes = [];
 
-                    // HELPER to add note with humanization bounds
                     function addDrumHit(midiNote, time, baseVelocity) {
                         let humanTime = time + (Math.random() - 0.5) * humanizeAmount;
                         if (humanTime < 0) humanTime = 0;
@@ -932,7 +1061,6 @@
                                 
                                 const baseTime = (bar * barDuration) + (beat * secondsPerTimeUnit) + (step * stepDuration);
                                 
-                                // Apply Swing
                                 let stepTime = baseTime;
                                 if (step % 2 !== 0) {
                                     stepTime += (stepDuration * swingAmount);
@@ -942,8 +1070,8 @@
                                 const isBackbeat = (isDownbeat && (beat === 1 || beat === 3)); 
                                 const inFillZone = isFillBar && (beat >= beatsPerBar - 2); 
 
-                                // --- STANDARD KICK ---
-                                if (elemKick.checked) {
+                                // KICK
+                                if (kick) {
                                     if (!inFillZone) {
                                         if (isDownbeat && (beat === 0 || beat === 2)) addDrumHit(MIDI_DRUMS.KICK, stepTime, 0.9);
                                         if (density !== 'minimal' && beat === 1 && step === 3 && Math.random() > 0.5) addDrumHit(MIDI_DRUMS.KICK, stepTime, 0.7);
@@ -953,9 +1081,9 @@
                                     }
                                 }
 
-                                // --- STANDARD SNARE / CLAP ---
-                                if (elemSnare.checked || elemClap.checked) {
-                                    const snareTarget = elemClap.checked && !elemSnare.checked ? MIDI_DRUMS.CLAP : MIDI_DRUMS.SNARE;
+                                // SNARE / CLAP
+                                if (snare || clap) {
+                                    const snareTarget = clap && !snare ? MIDI_DRUMS.CLAP : MIDI_DRUMS.SNARE;
                                     if (!inFillZone) {
                                         if (isBackbeat) addDrumHit(snareTarget, stepTime, 0.9);
                                         if (density === 'busy' && !isDownbeat && Math.random() > 0.85) addDrumHit(MIDI_DRUMS.SNARE, stepTime, 0.3);
@@ -964,8 +1092,8 @@
                                     }
                                 }
 
-                                // --- HI-HATS ---
-                                if (elemHats.checked && !inFillZone) {
+                                // HI-HATS
+                                if (hats && !inFillZone) {
                                     let playHat = false;
                                     let hatVel = 0.6;
                                     let hatType = MIDI_DRUMS.CH;
@@ -986,33 +1114,30 @@
                                     if (playHat) addDrumHit(hatType, stepTime, hatVel);
                                 }
 
-                                // --- TOMS ---
-                                if (elemToms.checked) {
+                                // TOMS
+                                if (toms) {
                                     if (inFillZone && (step === 0 || step === 2)) {
                                         const tomNote = Math.random() > 0.5 ? MIDI_DRUMS.TOM_HI : MIDI_DRUMS.TOM_LO;
                                         addDrumHit(tomNote, stepTime, 0.8);
                                     }
                                 }
 
-                                // --- INDIAN / SOUTH INDIAN ---
-                                if (elemIndian.checked) {
+                                // INDIAN
+                                if (indian) {
                                     if (genre === 'kuthu') {
-                                        // South Indian Dappan Koothu
                                         if (step === 0) addDrumHit(MIDI_DRUMS.TABLA_LO, stepTime, 0.9);
                                         if (step === 2) addDrumHit(MIDI_DRUMS.TABLA_HI, stepTime, 0.7);
                                         if (beat % 2 !== 0 && step === 1) addDrumHit(MIDI_DRUMS.TABLA_HI, stepTime, 0.8);
                                     } else {
-                                        // Teen Taal / Classical influence
                                         if (isDownbeat) addDrumHit(MIDI_DRUMS.TABLA_LO, stepTime, 0.8);
                                         if (step === 2 && Math.random() > 0.3) addDrumHit(MIDI_DRUMS.TABLA_HI, stepTime, 0.6);
                                         if (density === 'busy' && step === 3) addDrumHit(MIDI_DRUMS.TABLA_HI, stepTime, 0.4);
                                     }
                                 }
 
-                                // --- ORCHESTRAL / CINEMATIC ---
-                                if (elemOrch.checked) {
+                                // ORCHESTRAL
+                                if (orch) {
                                     if (genre === 'orchestral') {
-                                        // Epic Cinematic Marches
                                         if (isDownbeat && beat === 0) {
                                             addDrumHit(MIDI_DRUMS.CRASH, stepTime, 0.8);
                                             addDrumHit(MIDI_DRUMS.TIMPANI, stepTime, 1.0);
@@ -1031,10 +1156,9 @@
                     // Export MIDI Blob
                     const midiArray = midi.toArray();
                     const midiBlob = new Blob([midiArray], { type: "audio/midi" });
-                    if (midiBlobUrl) URL.revokeObjectURL(midiBlobUrl);
-                    midiBlobUrl = URL.createObjectURL(midiBlob);
+                    const midiBlobUrl = URL.createObjectURL(midiBlob);
                     downloadMidiBtn.href = midiBlobUrl;
-                    downloadMidiBtn.download = `tonevault_drums_${totalBars}bars_${currentTempo}bpm.mid`;
+                    downloadMidiBtn.download = `tonevault_drums_${genre}_${currentTempo}bpm.mid`;
 
                     progressBarFill.style.width = "100%";
                     statusText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#00d4ff;"></i> Drum Track Ready!`;
@@ -1047,14 +1171,15 @@
                     resultsArea.style.display = "block";
                     waveformPreviewContainer.style.display = "block";
 
-                    await renderDrumAudioPreview(generatedNotes, exactMaxTime, postInstrumentSelect.value);
+                    // Call render with the automatically selected kit based on genre
+                    await renderDrumAudioPreview(generatedNotes, exactMaxTime, kitConfig.kit);
 
                     processBtn.removeAttribute("disabled");
                     resultsArea.scrollIntoView({ behavior: "smooth", block: "start" });
 
                 } catch (error) {
                     console.error("FULL GENERATION ERROR:", error);
-                    alert(error.message);
+                    alert("Generation failed: " + error.message);
                     processBtn.removeAttribute("disabled");
                 }
             }, 500);
@@ -1070,7 +1195,7 @@
 
                 const buffer = await Tone.Offline(async () => {
 
-                    // 1. MASTER BUS SETUP
+                    // MASTER BUS SETUP
                     const compressor = new Tone.Compressor({
                         threshold: -12,
                         ratio: 3,
@@ -1080,7 +1205,6 @@
 
                     let masterBus = new Tone.Gain(0.9).connect(compressor);
 
-                    // If Lofi, add a lowpass filter and slight distortion
                     if (kitType === "lofiroom") {
                         const lofiFilter = new Tone.Filter(3500, "lowpass");
                         const dist = new Tone.Distortion(0.2);
@@ -1088,35 +1212,29 @@
                         masterBus.chain(dist, lofiFilter, compressor);
                     }
 
-                    // 2. DRUM SYNTH DEFINITIONS
-                    // KICK
+                    // DRUM SYNTH DEFINITIONS
                     const kickParams = kitType === "modern808" 
                         ? { pitchDecay: 0.05, octaves: 4, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.8, sustain: 0, release: 0.8 } }
                         : { pitchDecay: 0.02, octaves: 2.5, oscillator: { type: "square" }, envelope: { attack: 0.001, decay: 0.3, sustain: 0, release: 0.3 } };
                     const kick = new Tone.MembraneSynth(kickParams).connect(masterBus);
 
-                    // SNARE (Body + Noise)
                     const snareBody = new Tone.MembraneSynth({ pitchDecay: 0.01, octaves: 1, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.2, sustain: 0 } }).connect(masterBus);
                     const snareNoise = new Tone.NoiseSynth({ noise: { type: "pink" }, envelope: { attack: 0.001, decay: 0.2, sustain: 0 } }).connect(masterBus);
 
-                    // CLAP
                     const clapFilter = new Tone.Filter(1500, "bandpass").connect(masterBus);
                     const clapNoise = new Tone.NoiseSynth({ noise: { type: "white" }, envelope: { attack: 0.001, decay: 0.3, sustain: 0 } }).connect(clapFilter);
 
-                    // HI-HATS
                     const hatFilter = new Tone.Filter(8000, "highpass").connect(masterBus);
                     const ch = new Tone.NoiseSynth({ noise: { type: "white" }, envelope: { attack: 0.001, decay: 0.05, sustain: 0 } }).connect(hatFilter);
                     const oh = new Tone.NoiseSynth({ noise: { type: "white" }, envelope: { attack: 0.001, decay: 0.3, sustain: 0 } }).connect(hatFilter);
 
-                    // TOMS & ORCHESTRAL / ETHNIC 
                     const tomHi = new Tone.MembraneSynth({ pitchDecay: 0.02, octaves: 1.5, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.4, sustain: 0 } }).connect(masterBus);
                     const tomLo = new Tone.MembraneSynth({ pitchDecay: 0.02, octaves: 1.5, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.6, sustain: 0 } }).connect(masterBus);
                     const tablaHi = new Tone.MembraneSynth({ pitchDecay: 0.005, octaves: 2, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.4, sustain: 0 } }).connect(masterBus);
                     const tablaLo = new Tone.MembraneSynth({ pitchDecay: 0.01, octaves: 1.5, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.6, sustain: 0 } }).connect(masterBus);
                     const crash = new Tone.MetalSynth({ frequency: 200, envelope: { attack: 0.001, decay: 3.0, release: 3.0 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5 }).connect(masterBus);
 
-
-                    // 3. SCHEDULE NOTES
+                    // SCHEDULE NOTES
                     notes.forEach(note => {
                         const time = note.time;
                         const vel = note.velocity;
@@ -1165,7 +1283,7 @@
 
                 }, Math.max(totalDuration, 1));
 
-                // 4. CONVERT TO WAV
+                // CONVERT TO WAV
                 const wavBlob = bufferToWave(buffer.get(), buffer.length);
                 const wavUrl = URL.createObjectURL(wavBlob);
 
