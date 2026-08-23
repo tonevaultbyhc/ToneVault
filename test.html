@@ -1262,14 +1262,14 @@
                     const tomHi = new Tone.MembraneSynth({ pitchDecay: 0.02, octaves: 1.5, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.4, sustain: 0 } }).connect(masterBus);
                     const tomLo = new Tone.MembraneSynth({ pitchDecay: 0.02, octaves: 1.5, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.6, sustain: 0 } }).connect(masterBus);
                     
-                    // Orchestral / Indian Specific Synths
+                    // Advanced physical modeling for world instruments
                     const orchSnareBody = new Tone.MembraneSynth({ pitchDecay: 0.01, octaves: 1, oscillator: { type: "triangle" }, envelope: { attack: 0.001, decay: 0.3, sustain: 0 } }).connect(masterBus);
                     const orchSnareNoise = new Tone.NoiseSynth({ noise: { type: "white" }, envelope: { attack: 0.005, decay: 0.3, sustain: 0 } }).connect(masterBus);
                     
-                    const tablaHi = new Tone.MembraneSynth({ pitchDecay: 0.001, octaves: 1.5, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.8, sustain: 0, release: 0.8 } }).connect(masterBus);
-                    const tablaLo = new Tone.MembraneSynth({ pitchDecay: 0.1, octaves: 3, oscillator: { type: "sine" }, envelope: { attack: 0.005, decay: 1.5, sustain: 0, release: 1.5 } }).connect(masterBus);
+                    const tablaHi = new Tone.FMSynth({ harmonicity: 3.5, modulationIndex: 2, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.3, sustain: 0.1, release: 0.8 }, modulation: { type: "triangle" }, modulationEnvelope: { attack: 0.001, decay: 0.2, sustain: 0, release: 0.2 } }).connect(masterBus);
+                    const tablaLo = new Tone.MembraneSynth({ pitchDecay: 0.15, octaves: 3, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.5, sustain: 0, release: 1.0 } }).connect(masterBus);
                     
-                    const timpani = new Tone.MembraneSynth({ pitchDecay: 0.05, octaves: 1.2, oscillator: { type: "sine" }, envelope: { attack: 0.02, decay: 2.0, sustain: 0.2, release: 2.5 } }).connect(masterBus);
+                    const timpani = new Tone.MembraneSynth({ pitchDecay: 0.01, octaves: 1.1, oscillator: { type: "sine" }, envelope: { attack: 0.005, decay: 1.5, sustain: 0.1, release: 2.0 } }).connect(masterBus);
                     const crash = new Tone.MetalSynth({ frequency: 200, envelope: { attack: 0.001, decay: 3.0, release: 3.0 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5 }).connect(masterBus);
 
                     // SCHEDULE NOTES
@@ -1307,13 +1307,13 @@
                                 tomLo.triggerAttackRelease("D2", "8n", time, vel);
                                 break;
                             case MIDI_DRUMS.TABLA_HI:
-                                tablaHi.triggerAttackRelease("D4", "8n", time, vel);
+                                tablaHi.triggerAttackRelease("C5", "8n", time, vel);
                                 break;
                             case MIDI_DRUMS.TABLA_LO:
                                 tablaLo.triggerAttackRelease("G2", "8n", time, vel);
                                 break;
                             case 'TIMPANI': // Routed directly to Orchestral Timpani synth
-                                timpani.triggerAttackRelease("G2", "2n", time, vel);
+                                timpani.triggerAttackRelease("G1", "2n", time, vel);
                                 break;
                             case MIDI_DRUMS.CRASH:
                                 crash.triggerAttackRelease("4n", time, vel);
