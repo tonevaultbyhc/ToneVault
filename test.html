@@ -1375,169 +1375,132 @@
         // ============================================================
         function generateSouthIndianPattern(ctx) {
             const {
-                totalBars, beatsPerBar, barDuration, sixteenth,
+                totalBars, barDuration, sixteenth,
                 density, swingAmount, fillFreq, addHit, text, instrument
             } = ctx;
 
             /*
-             * V7 KUTHU ENGINE
-             * ----------------
-             * This is deliberately phrase-based instead of placing a hit
-             * on almost every 16th note.
+             * V9 PHRASE-BASED SOUTH INDIAN FOLK ENGINE
+             * ----------------------------------------
+             * The important change from V8 is that the groove is built as
+             * one coordinated phrase.  Low and high voices have deliberate
+             * roles instead of being generated independently.
              *
-             * Each 4-bar phrase has:
-             *   Bar 1 = establish
-             *   Bar 2 = response
-             *   Bar 3 = syncopated variation
-             *   Bar 4 = turnaround
+             * Dappan Koothu / Parai uses ONLY Parai Low + Parai High.
+             * Mridangam, Tabla, Dhol and modern drums are never injected
+             * into the Parai preset.
              *
-             * The low/high Parai or Dhol voices form the main conversation.
-             * Mridangam is a supporting articulation, not the main pulse.
+             * The four bars form a call -> response -> variation -> turnaround
+             * phrase and repeat naturally for longer arrangements.
              */
 
-            const isKuthu = true;
-            const phraseBars = 4;
-
-            const patterns = [
+            const phrase = [
+                // Bar 1: establish the pulse.
                 {
                     low:  [0, 4, 8, 12],
                     high: [2, 6, 10, 14]
                 },
+                // Bar 2: answer the first bar with a small anticipation.
                 {
-                    low:  [0, 3, 8, 11],
-                    high: [2, 5, 7, 10, 14]
+                    low:  [0, 4, 8, 11],
+                    high: [2, 6, 9, 14]
                 },
+                // Bar 3: variation, but leave breathing room.
                 {
-                    low:  [0, 4, 7, 8, 12],
-                    high: [2, 5, 6, 10, 13, 15]
+                    low:  [0, 3, 8, 12],
+                    high: [2, 5, 10, 13, 15]
                 },
+                // Bar 4: turnaround leading cleanly back to bar 1.
                 {
-                    low:  [0, 4, 8, 12],
-                    high: [2, 3, 6, 7, 10, 11, 13, 14, 15]
+                    low:  [0, 4, 8, 12, 14],
+                    high: [2, 6, 10, 12, 14, 15]
                 }
             ];
 
-            const sparsePatterns = [
-                { low:[0,8],     high:[2,6,10,14] },
-                { low:[0,4,8],   high:[2,7,10,14] },
-                { low:[0,4,8,12],high:[3,6,10,14] },
-                { low:[0,8,12],  high:[2,6,11,14] }
+            const sparsePhrase = [
+                { low:[0, 8],       high:[2, 6, 10, 14] },
+                { low:[0, 8, 12],   high:[2, 7, 14] },
+                { low:[0, 4, 8],    high:[2, 6, 11, 14] },
+                { low:[0, 8, 12],   high:[3, 6, 10, 14] }
             ];
 
-            const busyPatterns = [
-                { low:[0,4,8,12], high:[2,3,6,7,10,11,14,15] },
-                { low:[0,3,4,8,11,12], high:[2,5,6,10,13,14,15] },
-                { low:[0,4,7,8,12], high:[2,5,6,9,10,13,14,15] },
-                { low:[0,3,4,7,8,11,12,15], high:[2,5,6,10,13,14] }
+            const busyPhrase = [
+                { low:[0, 3, 4, 8, 11, 12], high:[2, 5, 6, 10, 13, 14] },
+                { low:[0, 4, 7, 8, 11, 12], high:[2, 5, 6, 9, 13, 14, 15] },
+                { low:[0, 3, 4, 8, 11, 12, 15], high:[2, 5, 6, 10, 13, 14] },
+                { low:[0, 4, 7, 8, 11, 12, 14], high:[2, 5, 6, 9, 10, 13, 14, 15] }
             ];
 
-            const chosenSet =
-                density === 'minimal' ? sparsePatterns :
-                density === 'busy' ? busyPatterns :
-                patterns;
+            const chosenPhrase = density === 'minimal'
+                ? sparsePhrase
+                : density === 'busy'
+                    ? busyPhrase
+                    : phrase;
+
+            // Only two voices for Parai/Thappu/Dhol folk styles.
+            // The selected instrument determines which real sample bank is used.
+            const lowMidi = MIDI_DRUMS.DHOL_LOW;
+            const highMidi = MIDI_DRUMS.DHOL_HIGH;
 
             for (let bar = 0; bar < totalBars; bar++) {
-                const startTime = bar * barDuration;
-                const phraseBar = bar % phraseBars;
-                const pattern = chosenSet[phraseBar];
-
+                const start = bar * barDuration;
+                const phraseBar = bar % 4;
+                const pattern = chosenPhrase[phraseBar];
                 const stepTime = barDuration / 16;
 
-                const schedule = (step, velocity, midi, duration=0.09, offset=0) => {
-                    let t = startTime + step * stepTime + offset;
-
-                    // Swing affects the off-beat 16th positions.
+                const schedule = (step, midi, velocity, duration = 0.085) => {
+                    let t = start + step * stepTime;
                     if (swingAmount > 0 && step % 2 === 1) {
-                        t += stepTime * Math.min(0.42, swingAmount * 0.55);
+                        t += stepTime * Math.min(0.36, swingAmount * 0.5);
                     }
-
                     addHit(midi, t, velocity, duration, 'drums');
                 };
 
-                // Main low/high conversation.
-                pattern.low.forEach(step => {
-                    const accent = step === 0 || step === 8;
-                    schedule(
-                        step,
-                        accent ? 0.98 : 0.72,
-                        MIDI_DRUMS.DHOL_LOW,
-                        0.11
-                    );
+                // LOW = the physical pulse / foundation.
+                pattern.low.forEach((step, i) => {
+                    let velocity = step === 0 ? 0.98 : 0.70;
+                    if (step === 8) velocity = 0.82;
+                    if (phraseBar === 3 && step >= 12) velocity += 0.05;
+                    schedule(step, lowMidi, velocity, 0.105);
                 });
 
-                pattern.high.forEach(step => {
-                    const accent = step === 2 || step === 10 || step === 14;
-                    schedule(
-                        step,
-                        accent ? 0.82 : 0.58,
-                        MIDI_DRUMS.DHOL_HIGH,
-                        0.075
-                    );
+                // HIGH = response / movement. Avoid simultaneous low+high hits
+                // except at the intentional turnaround.
+                pattern.high.forEach((step, i) => {
+                    let velocity = (step === 2 || step === 10) ? 0.76 : 0.58;
+                    if (phraseBar === 3 && step >= 14) velocity += 0.10;
+                    schedule(step, highMidi, velocity, 0.07);
                 });
 
-                // Mridangam is used as a response/ornament.
-                if (density !== 'minimal') {
-                    const mridangamSteps =
-                        phraseBar === 0 ? [6, 14] :
-                        phraseBar === 1 ? [5, 7, 14] :
-                        phraseBar === 2 ? [3, 6, 11, 14] :
-                        [5, 6, 7, 13, 14, 15];
-
-                    mridangamSteps.forEach((step, index) => {
-                        schedule(
-                            step,
-                            phraseBar === 3 ? 0.48 : 0.38,
-                            MIDI_DRUMS.MRIDANGAM_HIGH,
-                            0.055,
-                            step % 2 ? stepTime * 0.08 : 0
-                        );
-                    });
-                }
-
-                // Small anticipation before beat 4 in bars 2 and 3.
-                if (phraseBar === 1 || phraseBar === 2) {
-                    schedule(11, 0.46, MIDI_DRUMS.MRIDANGAM_HIGH, 0.05, stepTime * 0.12);
-                }
-
-                // Controlled 4-bar turnaround.
-                const fillBar = fillFreq > 0 && ((bar + 1) % fillFreq === 0);
-                if (phraseBar === 3 && (fillBar || totalBars <= 4)) {
-                    const fillSteps = density === 'minimal'
-                        ? [12, 14, 15]
-                        : [12, 13, 14, 15];
-
-                    fillSteps.forEach((step, i) => {
-                        schedule(
-                            step,
-                            0.52 + i * 0.09,
-                            step % 2 === 0
-                                ? MIDI_DRUMS.DHOL_LOW
-                                : MIDI_DRUMS.MRIDANGAM_HIGH,
-                            0.055
-                        );
-                    });
-
-                    // Strong return to the next phrase/downbeat.
-                    if (bar < totalBars - 1) {
-                        addHit(
-                            MIDI_DRUMS.DHOL_LOW,
-                            startTime + barDuration - stepTime * 0.04,
-                            0.78,
-                            0.08,
-                            'drums'
-                        );
-                    }
-                }
-
-                // Optional keyword-driven call/response emphasis.
+                // Explicit call-and-response keyword: reinforce the existing
+                // phrase rather than creating a separate random rhythm.
                 if (hasKeyword(text, 'call and response', 'call response')) {
-                    if (phraseBar % 2 === 0) {
-                        schedule(2, 0.86, MIDI_DRUMS.DHOL_HIGH, 0.07);
-                        schedule(6, 0.62, MIDI_DRUMS.DHOL_HIGH, 0.07);
+                    if (phraseBar === 0 || phraseBar === 2) {
+                        schedule(6, highMidi, 0.68, 0.065);
                     } else {
-                        schedule(10, 0.86, MIDI_DRUMS.DHOL_HIGH, 0.07);
-                        schedule(14, 0.68, MIDI_DRUMS.DHOL_HIGH, 0.07);
+                        schedule(13, highMidi, 0.68, 0.065);
                     }
+                }
+
+                // Driving/strong keywords change accents, not note count.
+                if (hasKeyword(text, 'driving', 'strong accents', 'aggressive')) {
+                    schedule(8, lowMidi, 0.88, 0.105);
+                }
+
+                // Sparse/space removes the optional anticipation rather than
+                // replacing the groove with random notes.
+                if (hasKeyword(text, 'space', 'sparse') && phraseBar === 1) {
+                    // Keep the main pulse; no extra events are added.
+                }
+
+                // A fill is a controlled variation of the final bar, not a
+                // separate instrument. This keeps the groove coherent.
+                const isFillBar = fillFreq > 0 && ((bar + 1) % fillFreq === 0);
+                if (phraseBar === 3 && isFillBar) {
+                    schedule(12, lowMidi, 0.72, 0.08);
+                    schedule(13, highMidi, 0.62, 0.065);
+                    schedule(14, lowMidi, 0.82, 0.08);
+                    schedule(15, highMidi, 0.88, 0.065);
                 }
             }
         }
@@ -2004,7 +1967,7 @@
 
 
         // ============================================================
-        // V8: SEPARATE INSTRUMENT PREVIEW + WAV EXPORT
+        // V9: PHRASE KUTHU + REAL SAMPLE STEM WAV EXPORT
         // ============================================================
 
         const STEM_SAMPLE_BANK = {
@@ -2280,7 +2243,7 @@
                 const download = document.createElement('a');
                 download.className = 'download-btn';
                 download.href = '#';
-                download.innerHTML = '<i class="fa-solid fa-file-waveform"></i> WAV';
+                download.innerHTML = '<i class="fa-solid fa-file-waveform"></i> Download WAV';
 
                 const status = document.createElement('span');
                 status.className = 'stem-status';
