@@ -1238,20 +1238,26 @@
 
         function getStyleConfig(genre, requestedRhythm, requestedInstrument, thoughts) {
             const text = normalizeWords(thoughts);
-            let rhythm = requestedRhythm !== 'auto' ? requestedRhythm : null;
-            let instrument = requestedInstrument !== 'auto' ? requestedInstrument : null;
+            const rhythmExplicit = requestedRhythm !== 'auto';
+            const instrumentExplicit = requestedInstrument !== 'auto';
 
-            if (hasKeyword(text, 'teen taal', 'teentaal', 'tabla')) rhythm = 'teen_taal';
-            if (hasKeyword(text, 'kuthu', 'dappan koothu', 'koothu')) rhythm = 'kuthu';
-            if (hasKeyword(text, 'cinematic build', 'orchestral build', 'build')) rhythm = 'cinematic_build';
-            if (hasKeyword(text, 'cinematic pulse', 'cinematic', 'epic', 'taiko')) rhythm = rhythm || 'cinematic_pulse';
-            if (hasKeyword(text, 'four-on-floor', 'four on floor', '4 on floor')) rhythm = 'four_floor';
-            if (hasKeyword(text, 'boom bap')) rhythm = 'boom_bap';
-            if (hasKeyword(text, 'trap', 'drill', 'rolls', 'rolling')) rhythm = rhythm || 'trap_roll';
+            let rhythm = rhythmExplicit ? requestedRhythm : null;
+            let instrument = instrumentExplicit ? requestedInstrument : null;
+
+            // Natural-language rhythm inference is used only when Rhythm is Auto.
+            // This prevents a keyword from silently changing an explicitly chosen groove.
+            if (!rhythmExplicit) {
+                if (hasKeyword(text, 'teen taal', 'teentaal', 'tabla')) rhythm = 'teen_taal';
+                else if (hasKeyword(text, 'kuthu', 'dappan koothu', 'koothu')) rhythm = 'kuthu';
+                else if (hasKeyword(text, 'cinematic build', 'orchestral build', 'build')) rhythm = 'cinematic_build';
+                else if (hasKeyword(text, 'cinematic pulse', 'cinematic', 'epic', 'taiko')) rhythm = 'cinematic_pulse';
+                else if (hasKeyword(text, 'four-on-floor', 'four on floor', '4 on floor')) rhythm = 'four_floor';
+                else if (hasKeyword(text, 'boom bap')) rhythm = 'boom_bap';
+                else if (hasKeyword(text, 'trap', 'drill', 'rolls', 'rolling')) rhythm = 'trap_roll';
+            }
 
             // Instrument keywords are used only when Percussion Set is Auto.
-            // An explicit selection must never be silently overridden.
-            if (requestedInstrument === 'auto') {
+            if (!instrumentExplicit) {
                 if (hasKeyword(text, 'tabla', 'teen taal', 'teentaal', 'bayan')) {
                     instrument = 'tabla';
                 } else if (hasKeyword(text, 'mridangam')) {
@@ -1282,15 +1288,20 @@
             rhythm = rhythm || defaults.rhythm;
             instrument = instrument || defaults.instrument;
 
-            if (genre.includes('orchestral') && hasKeyword(text, 'build', 'tension', 'rising')) {
+            if (genre.includes('orchestral') && !rhythmExplicit && hasKeyword(text, 'build', 'tension', 'rising')) {
                 rhythm = 'cinematic_build';
             }
 
             let engine = 'modern';
-            if (['teen_taal'].includes(rhythm) || instrument === 'tabla') engine = 'indian';
-            else if (['kuthu'].includes(rhythm) || instrument === 'parai') engine = 'south_indian';
-            else if (['cinematic_pulse','cinematic_build'].includes(rhythm) || instrument === 'cinematic') engine = 'cinematic';
-            else if (instrument === 'hybrid') engine = 'hybrid';
+            if (['teen_taal'].includes(rhythm) || instrument === 'tabla') {
+                engine = 'indian';
+            } else if (['kuthu'].includes(rhythm) || ['parai', 'dhol', 'mridangam'].includes(instrument)) {
+                engine = 'south_indian';
+            } else if (['cinematic_pulse','cinematic_build'].includes(rhythm) || instrument === 'cinematic') {
+                engine = 'cinematic';
+            } else if (instrument === 'hybrid') {
+                engine = 'hybrid';
+            }
 
             return { rhythm, instrument, engine, text };
         }
@@ -1317,17 +1328,52 @@
         // GENERIC NOTE HELPER
         // ============================================================
         function createNoteAdder({ drumTrack, orchTrack, exactMaxTime, humanizeAmount, notes }) {
-            return function addHit(midiNote, time, velocity, duration = 0.1, track = 'drums') {
-                let humanTime = time + (Math.random() - 0.5) * humanizeAmount;
+            let humanizeIndex = 0;
+
+            return function addHit(
+                midiNote,
+                time,
+                velocity,
+                duration = 0.1,
+                track = 'drums',
+                grooveOffset = 0,
+                humanizeScale = 1
+            ) {
+                // Keep the musical grid intact. Humanization is deliberately
+                // capped and deterministic instead of independently randomizing
+                // every hit, which used to make repeated accents lose their pocket.
+                const seed = Math.sin((humanizeIndex++ + 1) * 12.9898) * 43758.5453;
+                const unit = seed - Math.floor(seed);
+                const maxHuman = humanizeAmount * 0.40 * humanizeScale;
+                let humanTime = time + grooveOffset + (unit - 0.5) * maxHuman * 2;
+
                 humanTime = Math.max(0, humanTime);
                 if (humanTime >= exactMaxTime) return;
 
-                let humanVel = Math.max(0.08, Math.min(1, velocity + (Math.random() - 0.5) * 0.12));
+                const velocitySeed = Math.sin((humanizeIndex + 1) * 78.233) * 43758.5453;
+                const velocityUnit = velocitySeed - Math.floor(velocitySeed);
+                const humanVel = Math.max(
+                    0.08,
+                    Math.min(1, velocity + (velocityUnit - 0.5) * 0.07)
+                );
+
                 const target = track === 'orch' ? orchTrack : drumTrack;
                 const midiNumber = typeof midiNote === 'number' ? midiNote : 43;
 
-                target.addNote({ midi: midiNumber, time: humanTime, duration, velocity: humanVel });
-                notes.push({ midi: midiNote, time: humanTime, duration, velocity: humanVel, track });
+                target.addNote({
+                    midi: midiNumber,
+                    time: humanTime,
+                    duration,
+                    velocity: humanVel
+                });
+
+                notes.push({
+                    midi: midiNote,
+                    time: humanTime,
+                    duration,
+                    velocity: humanVel,
+                    track
+                });
             };
         }
 
@@ -1335,54 +1381,99 @@
         // MODERN PATTERNS
         // ============================================================
         function generateModernPattern(ctx) {
-            const { totalBars, beatsPerBar, barDuration, sixteenth, density, swingAmount, fillFreq, rhythm, addHit, text } = ctx;
+            const {
+                totalBars, beatsPerBar, barDuration, sixteenth,
+                density, swingAmount, fillFreq, rhythm, addHit, text
+            } = ctx;
+
+            // Four-bar phrase design. The groove changes subtly by bar instead
+            // of cloning the exact same 16th-note pattern every bar.
+            const groove = {
+                boom_bap: [
+                    { kick: [0, 7, 8, 12], snare: [4, 12], hat: [0, 2, 4, 6, 8, 10, 12, 14] },
+                    { kick: [0, 6, 8, 10, 14], snare: [4, 12], hat: [0, 2, 4, 6, 8, 10, 12, 14] },
+                    { kick: [0, 3, 8, 11, 12], snare: [4, 12], hat: [0, 2, 4, 6, 8, 10, 12, 14] },
+                    { kick: [0, 7, 8, 10, 15], snare: [4, 12], hat: [0, 2, 4, 6, 8, 10, 12, 14, 15] }
+                ],
+                trap_roll: [
+                    { kick: [0, 7, 8, 11, 14], snare: [4, 12], hat: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
+                    { kick: [0, 5, 8, 10, 14], snare: [4, 12], hat: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
+                    { kick: [0, 3, 7, 8, 11, 14], snare: [4, 12], hat: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] },
+                    { kick: [0, 6, 8, 10, 13, 15], snare: [4, 12], hat: [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15] }
+                ],
+                four_floor: [
+                    { kick: [0,4,8,12], snare: [4,12], hat: [0,2,4,6,8,10,12,14] },
+                    { kick: [0,4,8,12], snare: [4,12], hat: [0,2,4,6,8,10,12,14,15] },
+                    { kick: [0,4,8,12], snare: [4,12], hat: [0,2,4,6,8,10,12,14] },
+                    { kick: [0,4,8,12], snare: [4,12], hat: [0,2,4,6,8,10,12,14,15] }
+                ]
+            };
+
+            const templates = groove[rhythm] || groove.boom_bap;
 
             for (let bar = 0; bar < totalBars; bar++) {
                 const isFillBar = fillFreq > 0 && ((bar + 1) % fillFreq === 0);
-                for (let beat = 0; beat < beatsPerBar; beat++) {
-                    for (let step = 0; step < 4; step++) {
-                        const baseTime = bar * barDuration + beat * (barDuration / beatsPerBar) + step * sixteenth;
-                        let t = baseTime + (step % 2 ? sixteenth * swingAmount : 0);
-                        const down = step === 0;
-                        const backbeat = down && (beat === 1 || beat === 3);
-                        const fill = isFillBar && beat >= Math.max(0, beatsPerBar - 2);
+                const phraseBar = templates[bar % templates.length];
+                const barStart = bar * barDuration;
 
-                        if (rhythm === 'four_floor') {
-                            addHit(MIDI_DRUMS.KICK, t, down ? 0.92 : 0.78);
-                            if (beat === 1 || beat === 3) addHit(MIDI_DRUMS.CLAP, t, 0.72);
-                            if (step === 0 || step === 2 || density === 'busy') addHit(MIDI_DRUMS.CH, t, 0.42 + (step === 0 ? 0.2 : 0));
-                            if (density === 'busy' && step === 3 && Math.random() > 0.5) addHit(MIDI_DRUMS.OH, t, 0.48);
-                            continue;
+                const stepTime = step => {
+                    const base = barStart + step * sixteenth;
+                    const swing = (step % 2 === 1) ? sixteenth * swingAmount : 0;
+                    return base + swing;
+                };
+
+                phraseBar.kick.forEach((step, n) => {
+                    const accent = [0, 8, 12].includes(step);
+                    addHit(MIDI_DRUMS.KICK, stepTime(step), accent ? 0.92 : 0.68, 0.11, 'drums', 0, 0.6);
+                });
+
+                phraseBar.snare.forEach(step => {
+                    addHit(MIDI_DRUMS.SNARE, stepTime(step), step === 12 ? 0.88 : 0.82, 0.1, 'drums', 0, 0.5);
+                });
+
+                phraseBar.hat.forEach(step => {
+                    const accent = step % 4 === 0;
+                    addHit(MIDI_DRUMS.CH, stepTime(step), accent ? 0.50 : 0.30, 0.055, 'drums', 0, 0.35);
+                });
+
+                if (rhythm === 'four_floor') {
+                    [2, 6, 10, 14].forEach(step => {
+                        if (density !== 'minimal') {
+                            addHit(MIDI_DRUMS.OH, stepTime(step), 0.34, 0.12, 'drums', 0, 0.35);
                         }
+                    });
+                }
 
-                        if (rhythm === 'boom_bap') {
-                            if (down && (beat === 0 || beat === 2)) addHit(MIDI_DRUMS.KICK, t, 0.9);
-                            if (beat === 1 && step === 3 && !text.includes('sparse')) addHit(MIDI_DRUMS.KICK, t, 0.62);
-                            if (backbeat) addHit(MIDI_DRUMS.SNARE, t, 0.86);
-                            if (density !== 'minimal' && (step === 0 || step === 2)) addHit(MIDI_DRUMS.CH, t, 0.46);
-                            if (density === 'busy' && step === 3 && Math.random() > 0.35) addHit(MIDI_DRUMS.CH, t, 0.34);
-                            continue;
+                if (rhythm === 'boom_bap' && density !== 'minimal') {
+                    [3, 11].forEach(step => {
+                        addHit(MIDI_DRUMS.CH, stepTime(step), 0.24, 0.045, 'drums', 0, 0.3);
+                    });
+                }
+
+                if (rhythm === 'trap_roll') {
+                    const rollSteps = bar % 2 === 0 ? [6,7,14,15] : [3,7,11,15];
+                    rollSteps.forEach(step => {
+                        if (density !== 'minimal') {
+                            addHit(MIDI_DRUMS.CH, stepTime(step) + sixteenth * 0.42, 0.20, 0.035, 'drums', 0, 0.25);
                         }
+                    });
+                }
 
-                        if (rhythm === 'trap_roll') {
-                            if (down && (beat === 0 || beat === 2)) addHit(MIDI_DRUMS.KICK, t, 0.92);
-                            if (beat === 1 && step === 3) addHit(MIDI_DRUMS.KICK, t, 0.7);
-                            if (backbeat) addHit(MIDI_DRUMS.SNARE, t, 0.82);
-                            addHit(MIDI_DRUMS.CH, t, step === 0 ? 0.62 : 0.38);
-                            if (density === 'busy' && step >= 2 && Math.random() > 0.5) addHit(MIDI_DRUMS.CH, t + sixteenth * 0.5, 0.3, 0.06);
-                            continue;
-                        }
-
-                        // Fallback generic groove
-                        if (down && (beat === 0 || beat === 2)) addHit(MIDI_DRUMS.KICK, t, 0.9);
-                        if (backbeat) addHit(MIDI_DRUMS.SNARE, t, 0.86);
-                        if (step === 0 || step === 2) addHit(MIDI_DRUMS.CH, t, 0.45);
-
-                        if (fill && (step === 0 || step === 2)) {
-                            addHit(MIDI_DRUMS.TOM_HI, t, 0.72);
-                            addHit(MIDI_DRUMS.TOM_LO, t + sixteenth * 0.5, 0.62);
-                        }
-                    }
+                // Last-beat fills are separated from the core groove and use
+                // a clear pickup into the next bar.
+                if (isFillBar) {
+                    [12, 13, 14, 15].forEach((step, idx) => {
+                        addHit(
+                            idx % 2 === 0 ? MIDI_DRUMS.TOM_LO : MIDI_DRUMS.TOM_HI,
+                            stepTime(step),
+                            0.45 + idx * 0.08,
+                            0.08,
+                            'drums',
+                            0,
+                            0.45
+                        );
+                    });
+                    addHit(MIDI_DRUMS.CRASH, barStart + barDuration - sixteenth * 0.20, 0.72, 0.35, 'drums', 0, 0.4);
                 }
             }
         }
@@ -1391,53 +1482,59 @@
         // INDIAN RHYTHM PATTERNS
         // ============================================================
         function generateIndianPattern(ctx) {
-            const { totalBars, beatsPerBar, barDuration, sixteenth, density, fillFreq, rhythm, addHit, text } = ctx;
+            const {
+                totalBars, beatsPerBar, barDuration, sixteenth,
+                density, swingAmount, fillFreq, rhythm, addHit, text
+            } = ctx;
 
-            const teenTaal16 = [
+            const teenTaal = [
                 ['LOW','HI','HI','LOW'],
                 ['LOW','HI','HI','LOW'],
                 ['LOW','HI','HI','HI'],
                 ['HI','LOW','HI','LOW']
             ];
-            const kuthu16 = ['LOW','HI','HI','LOW','LOW','HI','LOW','HI','LOW','HI','HI','LOW','LOW','HI','HI','LOW'];
 
             for (let bar = 0; bar < totalBars; bar++) {
                 const phraseStart = bar * barDuration;
                 const isFillBar = fillFreq > 0 && ((bar + 1) % fillFreq === 0);
-                const pattern = rhythm === 'kuthu' ? kuthu16 : teenTaal16.flat();
-                const stepsPerBar = beatsPerBar * 4;
 
-                for (let i = 0; i < stepsPerBar; i++) {
-                    const t = phraseStart + i * sixteenth;
-                    const patternIndex = Math.min(15, Math.floor(i * 16 / stepsPerBar));
-                    const token = pattern[patternIndex];
-                    const accent = [0, 4, 8, 12].some(x => Math.floor(x * stepsPerBar / 16) === i);
+                for (let i = 0; i < 16; i++) {
+                    const base = phraseStart + i * sixteenth;
+                    const swing = (i % 2 === 1) ? sixteenth * swingAmount : 0;
+                    const t = base + swing;
+
+                    const token = teenTaal[Math.floor(i / 4)][i % 4];
+                    const sam = i === 0;
+                    const vibhag = [0, 4, 8, 12].includes(i);
 
                     if (token === 'LOW') {
-                        addHit(MIDI_DRUMS.TABLA_LOW, t, accent ? 0.92 : 0.68, 0.12, 'drums');
+                        addHit(MIDI_DRUMS.TABLA_LOW, t, sam ? 0.96 : (vibhag ? 0.82 : 0.64), 0.12, 'drums', 0, 0.45);
                     } else {
-                        addHit(MIDI_DRUMS.TA1, t, accent ? 0.72 : 0.56, 0.1, 'drums');
+                        addHit(MIDI_DRUMS.TA1, t, sam ? 0.82 : (vibhag ? 0.70 : 0.55), 0.09, 'drums', 0, 0.4);
                     }
 
-                    if (density !== 'minimal' && i % 4 === 1) {
-                        addHit(MIDI_DRUMS.TA2, t + sixteenth * 0.45, 0.38, 0.06, 'drums');
-                    }
-
-                    if (rhythm === 'kuthu' && (i === Math.floor(3 * stepsPerBar / 16) || i === Math.floor(7 * stepsPerBar / 16) || i === Math.floor(11 * stepsPerBar / 16) || i === stepsPerBar - 1)) {
-                        addHit(MIDI_DRUMS.DHOL_HIGH, t, 0.78, 0.09, 'drums');
+                    if (density !== 'minimal' && [1, 5, 9, 13].includes(i)) {
+                        addHit(MIDI_DRUMS.TA2, t + sixteenth * 0.35, 0.30, 0.045, 'drums', 0, 0.25);
                     }
                 }
 
                 if (hasKeyword(text, 'tihai') || isFillBar) {
-                    const phraseStartIndex = Math.max(0, stepsPerBar - 4);
-                    for (let rep = 0; rep < 3; rep++) {
-                        const base = phraseStart + Math.min(stepsPerBar - 1, phraseStartIndex + rep) * sixteenth;
-                        addHit(MIDI_DRUMS.TA1, base, 0.7, 0.07, 'drums');
-                        if (rep < 2) addHit(MIDI_DRUMS.TA2, base + sixteenth * 0.5, 0.5, 0.05, 'drums');
-                    }
+                    const startStep = 12;
+                    const offsets = [0, 1, 2, 4, 5, 6, 8, 9, 10];
+                    offsets.forEach((offset, index) => {
+                        const step = Math.min(15, startStep + offset);
+                        const t = phraseStart + step * sixteenth + (step % 2 ? sixteenth * swingAmount : 0);
+                        addHit(
+                            index % 2 ? MIDI_DRUMS.TA2 : MIDI_DRUMS.TA1,
+                            t,
+                            0.44 + (index / offsets.length) * 0.35,
+                            0.05,
+                            'drums',
+                            0,
+                            0.3
+                        );
+                    });
                 }
-
-                addHit(MIDI_DRUMS.TABLA_LOW, phraseStart, 1.0, 0.16, 'drums');
             }
         }
 
@@ -1445,10 +1542,11 @@
         // SOUTH INDIAN / KUTHU PATTERN
         // ============================================================
         function generateSouthIndianPattern(ctx) {
-            const { totalBars, barDuration, sixteenth, density, fillFreq, addHit, instrument } = ctx;
+            const {
+                totalBars, barDuration, sixteenth,
+                density, swingAmount, fillFreq, addHit, instrument
+            } = ctx;
 
-            // One two-voice groove, using the correct low/high voice for the
-            // selected South Indian percussion family.
             const lowMidi = instrument === 'mridangam'
                 ? MIDI_DRUMS.MRIDANGAM_LOW
                 : MIDI_DRUMS.DHOL_LOW;
@@ -1457,32 +1555,88 @@
                 ? MIDI_DRUMS.MRIDANGAM_HIGH
                 : MIDI_DRUMS.DHOL_HIGH;
 
-            const pattern = [
-                'LOW','HIGH','HIGH','LOW',
-                'LOW','HIGH','LOW','HIGH',
-                'LOW','HIGH','HIGH','LOW',
-                'LOW','HIGH','HIGH','LOW'
-            ];
+            // Four-bar South Indian groove phrase.
+            // Numbers are 16th-note positions; null means intentional space.
+            const phrases = instrument === 'mridangam'
+                ? [
+                    { low:[0,4,8,12], high:[2,3,6,7,10,14,15] },
+                    { low:[0,3,4,8,11,12], high:[1,2,5,6,9,10,13,14] },
+                    { low:[0,4,7,8,12], high:[2,5,6,10,11,14,15] },
+                    { low:[0,3,4,8,10,12,15], high:[1,2,6,7,9,11,13,14] }
+                ]
+                : instrument === 'dhol'
+                ? [
+                    { low:[0,4,8,12], high:[2,3,6,7,10,14,15] },
+                    { low:[0,4,7,8,12], high:[2,5,6,10,11,14] },
+                    { low:[0,3,4,8,11,12], high:[2,6,7,10,14,15] },
+                    { low:[0,4,8,10,12,15], high:[2,3,6,7,11,13,14] }
+                ]
+                : [
+                    { low:[0,4,8,12], high:[2,3,6,10,11,14,15] },
+                    { low:[0,3,4,8,11,12], high:[1,2,5,6,9,10,13,14] },
+                    { low:[0,4,7,8,12], high:[2,5,6,10,11,14,15] },
+                    { low:[0,3,4,8,10,12,15], high:[1,2,6,7,9,11,13,14] }
+                ];
 
             for (let bar = 0; bar < totalBars; bar++) {
+                const phrase = phrases[bar % phrases.length];
                 const start = bar * barDuration;
-                const fillBar = fillFreq > 0 && ((bar + 1) % fillFreq === 0);
+                const isFillBar = fillFreq > 0 && ((bar + 1) % fillFreq === 0);
 
-                for (let i = 0; i < 16; i++) {
-                    const t = start + i * sixteenth;
-                    const strong = i % 4 === 0;
-                    const midi = pattern[i] === 'LOW' ? lowMidi : highMidi;
+                const stepTime = step => {
+                    return start
+                        + step * sixteenth
+                        + (step % 2 === 1 ? sixteenth * swingAmount : 0);
+                };
 
-                    addHit(midi, t, strong ? 0.94 : 0.66, 0.1, 'drums');
+                phrase.low.forEach(step => {
+                    const accent = [0,4,8,12].includes(step);
+                    addHit(
+                        lowMidi,
+                        stepTime(step),
+                        accent ? 0.94 : 0.68,
+                        0.105,
+                        'drums',
+                        0,
+                        0.45
+                    );
+                });
 
-                    // Busy mode adds another articulation from the SAME family.
-                    if (density === 'busy' && (i === 2 || i === 6 || i === 10 || i === 14)) {
-                        addHit(highMidi, t + sixteenth * 0.45, 0.42, 0.05, 'drums');
-                    }
+                phrase.high.forEach(step => {
+                    const accent = [2,6,10,14].includes(step);
+                    addHit(
+                        highMidi,
+                        stepTime(step),
+                        accent ? 0.72 : 0.52,
+                        0.085,
+                        'drums',
+                        0,
+                        0.35
+                    );
+                });
 
-                    if (fillBar && i >= 12) {
-                        addHit(i % 2 ? highMidi : lowMidi, t, 0.72, 0.08, 'drums');
-                    }
+                // Extra articulations are sparse and phrase-aware rather than
+                // simply adding a note to every second 16th.
+                if (density === 'standard' || density === 'busy') {
+                    const ghosts = [3, 7, 11, 15].filter(step => !phrase.high.includes(step));
+                    ghosts.slice(0, density === 'busy' ? 4 : 2).forEach(step => {
+                        addHit(highMidi, stepTime(step), 0.24, 0.045, 'drums', 0, 0.2);
+                    });
+                }
+
+                if (isFillBar) {
+                    [12, 13, 14, 15].forEach((step, index) => {
+                        const midi = index % 2 === 0 ? lowMidi : highMidi;
+                        addHit(
+                            midi,
+                            stepTime(step),
+                            0.48 + index * 0.10,
+                            0.07,
+                            'drums',
+                            0,
+                            0.35
+                        );
+                    });
                 }
             }
         }
@@ -1491,7 +1645,7 @@
         // CINEMATIC ORCHESTRAL PATTERNS
         // ============================================================
         function generateCinematicPattern(ctx) {
-            const { totalBars, barDuration, sixteenth, density, fillFreq, rhythm, addHit, text } = ctx;
+            const { totalBars, barDuration, sixteenth, density, swingAmount, fillFreq, rhythm, addHit, text } = ctx;
 
             for (let bar = 0; bar < totalBars; bar++) {
                 const start = bar * barDuration;
@@ -1520,14 +1674,14 @@
                 const subdivision = build ? 2 : 4;
                 for (let i = 0; i < 16; i += subdivision) {
                     if ((isFillBar || (build && bar >= totalBars - 2)) && i >= 12) continue; 
-                    const t = start + i * sixteenth;
+                    const t = start + i * sixteenth + (i % 2 === 1 ? sixteenth * swingAmount : 0);
                     if (i % 4 === 0) addHit(MIDI_DRUMS.ORCH_SNARE, t, 0.5 * energy, 0.12, 'drums');
                     else if (density === 'busy') addHit(MIDI_DRUMS.HIGH_TOM_CIN, t, 0.32 * energy, 0.1, 'drums');
                 }
 
                 if (isFillBar || (build && bar >= totalBars - 2)) {
                     for (let i = 12; i < 16; i++) {
-                        const t = start + i * sixteenth;
+                        const t = start + i * sixteenth + (i % 2 === 1 ? sixteenth * swingAmount : 0);
                         addHit(i % 2 ? MIDI_DRUMS.HIGH_TOM_CIN : MIDI_DRUMS.LOW_TOM_CIN, t, 0.5 + (i - 12) * 0.1, 0.12, 'drums');
                     }
                     // Scheduled slightly early to guarantee no overlap collision with the exact next downbeat
@@ -1798,7 +1952,8 @@
 
             const ctx = {
                 totalBars, beatsPerBar, barDuration, sixteenth, density, swingAmount, fillFreq,
-                rhythm: resolved.rhythm, instrument: resolved.instrument, text: resolved.text, addHit
+                rhythm: resolved.rhythm, instrument: resolved.instrument, text: resolved.text,
+                swingAmount, addHit
             };
 
             if (resolved.engine === 'indian') generateIndianPattern(ctx);
