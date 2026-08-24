@@ -184,6 +184,8 @@
             z-index: 50;
             overflow-y: auto;
             max-height: 250px;
+            scrollbar-width: thin;
+            scrollbar-color: #00d4ff rgba(0,0,0,0.2);
         }
 
         .custom-select-wrapper.open .custom-select-options {
@@ -202,6 +204,17 @@
             cursor: pointer;
             transition: all 0.2s ease;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .custom-option-header {
+            padding: 10px 15px 5px 15px;
+            color: #00d4ff;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            pointer-events: none;
+            background: rgba(0,0,0,0.2);
         }
 
         .custom-option:last-child {
@@ -463,36 +476,6 @@
             text-align: center;
         }
 
-        .keyword-example {
-            margin-top: 20px;
-            padding: 15px;
-            border-left: 3px solid #00c8ff;
-            background: rgba(0, 200, 255, 0.04);
-            border-radius: 0 8px 8px 0;
-        }
-
-        .keyword-example strong {
-            display: block;
-            margin-bottom: 8px;
-            color: #fff;
-            font-size: 12px;
-        }
-
-        .keyword-example code {
-            display: block;
-            margin-bottom: 10px;
-            color: #00c8ff;
-            font-size: 11px;
-            line-height: 1.5;
-        }
-
-        .keyword-example p {
-            margin: 0;
-            color: #999;
-            font-size: 11px;
-            line-height: 1.5;
-        }
-
         .custom-keyword-note {
             margin-top: 15px;
             padding-top: 15px;
@@ -503,14 +486,30 @@
             line-height: 1.5;
         }
 
-        /* HIDE PAGE SCROLLBARS BUT ALLOW SCROLLING */
-        ::-webkit-scrollbar {
+        /* HIDE PAGE SCROLLBARS BUT EXPLICITLY SHOW CUSTOM DROPDOWN SCROLLBAR */
+        html::-webkit-scrollbar, body::-webkit-scrollbar {
             display: none;
         }
 
         html {
             -ms-overflow-style: none;
             scrollbar-width: none;
+        }
+
+        .custom-select-options::-webkit-scrollbar {
+            display: block !important;
+            width: 6px;
+        }
+
+        .custom-select-options::-webkit-scrollbar-thumb {
+            background: #00d4ff !important;
+            border-radius: 3px;
+            display: block !important;
+        }
+
+        .custom-select-options::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2) !important;
+            display: block !important;
         }
 
         /* CREATOR CREDIT FOOTER LINK */
@@ -544,8 +543,120 @@
             line-height: 1.4;
         }
 
-        .keyword-example + .keyword-example {
-            margin-top: 12px;
+        /* SEPARATE GENERATED INSTRUMENT MIDI DOWNLOADS */
+        .generated-instruments-panel {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .generated-instruments-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .generated-instruments-header strong {
+            color: #ffffff;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .generated-instruments-header span {
+            color: #777;
+            font-size: 0.78rem;
+        }
+
+        .instrument-midi-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .instrument-midi-row {
+            display: grid;
+            grid-template-columns: 165px 38px minmax(180px, 1fr) auto;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: rgba(10, 10, 10, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 10px;
+        }
+
+        .instrument-midi-row:hover {
+            border-color: rgba(0, 212, 255, 0.2);
+        }
+
+        .instrument-midi-info {
+            min-width: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .instrument-midi-info i {
+            color: #00d4ff;
+            width: 18px;
+            text-align: center;
+        }
+
+        .instrument-midi-name {
+            color: #ddd;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .instrument-midi-count {
+            color: #777;
+            font-size: 0.72rem;
+            margin-left: 5px;
+        }
+
+        .instrument-midi-download {
+            flex-shrink: 0;
+        }
+
+        .instrument-play-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            background: rgba(0, 212, 255, 0.08);
+            color: #00d4ff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .instrument-play-btn:hover,
+        .instrument-play-btn.active {
+            background: #00d4ff;
+            color: #000;
+        }
+
+        .instrument-waveform {
+            min-width: 0;
+            height: 48px;
+        }
+
+        .instrument-preview-label {
+            color: #777;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            white-space: nowrap;
+        }
+
+        .instrument-midi-empty {
+            color: #777;
+            font-size: 0.82rem;
+            padding: 12px 0;
         }
 
         /* RESPONSIVE DESIGN */
@@ -559,6 +670,11 @@
         @media (max-width: 768px) {
             .settings-grid { grid-template-columns: 1fr; gap: 15px; }
             .preview-toolbar { flex-direction: column; align-items: stretch; }
+            .instrument-midi-row { grid-template-columns: 1fr auto; }
+            .instrument-midi-info { grid-column: 1; }
+            .instrument-play-btn { grid-column: 2; grid-row: 1; }
+            .instrument-waveform { grid-column: 1 / -1; width: 100%; }
+            .instrument-midi-download { grid-column: 1 / -1; justify-content: center; }
             .keyword-row { flex-direction: column; align-items: flex-start; gap: 4px; }
         }
 
@@ -572,101 +688,46 @@
             .download-btn { justify-content: center; }
         }
     
-        /* V7: MAIN + INDIVIDUAL STEM WAV DOWNLOADS */
-        .stem-downloads {
-            margin-top: 22px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255,255,255,0.08);
-        }
-
-        .stem-downloads h4 {
-            margin: 0 0 14px 0;
-            color: #fff;
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .instrument-stem-card {
-            background: rgba(8,8,8,0.72);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 12px;
-        }
-
-        .instrument-stem-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 10px;
-        }
-
-        .instrument-stem-name {
-            color: #00d4ff;
-            font-weight: 700;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.7px;
-        }
-
-        .instrument-stem-meta {
-            color: #777;
-            font-size: 0.72rem;
-        }
-
-        .instrument-stem-waveform {
-            width: 100%;
-            min-height: 52px;
-            margin-bottom: 10px;
-        }
-
-        .instrument-stem-controls {
+        /* INSTRUMENT PREVIEW VOLUME */
+        .instrument-volume-control {
             display: flex;
             align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
+            gap: 7px;
+            margin-left: 8px;
+            color: #888;
         }
 
-        .stem-play-btn {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            border: 0;
-            background: #00d4ff;
-            color: #000;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
+        .instrument-volume-control i {
+            color: #aaa;
+            font-size: 0.82rem;
         }
 
-        .stem-volume {
-            width: 80px;
+        .instrument-volume-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 78px;
+            height: 4px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 3px;
+            outline: none;
             accent-color: #00d4ff;
         }
 
-        .stem-status {
-            color: #777;
-            font-size: 0.72rem;
-            margin-left: auto;
-        }
-
-        .stem-downloads .download-btn {
-            margin-top: 0;
+        .instrument-volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00d4ff;
+            cursor: pointer;
         }
 
         @media (max-width: 768px) {
-            .instrument-stem-header {
-                align-items: flex-start;
-                flex-direction: column;
-            }
-            .stem-status {
+            .instrument-volume-control {
                 margin-left: 0;
             }
         }
-
     </style>
 </head>
 <body>
@@ -701,23 +762,30 @@
                                 <i class="fa-solid fa-chevron-down"></i>
                             </div>
                             <div class="custom-select-options" id="genreSelectOptions">
+                                <div class="custom-option-header">Modern Electronic</div>
                                 <div class="custom-option selected" data-value="hiphop">Boom Bap / Hip-Hop</div>
                                 <div class="custom-option" data-value="trap">Modern Trap / Drill</div>
                                 <div class="custom-option" data-value="house">House / EDM</div>
-                                <div class="custom-option" data-value="kuthu">South Indian (Dappan Koothu)</div>
-                                <div class="custom-option" data-value="indian_classical">Indian Classical (Teen Taal)</div>
-                                <div class="custom-option" data-value="orchestral">Epic Cinematic Orchestral</div>
                                 <div class="custom-option" data-value="lofi">Lo-Fi / Chillhop</div>
+                                
+                                <div class="custom-option-header">Indian Traditions</div>
+                                <div class="custom-option" data-value="indian_classical">Indian Classical (Teen Taal 16-Beat)</div>
+                                <div class="custom-option" data-value="kuthu">South Indian (Dappan Koothu)</div>
+                                
+                                <div class="custom-option-header">Cinematic Orchestral</div>
+                                <div class="custom-option" data-value="orchestral_epic">Epic Trailer (Big Hits)</div>
+                                <div class="custom-option" data-value="orchestral_dark">Dark Tension (Slow Pulse)</div>
                             </div>
                         </div>
                         <select id="genreSelect" style="display: none;">
                             <option value="hiphop" selected>Boom Bap / Hip-Hop</option>
                             <option value="trap">Modern Trap / Drill</option>
                             <option value="house">House / EDM</option>
-                            <option value="kuthu">South Indian (Dappan Koothu)</option>
-                            <option value="indian_classical">Indian Classical (Teen Taal)</option>
-                            <option value="orchestral">Epic Cinematic Orchestral</option>
                             <option value="lofi">Lo-Fi / Chillhop</option>
+                            <option value="indian_classical">Indian Classical (Teen Taal)</option>
+                            <option value="kuthu">South Indian (Dappan Koothu)</option>
+                            <option value="orchestral_epic">Epic Trailer (Big Hits)</option>
+                            <option value="orchestral_dark">Dark Tension (Slow Pulse)</option>
                         </select>
                     </div>
 
@@ -902,7 +970,7 @@
 
                 <!-- SUBMIT BUTTON -->
                 <button id="processBtn" class="action-btn">
-                    <i class="fa-solid fa-drum-steelpan"></i> Generate Drum MIDI
+                    <i class="fa-solid fa-drum-steelpan"></i> Generate Rhythm
                 </button>
 
                 <!-- STATUS MESSAGE & PROGRESS BAR -->
@@ -919,7 +987,7 @@
                     
                     <div class="waveform-preview-container" id="waveformPreviewContainer">
                         <div class="waveform-header">
-                            <span><i class="fa-solid fa-waveform-lines"></i> Drum Preview</span>
+                            <span><i class="fa-solid fa-waveform-lines"></i> Full Kit Preview</span>
                             <span id="audioDurationText">0:00</span>
                         </div>
                         <div class="waveform-controls">
@@ -935,17 +1003,20 @@
                             </div>
                             
                             <a href="#" class="download-btn" id="downloadMidiBtn" download="tonevault_drums.mid" target="_blank">
-                                <i class="fa-solid fa-file-music"></i> Download MIDI File
-                            </a>
-                            <a href="#" class="download-btn" id="downloadMainWavBtn" download="tonevault_preview.wav" target="_blank">
-                                <i class="fa-solid fa-file-waveform"></i> Download WAV Preview
+                                <i class="fa-solid fa-file-music"></i> Download Full Kit MIDI
                             </a>
                         </div>
                     </div>
 
-                    <div class="stem-downloads" id="stemDownloads" style="display:none;">
-                        <h4><i class="fa-solid fa-layer-group"></i> Separate Instrument Previews</h4>
-                        <div id="stemDownloadsList"></div>
+                    <!-- SEPARATE GENERATED INSTRUMENT MIDI FILES -->
+                    <div class="generated-instruments-panel" id="generatedInstrumentsPanel">
+                        <div class="generated-instruments-header">
+                            <strong><i class="fa-solid fa-layer-group" style="color:#00d4ff; margin-right:7px;"></i> Generated Instruments</strong>
+                            <span id="generatedInstrumentSummary">Separate MIDI files from this generation</span>
+                        </div>
+                        <div class="instrument-midi-list" id="instrumentMidiList">
+                            <div class="instrument-midi-empty">Generate a rhythm to see the individual instrument MIDI files.</div>
+                        </div>
                     </div>
                 </div>
 
@@ -986,37 +1057,6 @@
                     <div class="keyword-row"><span class="keyword">taiko</span><span>Large low cinematic drum character</span></div>
                 </div>
 
-                <div class="keyword-example">
-            <strong>Parai Preview</strong>
-            <p style="margin-top:6px;color:#888;">
-                For authentic Dappan Koothu preview, add licensed recorded Parai one-shots to
-                <code>/Samples/Parai/</code>: <code>parai_low.wav</code>,
-                <code>parai_high.wav</code>, <code>parai_edge.wav</code>,
-                <code>parai_accent.wav</code>.
-            </p>
-        </div>
-
-        <div class="keyword-example">
-            <strong>Orchestra Preview</strong>
-            <p style="margin-top:6px;color:#888;">
-                Cinematic mode uses layered taiko, timpani, tom, snare and impact voices.
-                The preview is kept procedural so the MIDI remains portable; recorded orchestral
-                samples can be added later without changing the rhythm engine.
-            </p>
-        </div>
-
-        <div class="keyword-example">
-                    <strong>Try this</strong>
-                    <code>tabla, teen taal, rolling, humanized, tihai</code>
-                    <p>Creates a 16-matra Indian-style rhythmic cycle with rolling subdivisions and a three-part ending phrase.</p>
-                </div>
-
-                <div class="keyword-example">
-                    <strong>Orchestral example</strong>
-                    <code>cinematic, epic, taiko, tension, build</code>
-                    <p>Creates a low cinematic pulse that grows denser toward the phrase ending with orchestral-style fills and impacts.</p>
-                </div>
-
                 <div class="custom-keyword-note">
                     <i class="fa-solid fa-lightbulb" style="color: #00d4ff; margin-right: 5px;"></i>
                     Keywords are interpreted as musical instructions. You can combine the examples or write your own words; recognized keywords change the pattern engine while unknown words are safely ignored.
@@ -1042,11 +1082,6 @@
     <script type="module">
         // ============================================================
         // TONEVAULT RHYTHM ENGINE V2
-        // - Keeps modern styles
-        // - Adds phrase-based Indian rhythm
-        // - Adds cinematic orchestral percussion
-        // - Adds keyword interpretation
-        // - Keeps exact bar length / time signature / MIDI export
         // ============================================================
 
         function setupCustomDropdown(selectId) {
@@ -1110,9 +1145,9 @@
         const audioDurationText = document.getElementById('audioDurationText');
         const previewVolume = document.getElementById('previewVolume');
         const downloadMidiBtn = document.getElementById('downloadMidiBtn');
-        const downloadMainWavBtn = document.getElementById('downloadMainWavBtn');
-        const stemDownloads = document.getElementById('stemDownloads');
-        const stemDownloadsList = document.getElementById('stemDownloadsList');
+        
+        const instrumentMidiList = document.getElementById('instrumentMidiList');
+        const generatedInstrumentSummary = document.getElementById('generatedInstrumentSummary');
 
         let wavesurfer = null;
         let wavBlobUrl = null;
@@ -1120,6 +1155,9 @@
         let generatedNotes = [];
         let exactMaxTime = 8;
         let currentEngine = 'modern';
+        let instrumentMidiUrls = [];
+        let instrumentPreviewUrls = [];
+        const instrumentWaveSurfers = new Map();
 
         // ============================================================
         // GM + CUSTOM MIDI MAP
@@ -1137,9 +1175,9 @@
             LOW_TOM_CIN: 45,
             HIGH_TOM_CIN: 47,
             TIMPANI: 47,
-            TA1: 60,       // C4 - tabla-style high hit (custom mapping)
-            TA2: 62,       // D4
-            TABLA_LOW: 64, // E4 - custom mapping; DAW users can remap to their library
+            TA1: 60,       
+            TA2: 62,       
+            TABLA_LOW: 64, 
             DHOL_LOW: 36,
             DHOL_HIGH: 45,
             MRIDANGAM_LOW: 36,
@@ -1169,7 +1207,6 @@
             let rhythm = requestedRhythm !== 'auto' ? requestedRhythm : null;
             let instrument = requestedInstrument !== 'auto' ? requestedInstrument : null;
 
-            // Keyword overrides are intentional: explicit user words win over generic style.
             if (hasKeyword(text, 'teen taal', 'teentaal', 'tabla')) rhythm = 'teen_taal';
             if (hasKeyword(text, 'kuthu', 'dappan koothu', 'koothu')) rhythm = 'kuthu';
             if (hasKeyword(text, 'cinematic build', 'orchestral build', 'build')) rhythm = 'cinematic_build';
@@ -1189,7 +1226,8 @@
                 house: { rhythm: 'four_floor', instrument: 'modern' },
                 kuthu: { rhythm: 'kuthu', instrument: 'parai' },
                 indian_classical: { rhythm: 'teen_taal', instrument: 'tabla' },
-                orchestral: { rhythm: 'cinematic_pulse', instrument: 'cinematic' },
+                orchestral_epic: { rhythm: 'cinematic_build', instrument: 'cinematic' },
+                orchestral_dark: { rhythm: 'cinematic_pulse', instrument: 'cinematic' },
                 lofi: { rhythm: 'boom_bap', instrument: 'modern' }
             };
 
@@ -1197,7 +1235,7 @@
             rhythm = rhythm || defaults.rhythm;
             instrument = instrument || defaults.instrument;
 
-            if (genre === 'orchestral' && hasKeyword(text, 'build', 'tension', 'rising')) {
+            if (genre.includes('orchestral') && hasKeyword(text, 'build', 'tension', 'rising')) {
                 rhythm = 'cinematic_build';
             }
 
@@ -1270,7 +1308,6 @@
                             continue;
                         }
 
-                        // Boom bap / default / lofi
                         if (rhythm === 'boom_bap') {
                             if (down && (beat === 0 || beat === 2)) addHit(MIDI_DRUMS.KICK, t, 0.9);
                             if (beat === 1 && step === 3 && !text.includes('sparse')) addHit(MIDI_DRUMS.KICK, t, 0.62);
@@ -1280,7 +1317,6 @@
                             continue;
                         }
 
-                        // Trap / drill
                         if (rhythm === 'trap_roll') {
                             if (down && (beat === 0 || beat === 2)) addHit(MIDI_DRUMS.KICK, t, 0.92);
                             if (beat === 1 && step === 3) addHit(MIDI_DRUMS.KICK, t, 0.7);
@@ -1310,29 +1346,20 @@
         function generateIndianPattern(ctx) {
             const { totalBars, beatsPerBar, barDuration, sixteenth, density, fillFreq, rhythm, addHit, text } = ctx;
 
-            // Each 4/4 bar = 16 subdivisions. The pattern is deliberately phrase-based.
             const teenTaal16 = [
                 ['LOW','HI','HI','LOW'],
                 ['LOW','HI','HI','LOW'],
                 ['LOW','HI','HI','HI'],
                 ['HI','LOW','HI','LOW']
             ];
-
-            const dadra8 = ['LOW','HI','HI','LOW','HI','HI'];
             const kuthu16 = ['LOW','HI','HI','LOW','LOW','HI','LOW','HI','LOW','HI','HI','LOW','LOW','HI','HI','LOW'];
 
             for (let bar = 0; bar < totalBars; bar++) {
                 const phraseStart = bar * barDuration;
                 const isFillBar = fillFreq > 0 && ((bar + 1) % fillFreq === 0);
-                let pattern;
-
-                if (rhythm === 'kuthu') {
-                    pattern = kuthu16;
-                } else {
-                    pattern = teenTaal16.flat();
-                }
-
+                const pattern = rhythm === 'kuthu' ? kuthu16 : teenTaal16.flat();
                 const stepsPerBar = beatsPerBar * 4;
+
                 for (let i = 0; i < stepsPerBar; i++) {
                     const t = phraseStart + i * sixteenth;
                     const patternIndex = Math.min(15, Math.floor(i * 16 / stepsPerBar));
@@ -1345,7 +1372,6 @@
                         addHit(MIDI_DRUMS.TA1, t, accent ? 0.72 : 0.56, 0.1, 'drums');
                     }
 
-                    // Extra finger/hand articulation.
                     if (density !== 'minimal' && i % 4 === 1) {
                         addHit(MIDI_DRUMS.TA2, t + sixteenth * 0.45, 0.38, 0.06, 'drums');
                     }
@@ -1355,7 +1381,6 @@
                     }
                 }
 
-                // Tihai-like ending: three short phrases resolving into the next bar.
                 if (hasKeyword(text, 'tihai') || isFillBar) {
                     const phraseStartIndex = Math.max(0, stepsPerBar - 4);
                     for (let rep = 0; rep < 3; rep++) {
@@ -1365,7 +1390,6 @@
                     }
                 }
 
-                // Add a low bayan-like anchor at the start of every phrase.
                 addHit(MIDI_DRUMS.TABLA_LOW, phraseStart, 1.0, 0.16, 'drums');
             }
         }
@@ -1379,42 +1403,11 @@
                 density, swingAmount, fillFreq, addHit, text, instrument
             } = ctx;
 
-            /*
-             * V9 PHRASE-BASED SOUTH INDIAN FOLK ENGINE
-             * ----------------------------------------
-             * The important change from V8 is that the groove is built as
-             * one coordinated phrase.  Low and high voices have deliberate
-             * roles instead of being generated independently.
-             *
-             * Dappan Koothu / Parai uses ONLY Parai Low + Parai High.
-             * Mridangam, Tabla, Dhol and modern drums are never injected
-             * into the Parai preset.
-             *
-             * The four bars form a call -> response -> variation -> turnaround
-             * phrase and repeat naturally for longer arrangements.
-             */
-
             const phrase = [
-                // Bar 1: establish the pulse.
-                {
-                    low:  [0, 4, 8, 12],
-                    high: [2, 6, 10, 14]
-                },
-                // Bar 2: answer the first bar with a small anticipation.
-                {
-                    low:  [0, 4, 8, 11],
-                    high: [2, 6, 9, 14]
-                },
-                // Bar 3: variation, but leave breathing room.
-                {
-                    low:  [0, 3, 8, 12],
-                    high: [2, 5, 10, 13, 15]
-                },
-                // Bar 4: turnaround leading cleanly back to bar 1.
-                {
-                    low:  [0, 4, 8, 12, 14],
-                    high: [2, 6, 10, 12, 14, 15]
-                }
+                { low:  [0, 4, 8, 12], high: [2, 6, 10, 14] },
+                { low:  [0, 4, 8, 11], high: [2, 6, 9, 14] },
+                { low:  [0, 3, 8, 12], high: [2, 5, 10, 13, 15] },
+                { low:  [0, 4, 8, 12, 14], high: [2, 6, 10, 12, 14, 15] }
             ];
 
             const sparsePhrase = [
@@ -1431,14 +1424,8 @@
                 { low:[0, 4, 7, 8, 11, 12, 14], high:[2, 5, 6, 9, 10, 13, 14, 15] }
             ];
 
-            const chosenPhrase = density === 'minimal'
-                ? sparsePhrase
-                : density === 'busy'
-                    ? busyPhrase
-                    : phrase;
+            const chosenPhrase = density === 'minimal' ? sparsePhrase : density === 'busy' ? busyPhrase : phrase;
 
-            // Only two voices for Parai/Thappu/Dhol folk styles.
-            // The selected instrument determines which real sample bank is used.
             const lowMidi = MIDI_DRUMS.DHOL_LOW;
             const highMidi = MIDI_DRUMS.DHOL_HIGH;
 
@@ -1456,7 +1443,6 @@
                     addHit(midi, t, velocity, duration, 'drums');
                 };
 
-                // LOW = the physical pulse / foundation.
                 pattern.low.forEach((step, i) => {
                     let velocity = step === 0 ? 0.98 : 0.70;
                     if (step === 8) velocity = 0.82;
@@ -1464,37 +1450,21 @@
                     schedule(step, lowMidi, velocity, 0.105);
                 });
 
-                // HIGH = response / movement. Avoid simultaneous low+high hits
-                // except at the intentional turnaround.
                 pattern.high.forEach((step, i) => {
                     let velocity = (step === 2 || step === 10) ? 0.76 : 0.58;
                     if (phraseBar === 3 && step >= 14) velocity += 0.10;
                     schedule(step, highMidi, velocity, 0.07);
                 });
 
-                // Explicit call-and-response keyword: reinforce the existing
-                // phrase rather than creating a separate random rhythm.
                 if (hasKeyword(text, 'call and response', 'call response')) {
-                    if (phraseBar === 0 || phraseBar === 2) {
-                        schedule(6, highMidi, 0.68, 0.065);
-                    } else {
-                        schedule(13, highMidi, 0.68, 0.065);
-                    }
+                    if (phraseBar === 0 || phraseBar === 2) schedule(6, highMidi, 0.68, 0.065);
+                    else schedule(13, highMidi, 0.68, 0.065);
                 }
 
-                // Driving/strong keywords change accents, not note count.
                 if (hasKeyword(text, 'driving', 'strong accents', 'aggressive')) {
                     schedule(8, lowMidi, 0.88, 0.105);
                 }
 
-                // Sparse/space removes the optional anticipation rather than
-                // replacing the groove with random notes.
-                if (hasKeyword(text, 'space', 'sparse') && phraseBar === 1) {
-                    // Keep the main pulse; no extra events are added.
-                }
-
-                // A fill is a controlled variation of the final bar, not a
-                // separate instrument. This keeps the groove coherent.
                 const isFillBar = fillFreq > 0 && ((bar + 1) % fillFreq === 0);
                 if (phraseBar === 3 && isFillBar) {
                     schedule(12, lowMidi, 0.72, 0.08);
@@ -1517,47 +1487,267 @@
                 const build = rhythm === 'cinematic_build' || hasKeyword(text, 'build', 'tension', 'rising');
                 const progression = totalBars <= 1 ? 1 : bar / (totalBars - 1);
                 const energy = build ? 0.55 + progression * 0.4 : 0.75;
+                const isImpactBar = ((bar + 1) % 4 === 0 || bar === totalBars - 1);
 
-                // Low cinematic pulse: beats 1 and 3, with occasional anticipation.
                 for (let beat = 0; beat < 4; beat++) {
                     const beatTime = start + beat * sixteenth * 4;
                     if (beat === 0 || beat === 2) {
-                        addHit(MIDI_DRUMS.TAIKO_LOW, beatTime, 0.82 * energy, 0.35, 'drums');
-                        addHit(MIDI_DRUMS.TIMPANI, beatTime, 0.72 * energy, 0.5, 'orch');
+                        if (beat === 0 && isImpactBar) {
+                            addHit('TIMPANI', beatTime, 0.95, 1.2, 'orch');
+                            addHit(MIDI_DRUMS.TAIKO_LOW, beatTime, 0.92, 0.8, 'drums');
+                        } else {
+                            addHit(MIDI_DRUMS.TAIKO_LOW, beatTime, 0.82 * energy, 0.35, 'drums');
+                            addHit('TIMPANI', beatTime, 0.72 * energy, 0.8, 'orch');
+                        }
                     }
                     if (density !== 'minimal' && (beat === 1 || beat === 3)) {
                         addHit(MIDI_DRUMS.LOW_TOM_CIN, beatTime, 0.58 * energy, 0.24, 'drums');
                     }
                 }
 
-                // Cinematic snare/tom ostinato.
                 const subdivision = build ? 2 : 4;
                 for (let i = 0; i < 16; i += subdivision) {
+                    if ((isFillBar || (build && bar >= totalBars - 2)) && i >= 12) continue; 
                     const t = start + i * sixteenth;
                     if (i % 4 === 0) addHit(MIDI_DRUMS.ORCH_SNARE, t, 0.5 * energy, 0.12, 'drums');
                     else if (density === 'busy') addHit(MIDI_DRUMS.HIGH_TOM_CIN, t, 0.32 * energy, 0.1, 'drums');
                 }
 
-                // Rising fill in the final beat of build bars.
                 if (isFillBar || (build && bar >= totalBars - 2)) {
                     for (let i = 12; i < 16; i++) {
                         const t = start + i * sixteenth;
                         addHit(i % 2 ? MIDI_DRUMS.HIGH_TOM_CIN : MIDI_DRUMS.LOW_TOM_CIN, t, 0.5 + (i - 12) * 0.1, 0.12, 'drums');
                     }
-                    addHit(MIDI_DRUMS.CRASH, start + 16 * sixteenth, 0.85, 0.4, 'drums');
-                }
-
-                // Big phrase impact every 4 bars or at the end.
-                if ((bar + 1) % 4 === 0 || bar === totalBars - 1) {
-                    addHit(MIDI_DRUMS.TIMPANI, start, 0.95, 0.9, 'orch');
-                    addHit(MIDI_DRUMS.TAIKO_LOW, start, 0.92, 0.55, 'drums');
+                    addHit(MIDI_DRUMS.CRASH, start + 15.5 * sixteenth, 0.85, 0.4, 'drums');
                 }
             }
         }
 
         // ============================================================
-        // MIDI GENERATION
+        // GENERATED INSTRUMENT IDENTIFICATION / MIDI EXPORT
         // ============================================================
+        function getGeneratedInstrumentName(note, resolved) {
+            if (note.midi === 'TIMPANI') return 'Timpani';
+
+            const n = Number(note.midi);
+
+            if (resolved.engine === 'indian') {
+                if (n === MIDI_DRUMS.TABLA_LOW) return 'Tabla Low';
+                if (n === MIDI_DRUMS.TA1) return 'Tabla High';
+                if (n === MIDI_DRUMS.TA2) return 'Tabla Mid';
+            }
+
+            if (resolved.engine === 'south_indian') {
+                if (n === MIDI_DRUMS.DHOL_LOW) return 'Dhol Low / Mridangam Low';
+                if (n === MIDI_DRUMS.DHOL_HIGH) return 'Dhol High';
+                if (n === MIDI_DRUMS.MRIDANGAM_HIGH) return 'Mridangam High';
+            }
+
+            if (resolved.engine === 'cinematic' || resolved.engine === 'hybrid') {
+                if (n === MIDI_DRUMS.TAIKO_LOW) return 'Taiko Low';
+                if (n === MIDI_DRUMS.LOW_TOM_CIN) return 'Cinematic Low Tom';
+                if (n === MIDI_DRUMS.HIGH_TOM_CIN) return 'Cinematic High Tom';
+                if (n === MIDI_DRUMS.ORCH_SNARE) return 'Orchestral Snare';
+                if (n === MIDI_DRUMS.CRASH) return 'Crash Cymbal';
+            }
+
+            const modernMap = {
+                [MIDI_DRUMS.KICK]: 'Kick',
+                [MIDI_DRUMS.SNARE]: 'Snare',
+                [MIDI_DRUMS.CLAP]: 'Clap',
+                [MIDI_DRUMS.CH]: 'Closed Hi-Hat',
+                [MIDI_DRUMS.OH]: 'Open Hi-Hat',
+                [MIDI_DRUMS.TOM_LO]: 'Low Tom',
+                [MIDI_DRUMS.TOM_HI]: 'High Tom',
+                [MIDI_DRUMS.ORCH_SNARE]: 'Orchestral Snare',
+                [MIDI_DRUMS.CRASH]: 'Crash Cymbal'
+            };
+
+            return modernMap[n] || `MIDI Note ${n}`;
+        }
+
+        function getInstrumentIcon(name) {
+            const lower = name.toLowerCase();
+            if (lower.includes('kick')) return 'fa-drum';
+            if (lower.includes('snare')) return 'fa-drum-steelpan';
+            if (lower.includes('hat') || lower.includes('cymbal')) return 'fa-circle';
+            if (lower.includes('tabla') || lower.includes('mridangam') || lower.includes('dhol') || lower.includes('parai')) return 'fa-drum';
+            if (lower.includes('timpani') || lower.includes('tom') || lower.includes('taiko')) return 'fa-drum';
+            return 'fa-music';
+        }
+
+        function clearInstrumentMidiUrls() {
+            instrumentWaveSurfers.forEach(ws => {
+                try { ws.destroy(); } catch (e) {}
+            });
+            instrumentWaveSurfers.clear();
+
+            instrumentMidiUrls.forEach(url => URL.revokeObjectURL(url));
+            instrumentPreviewUrls.forEach(url => URL.revokeObjectURL(url));
+            instrumentMidiUrls = [];
+            instrumentPreviewUrls = [];
+        }
+
+        function createInstrumentMidiBlob(notes, instrumentName, currentTempo, timeSig) {
+            const [beatsPerBar, beatUnit] = timeSig.split('/').map(Number);
+            const midi = new Midi();
+            midi.header.setTempo(currentTempo);
+            midi.header.timeSignatures.push({
+                ticks: 0,
+                timeSignature: [beatsPerBar, beatUnit]
+            });
+
+            const track = midi.addTrack();
+            track.name = `ToneVault ${instrumentName}`;
+
+            if (instrumentName === 'Timpani') {
+                track.channel = 0;
+                track.instrument.number = 47;
+            } else {
+                track.channel = 9;
+            }
+
+            notes
+                .slice()
+                .sort((a, b) => a.time - b.time)
+                .forEach(note => {
+                    const midiNumber = note.midi === 'TIMPANI' ? 43 : Number(note.midi);
+                    if (!Number.isFinite(midiNumber)) return;
+                    track.addNote({
+                        midi: midiNumber,
+                        time: Math.max(0, note.time),
+                        duration: Math.max(0.01, note.duration || 0.1),
+                        velocity: Math.max(0.01, Math.min(1, note.velocity || 0.8))
+                    });
+                });
+
+            return new Blob([midi.toArray()], { type: 'audio/midi' });
+        }
+
+        async function buildInstrumentMidiDownloads(resolved, currentTempo, timeSig, totalDuration) {
+            clearInstrumentMidiUrls();
+            instrumentMidiList.innerHTML = '';
+
+            const groups = new Map();
+            generatedNotes.forEach(note => {
+                const name = getGeneratedInstrumentName(note, resolved);
+                if (!groups.has(name)) groups.set(name, []);
+                groups.get(name).push(note);
+            });
+
+            if (!groups.size) {
+                instrumentMidiList.innerHTML = '<div class="instrument-midi-empty">No generated instrument events were found.</div>';
+                generatedInstrumentSummary.textContent = 'No separate MIDI files available';
+                return;
+            }
+
+            generatedInstrumentSummary.textContent = `${groups.size} separate MIDI ${groups.size === 1 ? 'file' : 'files'} generated from this kit`;
+
+            const rows = [];
+            let index = 0;
+
+            groups.forEach((notes, name) => {
+                const blob = createInstrumentMidiBlob(notes, name, currentTempo, timeSig);
+                const midiUrl = URL.createObjectURL(blob);
+                instrumentMidiUrls.push(midiUrl);
+
+                const row = document.createElement('div');
+                row.className = 'instrument-midi-row';
+
+                const info = document.createElement('div');
+                info.className = 'instrument-midi-info';
+                info.innerHTML = `<i class="fa-solid ${getInstrumentIcon(name)}"></i><span class="instrument-midi-name"></span><span class="instrument-midi-count">${notes.length} notes</span>`;
+                info.querySelector('.instrument-midi-name').textContent = name;
+
+                const playBtn = document.createElement('button');
+                playBtn.className = 'instrument-play-btn';
+                playBtn.title = `Play ${name}`;
+                playBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+
+                const waveform = document.createElement('div');
+                waveform.className = 'instrument-waveform';
+                waveform.id = `instrumentWave_${index}`;
+
+                const link = document.createElement('a');
+                link.className = 'download-btn instrument-midi-download';
+                link.href = midiUrl;
+                link.download = `tonevault_${name.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_${currentTempo}bpm.mid`;
+                link.innerHTML = '<i class="fa-solid fa-file-music"></i> Download MIDI';
+
+                row.appendChild(info);
+                row.appendChild(playBtn);
+                row.appendChild(waveform);
+                row.appendChild(link);
+                instrumentMidiList.appendChild(row);
+
+                rows.push({ notes, name, playBtn, playIcon: playBtn.querySelector('i'), waveform, index });
+                index++;
+            });
+
+            generatedInstrumentSummary.textContent = `${groups.size} instruments — rendering individual previews...`;
+
+            for (const item of rows) {
+                try {
+                    const previewBlob = await renderRhythmAudioPreview(
+                        item.notes,
+                        totalDuration,
+                        resolved,
+                        { returnBlob: true }
+                    );
+
+                    const previewUrl = URL.createObjectURL(previewBlob);
+                    instrumentPreviewUrls.push(previewUrl);
+
+                    const ws = WaveSurfer.create({
+                        container: item.waveform,
+                        waveColor: '#3f3f3f',
+                        progressColor: '#00d4ff',
+                        cursorColor: '#ffffff',
+                        barWidth: 2,
+                        barRadius: 2,
+                        height: 48,
+                        normalize: true
+                    });
+
+                    instrumentWaveSurfers.set(item.name, ws);
+                    ws.load(previewUrl);
+
+                    item.playBtn.addEventListener('click', async () => {
+                        await Tone.start();
+
+                        instrumentWaveSurfers.forEach((otherWs, key) => {
+                            if (key !== item.name && otherWs.isPlaying()) {
+                                otherWs.pause();
+                            }
+                        });
+
+                        ws.playPause();
+                    });
+
+                    ws.on('play', () => {
+                        item.playBtn.classList.add('active');
+                        item.playIcon.className = 'fa-solid fa-pause';
+                    });
+
+                    ws.on('pause', () => {
+                        item.playBtn.classList.remove('active');
+                        item.playIcon.className = 'fa-solid fa-play';
+                    });
+
+                    ws.on('finish', () => {
+                        item.playBtn.classList.remove('active');
+                        item.playIcon.className = 'fa-solid fa-play';
+                    });
+
+                } catch (previewError) {
+                    console.warn(`ToneVault: ${item.name} preview could not be rendered.`, previewError);
+                    item.waveform.innerHTML = '<span class="instrument-preview-label">Preview unavailable</span>';
+                }
+            }
+
+            generatedInstrumentSummary.textContent = `${groups.size} separate MIDI ${groups.size === 1 ? 'file' : 'files'} + audio previews generated from this kit`;
+        }
+
         function generateMIDI({ currentTempo, totalBars, timeSig, density, swingAmount, humanizeAmount, fillFreq, genre, rhythm, instrument, thoughts }) {
             const timing = getTiming(currentTempo, timeSig);
             const { beatsPerBar, beatUnit, barDuration, sixteenth } = timing;
@@ -1583,17 +1773,8 @@
             const addHit = createNoteAdder({ drumTrack, orchTrack, exactMaxTime, humanizeAmount, notes: generatedNotes });
 
             const ctx = {
-                totalBars,
-                beatsPerBar,
-                barDuration,
-                sixteenth,
-                density,
-                swingAmount,
-                fillFreq,
-                rhythm: resolved.rhythm,
-                instrument: resolved.instrument,
-                text: resolved.text,
-                addHit
+                totalBars, beatsPerBar, barDuration, sixteenth, density, swingAmount, fillFreq,
+                rhythm: resolved.rhythm, instrument: resolved.instrument, text: resolved.text, addHit
             };
 
             if (resolved.engine === 'indian') generateIndianPattern(ctx);
@@ -1604,9 +1785,6 @@
             return { midi, resolved, timing };
         }
 
-        // ============================================================
-        // PREVIEW PLAYER
-        // ============================================================
         previewPlayBtn.addEventListener('click', async () => {
             await Tone.start();
             if (wavesurfer) wavesurfer.playPause();
@@ -1616,15 +1794,19 @@
             if (wavesurfer) wavesurfer.setVolume(parseFloat(e.target.value));
         });
 
-        // ============================================================
-        // GENERATE BUTTON
-        // ============================================================
         processBtn.addEventListener('click', async () => {
             await Tone.start();
             processBtn.disabled = true;
             statusMessage.style.display = 'block';
+            
+            // HIDE OLD RESULTS PROPERLY
             resultsArea.style.display = 'none';
             waveformPreviewContainer.style.display = 'none';
+            if (wavesurfer) {
+                wavesurfer.destroy();
+                wavesurfer = null;
+            }
+            
             progressBarFill.style.width = '20%';
             statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Reading musical intent...`;
 
@@ -1655,26 +1837,17 @@
                     if (midiBlobUrl) URL.revokeObjectURL(midiBlobUrl);
                     midiBlobUrl = URL.createObjectURL(midiBlob);
                     downloadMidiBtn.href = midiBlobUrl;
-                    downloadMidiBtn.download = `tonevault_${resolved.rhythm}_${currentTempo}bpm.mid`;
+                    downloadMidiBtn.download = `tonevault_${resolved.rhythm}_${currentTempo}bpm_full_kit.mid`;
+
+                    await buildInstrumentMidiDownloads(resolved, currentTempo, timeSig, exactMaxTime);
 
                     progressBarFill.style.width = '70%';
                     statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Rendering ${resolved.instrument} preview...`;
 
                     resultsArea.style.display = 'block';
                     waveformPreviewContainer.style.display = 'block';
+                    
                     await renderRhythmAudioPreview(generatedNotes, exactMaxTime, resolved);
-                    if (downloadMainWavBtn && wavBlobUrl) {
-                        downloadMainWavBtn.href = wavBlobUrl;
-                        downloadMainWavBtn.download = `tonevault_${resolved.rhythm}_${currentTempo}bpm_preview.wav`;
-                    }
-
-                    await renderSeparateInstrumentPreviews(
-                        generatedNotes,
-                        exactMaxTime,
-                        resolved,
-                        currentTempo,
-                        timeSig
-                    );
 
                     progressBarFill.style.width = '100%';
                     statusText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#00d4ff;"></i> ${resolved.rhythm.replaceAll('_',' ')} ready`;
@@ -1695,248 +1868,250 @@
         });
 
         // ============================================================
-        // HIGHER-QUALITY PROCEDURAL PREVIEW
+        // TONEVAULT AUDIO SYNTHESIS WITH DYNAMIC DURATION SANITIZER
         // ============================================================
-        // These are still browser-generated sounds, not commercial samples.
-        // For true recorded tabla / taiko / orchestral sounds, replace the
-        // corresponding synth voices with local Tone.Sampler sample sets.
-        // ============================================================
-        // AUTHENTIC INDIAN SAMPLE PREVIEW
-        // ============================================================
-        // The previous version used FM/MembraneSynth voices for Indian
-        // percussion. That can imitate a drum, but it cannot sound like
-        // a real tabla or mridangam. This version uses actual recorded
-        // samples for the Indian preview while keeping synth fallback
-        // for instruments for which no sample bank is configured.
-        //
-        // Tabla samples: TidalCycles Dirt-Samples (permissive sample set)
-        // Mridangam samples: Arthur Carabott / Harishankar V Menon set
-        // from the mrid sample repository.
-        // ============================================================
-        // ============================================================
-        // V8 SAMPLE ENGINE
-        // Uses the actual WAV files from the ToneVault /Samples tree.
-        // No procedural drum fallback is used for mapped instruments.
-        // ============================================================
-        const SAMPLE_RAW_BASE = 'https://raw.githubusercontent.com/tonevaultbyhc/ToneVault/main';
-        const decodedSampleCache = new Map();
+        
+        // Caching context for Tone.js
         let sampleDecodeContext = null;
+        const decodedSampleCache = new Map();
 
-        function encodedSampleUrl(path) {
-            const clean = String(path || '').replace(/^\/+/, '');
-            const encodedPath = clean.split('/').map(part => encodeURIComponent(part)).join('/');
-            return `${location.origin}/${encodedPath}`;
-        }
-
-        function rawSampleUrl(path) {
-            const clean = String(path || '').replace(/^\/+/, '');
-            const encodedPath = clean.split('/').map(part => encodeURIComponent(part)).join('/');
-            return `${SAMPLE_RAW_BASE}/${encodedPath}`;
-        }
-
-        async function fetchSampleBuffer(path) {
-            if (decodedSampleCache.has(path)) return decodedSampleCache.get(path);
+        async function fetchSampleBuffer(url) {
+            if (decodedSampleCache.has(url)) return decodedSampleCache.get(url);
 
             const promise = (async () => {
-                const urls = [encodedSampleUrl(path), rawSampleUrl(path)];
-                let lastError = null;
-
-                for (const url of urls) {
-                    try {
-                        const response = await fetch(url, { cache: 'force-cache' });
-                        if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`);
-                        const arrayBuffer = await response.arrayBuffer();
-
-                        if (!sampleDecodeContext) {
-                            const AC = window.AudioContext || window.webkitAudioContext;
-                            if (!AC) throw new Error('Web Audio API is unavailable');
-                            sampleDecodeContext = new AC();
-                        }
-
-                        return await sampleDecodeContext.decodeAudioData(arrayBuffer.slice(0));
-                    } catch (error) {
-                        lastError = error;
-                        console.warn('ToneVault sample load failed:', url, error);
+                try {
+                    const response = await fetch(url, { cache: 'force-cache' });
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const arrayBuffer = await response.arrayBuffer();
+                    if (!sampleDecodeContext) {
+                        const AC = window.AudioContext || window.webkitAudioContext;
+                        if (!AC) throw new Error('Web Audio API is unavailable');
+                        sampleDecodeContext = new AC();
                     }
+                    return await sampleDecodeContext.decodeAudioData(arrayBuffer);
+                } catch (error) {
+                    console.warn(`ToneVault sample load failed: ${url}`, error);
+                    throw error;
                 }
-
-                throw lastError || new Error(`Unable to load ${path}`);
             })();
 
-            decodedSampleCache.set(path, promise);
+            decodedSampleCache.set(url, promise);
             return promise;
         }
 
-        function bankFiles(bank) {
-            if (!bank || !bank.notes) return [];
-            return Object.values(bank.notes).flat();
-        }
+        async function renderRhythmAudioPreview(notes, totalDuration, resolved, options = {}) {
+            
+            const previewNotes = notes
+                .map(note => ({ ...note }))
+                .filter(note => Number.isFinite(note.time) && note.time >= 0 && note.time < totalDuration)
+                .sort((a, b) => a.time - b.time || a.midi - b.midi);
 
-        function chooseBankFile(bank, noteIndex) {
-            const files = bankFiles(bank);
-            if (!files.length) return null;
-            return files[Math.abs(noteIndex) % files.length];
-        }
-
-        function stemKeyForNote(note, resolved) {
-            const m = Number(note.midi);
-
-            // South Indian / Kuthu uses its own internal MIDI positions.
-            // 36 = low Parai/Dhol, 45 = high Parai/Dhol, 62 = Mridangam high.
-            if (resolved.engine === 'south_indian') {
-                if (resolved.instrument === 'parai') {
-                    if (m === MIDI_DRUMS.DHOL_LOW) return 'parai_low';
-                    if (m === MIDI_DRUMS.DHOL_HIGH) return 'parai_high';
-                    if (m === MIDI_DRUMS.MRIDANGAM_HIGH) return 'mridangam_high';
-                    if (m === MIDI_DRUMS.MRIDANGAM_LOW) return 'mridangam_low';
-                }
-                if (resolved.instrument === 'tabla') {
-                    if (m === MIDI_DRUMS.DHOL_LOW) return 'tabla_low';
-                    if (m === MIDI_DRUMS.DHOL_HIGH) return 'tabla_high';
-                }
-                if (resolved.instrument === 'cinematic') {
-                    if (m === MIDI_DRUMS.DHOL_LOW) return 'taiko_low';
-                    if (m === MIDI_DRUMS.DHOL_HIGH) return 'taiko_high';
-                }
-            }
-
-            if (resolved.engine === 'indian') {
-                if (m === MIDI_DRUMS.TABLA_LOW) return 'tabla_low';
-                if (m === MIDI_DRUMS.TA1) return 'tabla_mid';
-                if (m === MIDI_DRUMS.TA2) return 'tabla_high';
-            }
-
-            if (resolved.engine === 'cinematic' || resolved.engine === 'hybrid') {
-                if (m === MIDI_DRUMS.TAIKO_LOW) return 'taiko_low';
-                if (m === MIDI_DRUMS.TAIKO_HIGH) return 'taiko_high';
-                if (m === MIDI_DRUMS.ORCH_SNARE) return 'orchestral_snare';
-                if (m === MIDI_DRUMS.TIMPANI) return 'timpani_low';
-                if (m === MIDI_DRUMS.CRASH) return 'orchestral_crash';
-                if (m === MIDI_DRUMS.LOW_TOM_CIN) return 'modern_low_tom';
-                if (m === MIDI_DRUMS.HIGH_TOM_CIN) return 'modern_high_tom';
-            }
-
-            if (m === MIDI_DRUMS.KICK) return 'modern_kick';
-            if (m === MIDI_DRUMS.SNARE) return 'modern_snare';
-            if (m === MIDI_DRUMS.CLAP) return 'modern_clap';
-            if (m === MIDI_DRUMS.CH) return 'modern_ch';
-            if (m === MIDI_DRUMS.OH) return 'modern_oh';
-            if (m === MIDI_DRUMS.TOM_LO) return 'modern_low_tom';
-            if (m === MIDI_DRUMS.TOM_HI) return 'modern_high_tom';
-            if (m === MIDI_DRUMS.CRASH) return 'modern_crash';
-
-            return null;
-        }
-
-        async function decodeBanksForNotes(notes, resolved) {
-            const required = new Map();
-            notes.forEach((note, index) => {
-                const key = stemKeyForNote(note, resolved);
-                const bank = key && STEM_SAMPLE_BANK[key];
-                if (!bank) return;
-                for (const file of bankFiles(bank)) {
-                    if (!required.has(file)) required.set(file, null);
+            const uniquePreviewNotes = [];
+            const seenPreviewEvents = new Set();
+            
+            previewNotes.forEach(note => {
+                const t = Math.max(0, Math.min(note.time, totalDuration - 0.001));
+                const key = `${note.track}|${note.midi}|${Math.round(t * 100)}`;
+                if (!seenPreviewEvents.has(key)) {
+                    seenPreviewEvents.add(key);
+                    uniquePreviewNotes.push({ ...note, time: t });
                 }
             });
 
-            const failures = [];
-            await Promise.all([...required.keys()].map(async file => {
-                try {
-                    required.set(file, await fetchSampleBuffer(file));
-                } catch (error) {
-                    failures.push({ file, error });
+            const buffer = await Tone.Offline(async () => {
+                const isIndian = resolved.engine === 'indian';
+                const isSouth = resolved.engine === 'south_indian';
+                const isCinematic = resolved.engine === 'cinematic' || resolved.engine === 'hybrid';
+
+                const master = new Tone.Gain(0.78);
+                const compressor = new Tone.Compressor({ threshold: -18, ratio: 2.2, attack: 0.01, release: 0.18 });
+                const reverb = new Tone.Reverb({
+                    decay: isIndian || isSouth ? 2.8 : isCinematic ? 4.8 : 1.5,
+                    preDelay: 0.025,
+                    wet: isIndian || isSouth ? 0.22 : isCinematic ? 0.38 : 0.08
+                });
+                master.chain(compressor, reverb, Tone.getDestination());
+
+                let tablaSampler = null;
+                let mridangamSampler = null;
+                let paraiSampler = null;
+
+                if (isIndian) {
+                    tablaSampler = new Tone.Sampler({
+                        urls: {
+                            C4: '000_bass_flick1.wav',
+                            D4: '001_bass_flick2.wav',
+                            E4: '002_bass_lick1.wav',
+                            F4: '003_dead_hit1.wav',
+                            G4: '004_dead_hit2.wav',
+                            A4: '005_dead_hit3.wav'
+                        },
+                        baseUrl: 'https://raw.githubusercontent.com/tidalcycles/Dirt-Samples/master/tabla/',
+                        release: 0.8,
+                        curve: 'exponential'
+                    }).connect(master);
+                    
+                    try {
+                        await Tone.loaded();
+                    } catch (e) {
+                        tablaSampler = null;
+                    }
                 }
-            }));
 
-            return { buffers: required, failures };
-        }
+                if (isSouth && resolved.instrument !== 'parai') {
+                    mridangamSampler = new Tone.Sampler({
+                        urls: {
+                            C4: 'norm_sounds/ka/ka-1.wav',
+                            D4: 'norm_sounds/ta/ta-1.wav',
+                            E4: 'norm_sounds/na/na-1.wav',
+                            F4: 'norm_sounds/dhin/dhin-1.wav',
+                            G4: 'norm_sounds/dhum/dhum-1.wav',
+                            A4: 'norm_sounds/thom/thom-1.wav',
+                            B4: 'norm_sounds/chaapu/chaapu-1.wav'
+                        },
+                        baseUrl: 'https://raw.githubusercontent.com/yaxu/mrid/main/',
+                        release: 0.7,
+                        curve: 'exponential'
+                    }).connect(master);
+                    
+                    try {
+                        await Tone.loaded();
+                    } catch (e) {
+                        mridangamSampler = null;
+                    }
+                }
 
-        function connectSampleMaster(ctx, destination, masterGain = 0.82) {
-            const gain = ctx.createGain();
-            gain.gain.value = masterGain;
-            const compressor = ctx.createDynamicsCompressor();
-            compressor.threshold.value = -16;
-            compressor.knee.value = 8;
-            compressor.ratio.value = 2.2;
-            compressor.attack.value = 0.004;
-            compressor.release.value = 0.18;
-            gain.connect(compressor);
-            compressor.connect(destination);
-            return gain;
-        }
+                // ----------------------------------------------------
+                // BULLETPROOF PARAI SAMPLER
+                // ----------------------------------------------------
+                if (isSouth && resolved.instrument === 'parai') {
+                    paraiSampler = new Tone.Sampler({
+                        urls: {
+                            C4: 'parai_low.wav', 
+                            D4: 'parai_high.wav', 
+                            E4: 'parai_edge.wav', 
+                            F4: 'parai_accent.wav'
+                        },
+                        baseUrl: '/Samples/Parai/',
+                        release: 0.9, 
+                        curve: 'exponential'
+                    }).connect(master);
 
-        async function renderSampleMix(notes, totalDuration, resolved, onlyStemKey = null) {
-            const selected = notes
-                .map((note, index) => ({ ...note, __index: index }))
-                .filter(note => note.time >= 0 && note.time < totalDuration)
-                .filter(note => {
-                    const key = stemKeyForNote(note, resolved);
-                    return key && STEM_SAMPLE_BANK[key] && (!onlyStemKey || key === onlyStemKey);
-                })
-                .sort((a, b) => a.time - b.time || a.__index - b.__index);
+                    try { 
+                        await Tone.loaded(); 
+                    } catch (e) {
+                        paraiSampler = null;
+                    }
+                }
 
-            if (!selected.length) return { buffer: null, failures: [] };
+                // SYNTH FALLBACKS
+                const kick = new Tone.MembraneSynth({
+                    pitchDecay: 0.035, octaves: 3.5, oscillator: { type: 'sine' },
+                    envelope: { attack: 0.001, decay: 0.5, sustain: 0, release: 0.25 }
+                }).connect(master);
 
-            const { buffers, failures } = await decodeBanksForNotes(selected, resolved);
-            const usable = selected.filter(note => {
-                const key = stemKeyForNote(note, resolved);
-                const bank = STEM_SAMPLE_BANK[key];
-                const file = chooseBankFile(bank, note.__index);
-                return file && buffers.get(file);
-            });
+                const snareBody = new Tone.MembraneSynth({
+                    pitchDecay: 0.008, octaves: 1.2, oscillator: { type: 'triangle' },
+                    envelope: { attack: 0.001, decay: 0.16, sustain: 0, release: 0.12 }
+                }).connect(master);
 
-            if (!usable.length) return { buffer: null, failures };
+                const snareNoise = new Tone.NoiseSynth({
+                    noise: { type: 'pink' }, envelope: { attack: 0.001, decay: 0.18, sustain: 0, release: 0.05 }
+                }).connect(master);
 
-            const sampleRate = 44100;
-            const tail = Math.min(2.0, Math.max(...usable.map(note => {
-                const bank = STEM_SAMPLE_BANK[stemKeyForNote(note, resolved)];
-                const file = chooseBankFile(bank, note.__index);
-                const audio = buffers.get(file);
-                return audio ? audio.duration : 0;
-            })));
-            const duration = Math.max(1, totalDuration + tail);
-            const offline = new OfflineAudioContext(2, Math.ceil(duration * sampleRate), sampleRate);
-            const master = connectSampleMaster(offline, offline.destination, onlyStemKey ? 0.92 : 0.78);
+                const hatFilter = new Tone.Filter(7500, 'highpass').connect(master);
+                const hat = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.001, decay: 0.045, sustain: 0, release: 0.02 } }).connect(hatFilter);
+                const openHat = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.001, decay: 0.28, sustain: 0, release: 0.06 } }).connect(hatFilter);
 
-            usable.forEach(note => {
-                const key = stemKeyForNote(note, resolved);
-                const bank = STEM_SAMPLE_BANK[key];
-                const file = chooseBankFile(bank, note.__index);
-                const sourceBuffer = buffers.get(file);
-                if (!sourceBuffer) return;
+                const clap = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.001, decay: 0.22, sustain: 0, release: 0.03 } }).connect(new Tone.Filter(1700, 'bandpass').connect(master));
 
-                const source = offline.createBufferSource();
-                source.buffer = sourceBuffer;
+                const paraiBody = new Tone.MembraneSynth({ pitchDecay: 0.006, octaves: 0.55, oscillator: { type: 'triangle' }, envelope: { attack: 0.001, decay: 0.34, sustain: 0.015, release: 0.18 } }).connect(master);
+                const paraiSkin = new Tone.NoiseSynth({ noise: { type: 'pink' }, envelope: { attack: 0.001, decay: 0.075, sustain: 0, release: 0.035 } }).connect(new Tone.Filter(2400, 'bandpass').connect(master));
+                const dholLow = paraiBody; const dholHigh = paraiBody;
 
-                const gain = offline.createGain();
-                const velocity = Math.max(0.04, Math.min(1, Number(note.velocity) || 0.8));
-                gain.gain.setValueAtTime(velocity * (onlyStemKey ? 0.95 : 0.82), note.time);
+                const taikoLow = new Tone.PolySynth(Tone.MembraneSynth, { pitchDecay: 0.025, octaves: 1.0, oscillator: { type: 'sine' }, envelope: { attack: 0.003, decay: 1.0, sustain: 0.08, release: 1.2 } }).connect(master);
+                const lowTom = new Tone.PolySynth(Tone.MembraneSynth, { pitchDecay: 0.02, octaves: 1.2, oscillator: { type: 'triangle' }, envelope: { attack: 0.002, decay: 0.5, sustain: 0.04, release: 0.45 } }).connect(master);
+                const timpani = new Tone.PolySynth(Tone.MembraneSynth, { pitchDecay: 0.01, octaves: 0.8, oscillator: { type: 'sine' }, envelope: { attack: 0.005, decay: 1.25, sustain: 0.1, release: 1.8 } }).connect(master);
+                const orchSnare = new Tone.PolySynth(Tone.MembraneSynth, { pitchDecay: 0.008, octaves: 0.9, oscillator: { type: 'triangle' }, envelope: { attack: 0.002, decay: 0.2, sustain: 0, release: 0.12 } }).connect(master);
+                const orchNoise = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "square" }, envelope: { attack: 0.002, decay: 0.24, sustain: 0, release: 0.06 } }).connect(master);
+                const crash = new Tone.PolySynth(Tone.MetalSynth, { frequency: 220, envelope: { attack: 0.001, decay: 2.8, release: 3.2 }, harmonicity: 5.1, modulationIndex: 28, resonance: 4200, octaves: 1.7 }).connect(master);
 
-                source.connect(gain);
-                gain.connect(master);
-                source.start(note.time);
-            });
+                const tablaMap = { [MIDI_DRUMS.TA1]: 'C4', [MIDI_DRUMS.TA2]: 'D4', [MIDI_DRUMS.TABLA_LOW]: 'E4' };
+                const mridangamMap = { [MIDI_DRUMS.MRIDANGAM_HIGH]: 'C4', [MIDI_DRUMS.MRIDANGAM_LOW]: 'G4', [MIDI_DRUMS.TA1]: 'D4', [MIDI_DRUMS.TA2]: 'E4', [MIDI_DRUMS.TABLA_LOW]: 'G4' };
+                const paraiMap = { [MIDI_DRUMS.DHOL_LOW]: 'C4', [MIDI_DRUMS.DHOL_HIGH]: 'D4', [MIDI_DRUMS.MRIDANGAM_HIGH]: 'E4', [MIDI_DRUMS.MRIDANGAM_LOW]: 'F4', [MIDI_DRUMS.TA1]: 'D4', [MIDI_DRUMS.TA2]: 'E4', [MIDI_DRUMS.TABLA_LOW]: 'C4' };
 
-            const rendered = await offline.startRendering();
-            return { buffer: rendered, failures };
-        }
+                const lastVoiceTime = new Map();
 
-        async function renderRhythmAudioPreview(notes, totalDuration, resolved) {
-            const result = await renderSampleMix(notes, totalDuration, resolved);
+                uniquePreviewNotes.forEach(note => {
+                    const voiceKey = `${note.track}|${note.midi}`;
+                    let t = Math.max(0, Math.min(note.time, totalDuration - 0.001));
+                    const previous = lastVoiceTime.get(voiceKey);
+                    
+                    if (previous !== undefined && t <= previous + 0.002) {
+                        t = Math.min(totalDuration - 0.001, previous + 0.002);
+                    }
+                    lastVoiceTime.set(voiceKey, t);
+                    const v = note.velocity;
 
-            if (!result.buffer) {
-                const failed = result.failures.map(x => x.file).join('\n');
-                throw new Error(
-                    'No mapped audio samples could be loaded.\n\n' +
-                    (failed || 'No sample bank matched the generated notes.')
-                );
-            }
+                    if (paraiSampler && paraiMap[note.midi]) {
+                        const sampleNote = paraiMap[note.midi];
+                        const duration =
+                            note.midi === MIDI_DRUMS.DHOL_LOW ||
+                            note.midi === MIDI_DRUMS.MRIDANGAM_LOW
+                                ? '8n'
+                                : '16n';
 
-            if (result.failures.length) {
-                console.warn('Some ToneVault samples failed to load:', result.failures);
-            }
+                        paraiSampler.triggerAttackRelease(
+                            sampleNote,
+                            duration,
+                            t,
+                            Math.min(1, v * 1.08)
+                        );
+                        return;
+                    }
 
-            const wavBlob = bufferToWave(result.buffer, result.buffer.length);
+                    if (tablaSampler && tablaMap[note.midi]) {
+                        const sampleNote = tablaMap[note.midi];
+                        const duration = note.midi === MIDI_DRUMS.TABLA_LOW ? '8n' : '16n';
+                        tablaSampler.triggerAttackRelease(sampleNote, duration, t, Math.min(1, v * 1.08));
+                        return;
+                    }
+
+                    if (mridangamSampler && mridangamMap[note.midi]) {
+                        const sampleNote = mridangamMap[note.midi];
+                        const duration = note.midi === MIDI_DRUMS.MRIDANGAM_LOW ? '8n' : '16n';
+                        mridangamSampler.triggerAttackRelease(sampleNote, duration, t, Math.min(1, v * 1.05));
+                        return;
+                    }
+
+                    switch (note.midi) {
+                        case MIDI_DRUMS.KICK: kick.triggerAttackRelease('C1', '32n', t, v); break;
+                        case MIDI_DRUMS.SNARE: snareBody.triggerAttackRelease('G2', '32n', t, v); snareNoise.triggerAttackRelease('32n', t, v * 0.8); break;
+                        case MIDI_DRUMS.CH: hat.triggerAttackRelease('32n', t, v * 0.7); break;
+                        case MIDI_DRUMS.OH: openHat.triggerAttackRelease('16n', t, v * 0.7); break;
+                        case MIDI_DRUMS.CLAP: clap.triggerAttackRelease('32n', t, v); break;
+                        case MIDI_DRUMS.TOM_HI: lowTom.triggerAttackRelease('A2', '32n', t, v); break;
+                        case MIDI_DRUMS.TOM_LO: lowTom.triggerAttackRelease('D2', '32n', t, v); break;
+                        case MIDI_DRUMS.DHOL_LOW: 
+                            if (resolved.instrument === 'parai') { paraiBody.triggerAttackRelease('G2', '32n', t, v * 0.9); paraiSkin.triggerAttackRelease('16n', t, v * 0.55); } 
+                            else { dholLow.triggerAttackRelease('D2', '32n', t, v); } break;
+                        case MIDI_DRUMS.DHOL_HIGH: 
+                            if (resolved.instrument === 'parai') { paraiBody.triggerAttackRelease('D3', '32n', t, v * 0.8); paraiSkin.triggerAttackRelease('32n', t, v * 0.72); } 
+                            else { dholHigh.triggerAttackRelease('A2', '32n', t, v); } break;
+                        case MIDI_DRUMS.TAIKO_LOW: taikoLow.triggerAttackRelease('C1', '16n', t, v); break;
+                        case MIDI_DRUMS.LOW_TOM_CIN: lowTom.triggerAttackRelease('D2', '32n', t, v); break;
+                        case MIDI_DRUMS.HIGH_TOM_CIN: lowTom.triggerAttackRelease('A2', '32n', t, v); break;
+                        case 'TIMPANI': timpani.triggerAttackRelease('G1', '16n', t, v); break;
+                        case MIDI_DRUMS.ORCH_SNARE: orchSnare.triggerAttackRelease('C3', '32n', t, v); orchNoise.triggerAttackRelease('C6', '32n', t, v * 0.45); break;
+                        case MIDI_DRUMS.CRASH: crash.triggerAttackRelease('16n', t, v); break;
+                    }
+                });
+            }, Math.max(totalDuration, 1));
+
+            const wavBlob = bufferToWave(buffer.get(), buffer.length);
+
+            if (options.returnBlob) return wavBlob;
+
             if (wavBlobUrl) URL.revokeObjectURL(wavBlobUrl);
             wavBlobUrl = URL.createObjectURL(wavBlob);
 
@@ -1945,438 +2120,27 @@
                 previewPlayIcon.className = 'fa-solid fa-play';
             }
 
-            wavesurfer = WaveSurfer.create({
-                container: '#waveform',
-                waveColor: '#444',
-                progressColor: '#00d4ff',
-                cursorColor: '#ffffff',
-                barWidth: 3,
-                barRadius: 3,
-                height: 60,
-                normalize: true
-            });
-
-            wavesurfer.load(wavBlobUrl);
-            wavesurfer.on('ready', () => {
-                audioDurationText.textContent = formatTime(wavesurfer.getDuration());
-                wavesurfer.setVolume(parseFloat(previewVolume.value));
-            });
-            wavesurfer.on('play', () => previewPlayIcon.className = 'fa-solid fa-pause');
-            wavesurfer.on('pause', () => previewPlayIcon.className = 'fa-solid fa-play');
-            wavesurfer.on('finish', () => previewPlayIcon.className = 'fa-solid fa-play');
-        }
-
-
-        // ============================================================
-        // V10: PHRASE KUTHU + REAL SAMPLE STEM WAV + MIDI EXPORT
-        // ============================================================
-
-        const STEM_SAMPLE_BANK = {
-            modern_kick: {
-                label: 'Kick',
-                notes: {36: ['/Samples/Modern/Kick/Kick_001.wav','/Samples/Modern/Kick/Kick_002.wav','/Samples/Modern/Kick/Kick_003.wav']}
-            },
-            modern_snare: {
-                label: 'Snare',
-                notes: {38: ['/Samples/Modern/Snare/Snare_001.wav','/Samples/Modern/Snare/Snare_002.wav','/Samples/Modern/Snare/Snare_003.wav']}
-            },
-            modern_clap: {
-                label: 'Clap',
-                notes: {39: ['/Samples/Modern/Clap/Clap_001.wav','/Samples/Modern/Clap/Clap_002.wav']}
-            },
-            modern_ch: {
-                label: 'Closed Hi-Hat',
-                notes: {42: ['/Samples/Modern/Closed Hi-Hat/Closed Hi-Hat_001.wav','/Samples/Modern/Closed Hi-Hat/Closed Hi-Hat_002.wav']}
-            },
-            modern_oh: {
-                label: 'Open Hi-Hat',
-                notes: {46: ['/Samples/Modern/Open Hi-Hat/Open Hi-Hat_001.wav','/Samples/Modern/Open Hi-Hat/Open Hi-Hat_002.wav']}
-            },
-            modern_low_tom: {
-                label: 'Low Tom',
-                notes: {41: ['/Samples/Modern/Low Tom/Low Tom_001.wav','/Samples/Modern/Low Tom/Low Tom_002.wav']}
-            },
-            modern_high_tom: {
-                label: 'High Tom',
-                notes: {45: ['/Samples/Modern/High Tom/High Tom_001.wav','/Samples/Modern/High Tom/High Tom_002.wav']}
-            },
-            modern_crash: {
-                label: 'Crash',
-                notes: {49: ['/Samples/Modern/Crash/Crash_001.wav','/Samples/Modern/Crash/Crash_002.wav']}
-            },
-            parai_low: {
-                label: 'Parai Low',
-                notes: {
-                    36: [
-                        '/Samples/South Indian/Parai Low/EM_THAPPU_PARAI_KICK_ONE SHOT_01.wav',
-                        '/Samples/South Indian/Parai Low/EM_THAPPU_PARAI_KICK_ONE SHOT_02.wav',
-                        '/Samples/South Indian/Parai Low/EM_THAPPU_PARAI_KICK_ONE SHOT_03.wav'
-                    ]
-                }
-            },
-            parai_high: {
-                label: 'Parai High',
-                notes: {
-                    38: [
-                        '/Samples/South Indian/Parai High/EM_THAPPU_PARAI_HITS_ONE SHOT_02.wav',
-                        '/Samples/South Indian/Parai High/EM_THAPPU_PARAI_HITS_ONE SHOT_03.wav',
-                        '/Samples/South Indian/Parai High/EM_THAPPU_PARAI_HITS_ONE SHOT_04.wav'
-                    ]
-                }
-            },
-            thappu_low: {
-                label: 'Thappu Folk Low',
-                notes: {
-                    36: [
-                        '/Samples/South Indian/Thappu  Folk Low/EM_THAPPU_PARAI_KICK_ONE SHOT_04.wav',
-                        '/Samples/South Indian/Thappu  Folk Low/EM_THAPPU_PARAI_KICK_ONE SHOT_05.wav',
-                        '/Samples/South Indian/Thappu  Folk Low/EM_THAPPU_PARAI_KICK_ONE SHOT_06.wav'
-                    ]
-                }
-            },
-            thappu_high: {
-                label: 'Thappu Folk High',
-                notes: {
-                    38: [
-                        '/Samples/South Indian/Thappu  Folk High/thappu-hit-hollow-indian-drum_110bpm_B_major.wav',
-                        '/Samples/South Indian/Thappu  Folk High/thappu-hit-strong-indian-drum_110bpm_A#_minor.wav',
-                        '/Samples/South Indian/Thappu  Folk High/thappu-hit-high-indian-drum_110bpm_D#_minor.wav'
-                    ]
-                }
-            },
-            mridangam_low: {
-                label: 'Mridangam Low',
-                notes: {
-                    36: [
-                        '/Samples/Indian/Mridangam Low/mridangam-1_E_minor.wav',
-                        '/Samples/Indian/Mridangam Low/mridangam-6_E_minor.wav'
-                    ]
-                }
-            },
-            mridangam_high: {
-                label: 'Mridangam High',
-                notes: {
-                    38: [
-                        '/Samples/Indian/Mridangam High/mridangam-3_D_major.wav',
-                        '/Samples/Indian/Mridangam High/mridangam-5_E_major.wav',
-                        '/Samples/Indian/Mridangam High/mridangam-7_F_major.wav'
-                    ]
-                }
-            },
-            dhol_low: {
-                label: 'Dhol Low',
-                notes: {
-                    36: [
-                        '/Samples/South Indian/Dhol Low/BDaDHA.wav',
-                        '/Samples/South Indian/Dhol Low/BDaDHIN.wav',
-                        '/Samples/South Indian/Dhol Low/BDaOPNGE.wav'
-                    ]
-                }
-            },
-            dhol_high: {
-                label: 'Dhol High',
-                notes: {
-                    38: [
-                        '/Samples/South Indian/Dhol High/DHyTA.wav',
-                        '/Samples/South Indian/Dhol High/DHyTHAP.wav',
-                        '/Samples/South Indian/Dhol High/DHxTIN.wav',
-                        '/Samples/South Indian/Dhol High/DHxTE.wav',
-                        '/Samples/South Indian/Dhol High/DHxNA.wav'
-                    ]
-                }
-            },
-            tabla_low: {
-                label: 'Tabla Low',
-                notes: {
-                    36: [
-                        '/Samples/Indian/Tabla Low/Ghe-Open-1.1.wav',
-                        '/Samples/Indian/Tabla Low/Ghe-Open-2.2.wav',
-                        '/Samples/Indian/Tabla Low/Ghe-Open-3.3.wav'
-                    ]
-                }
-            },
-            tabla_mid: {
-                label: 'Tabla Mid',
-                notes: {
-                    38: [
-                        '/Samples/Indian/Tabla Mid/Ta-1.26.wav',
-                        '/Samples/Indian/Tabla Mid/Ta-2.27.wav',
-                        '/Samples/Indian/Tabla Mid/Ta-3.28.wav',
-                        '/Samples/Indian/Tabla Mid/Ta-4.29.wav',
-                        '/Samples/Indian/Tabla Mid/Ta-5.30.wav'
-                    ]
-                }
-            },
-            tabla_high: {
-                label: 'Tabla High',
-                notes: {
-                    38: [
-                        '/Samples/Indian/Tabla High/Na-1.1.wav',
-                        '/Samples/Indian/Tabla High/Na-2.2.wav',
-                        '/Samples/Indian/Tabla High/Na-3.3.wav',
-                        '/Samples/Indian/Tabla High/Na-4.4.wav',
-                        '/Samples/Indian/Tabla High/Na-5.5.wav',
-                        '/Samples/Indian/Tabla High/Na-6.6.wav',
-                        '/Samples/Indian/Tabla High/Na-7.7.wav',
-                        '/Samples/Indian/Tabla High/Na-8.8.wav',
-                        '/Samples/Indian/Tabla High/Na-9.9.wav'
-                    ]
-                }
-            },
-            orchestral_snare: {
-                label: 'Orchestral Snare',
-                notes: {
-                    40: [
-                        '/Samples/Orchestral/Orchestral Snare/KSHMR_snare_big_roomy.wav',
-                        '/Samples/Orchestral/Orchestral Snare/KSHMR_snare_character_snappy_C.wav',
-                        '/Samples/Orchestral/Orchestral Snare/KSHMR_snare_big_noisy.wav'
-                    ]
-                }
-            },
-            taiko_low: {
-                label: 'Taiko Low',
-                notes: {
-                    36: ['/Samples/Orchestral/Taiko Low/Taiko Low_001.wav']
-                }
-            },
-            taiko_high: {
-                label: 'Taiko High',
-                notes: {
-                    45: ['/Samples/Orchestral/Taiko High/Taiko High_001.wav']
-                }
-            },
-            timpani_low: {
-                label: 'Timpani Low',
-                notes: {
-                    47: [
-                        '/Samples/Orchestral/Timpani Low/KSHMR_Timpani_Hit_01_E.wav',
-                        '/Samples/Orchestral/Timpani Low/KSHMR_Timpani_Hit_02_A.wav'
-                    ]
-                }
-            },
-            timpani_mid_high: {
-                label: 'Timpani Mid/High',
-                notes: {
-                    47: [
-                        '/Samples/Orchestral/Timpani Mid High/KSHMR_Timpani_Flam_01_E.wav',
-                        '/Samples/Orchestral/Timpani Mid High/KSHMR_Timpani_Flam_02_A.wav'
-                    ]
-                }
-            },
-            orchestral_crash: {
-                label: 'Orchestral Crash',
-                notes: {
-                    49: [
-                        '/Samples/Orchestral/Crash/KSHMR_Orchestral_Crash_01.wav',
-                        '/Samples/Orchestral/Crash/KSHMR_Orchestral_Crash_03.wav'
-                    ]
-                }
-            }
-        };
-
-        function stemKeyForNoteLegacyRemoved() { return null; }
-
-        function createIndividualStemMidi(notes, stemKey, tempo, timeSig, totalDuration) {
-            const midi = new Midi();
-            midi.header.setTempo(tempo);
-
-            const parts = String(timeSig || '4/4').split('/');
-            const beatsPerBar = Number(parts[0]) || 4;
-            const beatUnit = Number(parts[1]) || 4;
-            midi.header.timeSignatures.push({ ticks: 0, timeSignature: [beatsPerBar, beatUnit] });
-
-            const track = midi.addTrack();
-            track.channel = 9;
-            const bank = STEM_SAMPLE_BANK[stemKey];
-            track.name = bank ? `${bank.label} - ToneVault` : `ToneVault ${stemKey}`;
-
-            notes
-                .filter(note => stemKeyForNote(note, currentResolvedForStemMidi) === stemKey)
-                .filter(note => note.time >= 0 && note.time < totalDuration)
-                .sort((a,b) => a.time - b.time)
-                .forEach(note => {
-                    track.addNote({
-                        midi: Number(note.midi),
-                        time: Math.max(0, Number(note.time) || 0),
-                        duration: Math.max(0.03, Number(note.duration) || 0.08),
-                        velocity: Math.max(0.01, Math.min(1, Number(note.velocity) || 0.8))
-                    });
+            setTimeout(() => {
+                wavesurfer = WaveSurfer.create({
+                    container: '#waveform',
+                    waveColor: '#444',
+                    progressColor: '#00d4ff',
+                    cursorColor: '#ffffff',
+                    barWidth: 3,
+                    barRadius: 3,
+                    height: 60,
+                    normalize: true
                 });
 
-            return midi;
-        }
-
-        // The current resolved style is captured while building individual MIDI stems.
-        let currentResolvedForStemMidi = null;
-
-        async function renderSeparateInstrumentWav(notes, totalDuration, resolved, stemKey) {
-            const result = await renderSampleMix(notes, totalDuration, resolved, stemKey);
-            if (!result.buffer) return null;
-            return bufferToWave(result.buffer, result.buffer.length);
-        }
-
-        async function renderSeparateInstrumentPreviews(notes, totalDuration, resolved, tempo, timeSig) {
-            currentResolvedForStemMidi = resolved;
-            stemDownloadsList.innerHTML = '';
-            stemDownloads.style.display = 'block';
-
-            const used = [];
-            const seen = new Set();
-
-            notes.forEach(note => {
-                const key = stemKeyForNote(note, resolved);
-                if (key && !seen.has(key) && STEM_SAMPLE_BANK[key]) {
-                    seen.add(key);
-                    used.push(key);
-                }
-            });
-
-            if (!used.length) {
-                stemDownloadsList.innerHTML = '<div style="color:#777;font-size:0.8rem;">No separately mapped instrument samples for this pattern.</div>';
-                return;
-            }
-
-            for (const stemKey of used) {
-                const bank = STEM_SAMPLE_BANK[stemKey];
-
-                const card = document.createElement('div');
-                card.className = 'instrument-stem-card';
-
-                const header = document.createElement('div');
-                header.className = 'instrument-stem-header';
-
-                const name = document.createElement('div');
-                name.className = 'instrument-stem-name';
-                name.textContent = bank.label;
-
-                const meta = document.createElement('div');
-                meta.className = 'instrument-stem-meta';
-                meta.textContent = 'Rendering WAV preview...';
-
-                header.appendChild(name);
-                header.appendChild(meta);
-
-                const wave = document.createElement('div');
-                wave.className = 'instrument-stem-waveform';
-
-                const controls = document.createElement('div');
-                controls.className = 'instrument-stem-controls';
-
-                const play = document.createElement('button');
-                play.className = 'stem-play-btn';
-                play.innerHTML = '<i class="fa-solid fa-play"></i>';
-                play.disabled = true;
-
-                const volume = document.createElement('input');
-                volume.type = 'range';
-                volume.className = 'stem-volume';
-                volume.min = '0';
-                volume.max = '1';
-                volume.step = '0.05';
-                volume.value = '1';
-
-                const download = document.createElement('a');
-                download.className = 'download-btn';
-                download.href = '#';
-                download.innerHTML = '<i class="fa-solid fa-file-waveform"></i> Download WAV';
-
-                const downloadMidi = document.createElement('a');
-                downloadMidi.className = 'download-btn';
-                downloadMidi.href = '#';
-                downloadMidi.innerHTML = '<i class="fa-solid fa-file-music"></i> Download MIDI';
-
-                const status = document.createElement('span');
-                status.className = 'stem-status';
-                status.textContent = 'Preparing...';
-
-                controls.appendChild(play);
-                controls.appendChild(volume);
-                controls.appendChild(download);
-                controls.appendChild(downloadMidi);
-                controls.appendChild(status);
-
-                card.appendChild(header);
-                card.appendChild(wave);
-                card.appendChild(controls);
-                stemDownloadsList.appendChild(card);
-
-                try {
-                    const blob = await renderSeparateInstrumentWav(
-                        notes, totalDuration, resolved, stemKey
-                    );
-
-                    if (!blob) {
-                        status.textContent = 'No notes';
-                        card.style.opacity = '0.55';
-                        continue;
-                    }
-
-                    const url = URL.createObjectURL(blob);
-                    download.href = url;
-                    download.download = `tonevault_${bank.label.toLowerCase().replace(/[^a-z0-9]+/g,'_')}_${tempo}bpm.wav`;
-
-                    const stemMidi = createIndividualStemMidi(notes, stemKey, tempo, timeSig, totalDuration);
-                    const stemMidiBlob = new Blob([stemMidi.toArray()], { type: 'audio/midi' });
-                    const stemMidiUrl = URL.createObjectURL(stemMidiBlob);
-                    downloadMidi.href = stemMidiUrl;
-                    downloadMidi.download = `tonevault_${bank.label.toLowerCase().replace(/[^a-z0-9]+/g,'_')}_${tempo}bpm.mid`;
-
-                    const ws = WaveSurfer.create({
-                        container: wave,
-                        waveColor: '#444',
-                        progressColor: '#00d4ff',
-                        cursorColor: '#fff',
-                        barWidth: 2,
-                        barRadius: 2,
-                        height: 52,
-                        normalize: true
-                    });
-
-                    ws.load(url);
-
-                    ws.on('ready', () => {
-                        play.disabled = false;
-                        status.textContent = formatTime(ws.getDuration());
-                        ws.setVolume(Number(volume.value));
-                    });
-
-                    ws.on('play', () => {
-                        play.innerHTML = '<i class="fa-solid fa-pause"></i>';
-                    });
-
-                    ws.on('pause', () => {
-                        play.innerHTML = '<i class="fa-solid fa-play"></i>';
-                    });
-
-                    ws.on('finish', () => {
-                        play.innerHTML = '<i class="fa-solid fa-play"></i>';
-                    });
-
-                    play.addEventListener('click', async () => {
-                        await Tone.start();
-
-                        // Keep one common active stem at a time.
-                        document.querySelectorAll('.stem-play-btn').forEach(btn => {
-                            if (btn !== play) btn.innerHTML = '<i class="fa-solid fa-play"></i>';
-                        });
-
-                        ws.playPause();
-                    });
-
-                    volume.addEventListener('input', () => {
-                        ws.setVolume(Number(volume.value));
-                    });
-
-                    meta.textContent = 'Separate instrument';
-                    status.textContent = 'Ready';
-                } catch (error) {
-                    console.error(`Stem render failed: ${stemKey}`, error);
-                    const message = String(error && error.message || error);
-                    status.textContent = 'Sample unavailable';
-                    status.title = message;
-                    download.style.display = 'none';
-                }
-            }
+                wavesurfer.load(wavBlobUrl);
+                wavesurfer.on('ready', () => {
+                    audioDurationText.textContent = formatTime(wavesurfer.getDuration());
+                    wavesurfer.setVolume(parseFloat(previewVolume.value));
+                });
+                wavesurfer.on('play', () => previewPlayIcon.className = 'fa-solid fa-pause');
+                wavesurfer.on('pause', () => previewPlayIcon.className = 'fa-solid fa-play');
+                wavesurfer.on('finish', () => previewPlayIcon.className = 'fa-solid fa-play');
+            }, 50);
         }
 
         function bufferToWave(abuffer, len) {
@@ -2419,6 +2183,12 @@
             }
             return new Blob([buffer], { type: 'audio/wav' });
         }
+
+        window.addEventListener('beforeunload', () => {
+            clearInstrumentMidiUrls();
+            if (midiBlobUrl) URL.revokeObjectURL(midiBlobUrl);
+            if (wavBlobUrl) URL.revokeObjectURL(wavBlobUrl);
+        });
     </script>
 
 </body>
