@@ -1852,7 +1852,7 @@
         // ============================================================
         // TONEVAULT SAMPLE-BASED AUDIO PREVIEW ENGINE
         // ============================================================
-        const SAMPLE_BASE_URL = 'https://raw.githubusercontent.com/tonevaultbyhc/ToneVault/main/Samples/';
+        const SAMPLE_BASE_URL = 'https://raw.githubusercontent.com/tonevault/toneVault/main/Samples/';
 
         const SAMPLE_FILES = {
             modernKick: [
@@ -1932,6 +1932,28 @@
         const sampleUrl = parts => SAMPLE_BASE_URL + parts.map(part => encodeURIComponent(part)).join('/');
         const sampleUrlList = key => (SAMPLE_FILES[key] || []).map(sampleUrl);
 
+        // A missing WAV must never abort the entire rhythm render. GitHub sample
+        // folders can change independently of this HTML, so validate each file
+        // before giving it to Tone.Sampler and silently skip unavailable files.
+        const sampleAvailabilityCache = new Map();
+        async function getAvailableSampleUrls(urls) {
+            const checks = await Promise.all(urls.map(async url => {
+                if (sampleAvailabilityCache.has(url)) return sampleAvailabilityCache.get(url);
+                try {
+                    const response = await fetch(url, { method: 'HEAD', cache: 'force-cache' });
+                    const ok = response.ok;
+                    sampleAvailabilityCache.set(url, ok);
+                    if (!ok) console.warn('ToneVault: sample unavailable, skipping:', url);
+                    return ok;
+                } catch (error) {
+                    sampleAvailabilityCache.set(url, false);
+                    console.warn('ToneVault: sample check failed, skipping:', url, error);
+                    return false;
+                }
+            }));
+            return urls.filter((_, index) => checks[index]);
+        }
+
         // One sampler note per source file keeps the original sample pitch intact.
         const SAMPLE_NOTE_NAMES = ['C4','C#4','D4','D#4','E4','F4','F#4','G4','G#4','A4','A#4','B4'];
         const sampleRoundRobin = new Map();
@@ -1998,57 +2020,69 @@
                 master.chain(compressor, reverb, Tone.getDestination());
 
                 const samplePools = {};
-                const addPool = (name, files, release = 0.8) => {
-                    samplePools[name] = createSampleSampler(sampleUrlList(files), master, release);
+                const addPool = async (name, files, release = 0.8) => {
+                    const urls = await getAvailableSampleUrls(sampleUrlList(files));
+                    if (!urls.length) {
+                        console.warn(`ToneVault: no available samples for pool ${name}.`);
+                        return;
+                    }
+                    samplePools[name] = createSampleSampler(urls, master, release);
                 };
 
                 // Load only the sample families needed by the current style.
                 if (isIndian) {
-                    addPool('tablaLow', 'tablaLow', 0.8);
-                    addPool('tablaMid', 'tablaMid', 0.7);
-                    addPool('tablaHigh', 'tablaHigh', 0.65);
-                    addPool('modernKick', 'modernKick', 0.45);
-                    addPool('modernClosedHat', 'modernClosedHat', 0.18);
-                    addPool('modernOpenHat', 'modernOpenHat', 0.5);
+                    await addPool('tablaLow', 'tablaLow', 0.8);
+                    await addPool('tablaMid', 'tablaMid', 0.7);
+                    await addPool('tablaHigh', 'tablaHigh', 0.65);
+                    await addPool('modernKick', 'modernKick', 0.45);
+                    await addPool('modernClosedHat', 'modernClosedHat', 0.18);
+                    await addPool('modernOpenHat', 'modernOpenHat', 0.5);
                 } else if (isSouth) {
-                    addPool('mridangamLow', 'mridangamLow', 0.8);
-                    addPool('mridangamHigh', 'mridangamHigh', 0.65);
-                    addPool('dholLow', 'dholLow', 0.8);
-                    addPool('dholHigh', 'dholHigh', 0.65);
-                    addPool('paraiLow', 'paraiLow', 0.8);
-                    addPool('paraiHigh', 'paraiHigh', 0.65);
+                    await addPool('mridangamLow', 'mridangamLow', 0.8);
+                    await addPool('mridangamHigh', 'mridangamHigh', 0.65);
+                    await addPool('dholLow', 'dholLow', 0.8);
+                    await addPool('dholHigh', 'dholHigh', 0.65);
+                    await addPool('paraiLow', 'paraiLow', 0.8);
+                    await addPool('paraiHigh', 'paraiHigh', 0.65);
                 }
 
                 if (isCinematic) {
-                    addPool('taikoLow', 'taikoLow', 1.2);
-                    addPool('taikoHigh', 'taikoHigh', 1.0);
-                    addPool('cinematicLowTom', 'cinematicLowTom', 0.8);
-                    addPool('orchSnare', 'orchSnare', 0.45);
-                    addPool('timpaniLow', 'timpaniLow', 1.6);
-                    addPool('timpaniMidHigh', 'timpaniMidHigh', 1.4);
-                    addPool('orchestralCrash', 'orchestralCrash', 2.5);
+                    await addPool('taikoLow', 'taikoLow', 1.2);
+                    await addPool('taikoHigh', 'taikoHigh', 1.0);
+                    await addPool('cinematicLowTom', 'cinematicLowTom', 0.8);
+                    await addPool('orchSnare', 'orchSnare', 0.45);
+                    await addPool('timpaniLow', 'timpaniLow', 1.6);
+                    await addPool('timpaniMidHigh', 'timpaniMidHigh', 1.4);
+                    await addPool('orchestralCrash', 'orchestralCrash', 2.5);
                 }
 
                 // Hybrid keeps a modern rhythmic foundation and adds cinematic percussion.
                 if (!isIndian && !isSouth && !isCinematic || resolved.engine === 'hybrid') {
-                    addPool('modernKick', 'modernKick', 0.45);
-                    addPool('modernSnare', 'modernSnare', 0.5);
-                    addPool('modernClap', 'modernClap', 0.35);
-                    addPool('modernClosedHat', 'modernClosedHat', 0.18);
-                    addPool('modernOpenHat', 'modernOpenHat', 0.5);
-                    addPool('modernLowTom', 'modernLowTom', 0.55);
-                    addPool('modernHighTom', 'modernHighTom', 0.45);
-                    addPool('modernCrash', 'modernCrash', 2.0);
+                    await addPool('modernKick', 'modernKick', 0.45);
+                    await addPool('modernSnare', 'modernSnare', 0.5);
+                    await addPool('modernClap', 'modernClap', 0.35);
+                    await addPool('modernClosedHat', 'modernClosedHat', 0.18);
+                    await addPool('modernOpenHat', 'modernOpenHat', 0.5);
+                    await addPool('modernLowTom', 'modernLowTom', 0.55);
+                    await addPool('modernHighTom', 'modernHighTom', 0.45);
+                    await addPool('modernCrash', 'modernCrash', 2.0);
                 }
 
                 // Cinematic styles still use the modern samples for any generic fallback notes.
                 if (isCinematic) {
-                    addPool('modernKick', 'modernKick', 0.45);
-                    addPool('modernClosedHat', 'modernClosedHat', 0.18);
-                    addPool('modernOpenHat', 'modernOpenHat', 0.5);
+                    await addPool('modernKick', 'modernKick', 0.45);
+                    await addPool('modernClosedHat', 'modernClosedHat', 0.18);
+                    await addPool('modernOpenHat', 'modernOpenHat', 0.5);
                 }
 
-                await Tone.loaded();
+                try {
+                    await Tone.loaded();
+                } catch (sampleLoadError) {
+                    // A single bad/moved sample should not prevent the rest of the
+                    // kit from rendering. Tone.Sampler will still use every buffer
+                    // that loaded successfully.
+                    console.warn('ToneVault: one or more samples failed to load; continuing with available samples.', sampleLoadError);
+                }
 
                 const lastVoiceTime = new Map();
 
