@@ -476,6 +476,36 @@
             text-align: center;
         }
 
+        .keyword-example {
+            margin-top: 20px;
+            padding: 15px;
+            border-left: 3px solid #00c8ff;
+            background: rgba(0, 200, 255, 0.04);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .keyword-example strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .keyword-example code {
+            display: block;
+            margin-bottom: 10px;
+            color: #00c8ff;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .keyword-example p {
+            margin: 0;
+            color: #999;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
         .custom-keyword-note {
             margin-top: 15px;
             padding-top: 15px;
@@ -1469,6 +1499,7 @@
                         const t = start + i * sixteenth;
                         addHit(i % 2 ? MIDI_DRUMS.HIGH_TOM_CIN : MIDI_DRUMS.LOW_TOM_CIN, t, 0.5 + (i - 12) * 0.1, 0.12, 'drums');
                     }
+                    // Scheduled slightly early to guarantee no overlap collision with the exact next downbeat
                     addHit(MIDI_DRUMS.CRASH, start + 15.5 * sixteenth, 0.85, 0.4, 'drums');
                 }
             }
@@ -1489,6 +1520,7 @@
             }
 
             if (resolved.engine === 'south_indian') {
+                // 36/45 are shared custom MIDI numbers in the existing engine.
                 if (n === MIDI_DRUMS.DHOL_LOW) return 'Dhol Low / Mridangam Low';
                 if (n === MIDI_DRUMS.DHOL_HIGH) return 'Dhol High';
                 if (n === MIDI_DRUMS.MRIDANGAM_HIGH) return 'Mridangam High';
@@ -1750,7 +1782,6 @@
             processBtn.disabled = true;
             statusMessage.style.display = 'block';
             
-            // HIDE OLD RESULTS PROPERLY
             resultsArea.style.display = 'none';
             waveformPreviewContainer.style.display = 'none';
             if (wavesurfer) {
@@ -1819,21 +1850,169 @@
         });
 
         // ============================================================
-        // TONEVAULT AUDIO SYNTHESIS WITH DYNAMIC DURATION SANITIZER
+        // TONEVAULT SAMPLE-BASED AUDIO PREVIEW ENGINE
         // ============================================================
+        // IMPORTANT:
+        // The GitHub repository is tonevaultbyhc/ToneVault.
+        // The renderer below uses the browser's native Web Audio API instead
+        // of Tone.Sampler inside Tone.Offline. This avoids the common problem
+        // where the samples load successfully but the Offline context renders
+        // silence, which produces a blank WaveSurfer waveform.
+        const SAMPLE_BASE_URL = 'https://raw.githubusercontent.com/tonevaultbyhc/ToneVault/main/Samples/';
+
+        const SAMPLE_FILES = {
+            modernKick: [
+                ['Modern','Kick','Kick_001.wav'], ['Modern','Kick','Kick_002.wav'], ['Modern','Kick','Kick_003.wav']
+            ],
+            modernSnare: [
+                ['Modern','Snare','Snare_001.wav'], ['Modern','Snare','Snare_002.wav'], ['Modern','Snare','Snare_003.wav']
+            ],
+            modernClap: [
+                ['Modern','Clap','Clap_001.wav'], ['Modern','Clap','Clap_002.wav']
+            ],
+            modernClosedHat: [
+                ['Modern','Closed Hi-Hat','Closed Hi-Hat_001.wav'], ['Modern','Closed Hi-Hat','Closed Hi-Hat_002.wav']
+            ],
+            modernOpenHat: [
+                ['Modern','Open Hi-Hat','Open Hi-Hat_001.wav'], ['Modern','Open Hi-Hat','Open Hi-Hat_002.wav']
+            ],
+            modernLowTom: [
+                ['Modern','Low Tom','Low Tom_001.wav'], ['Modern','Low Tom','Low Tom_002.wav']
+            ],
+            modernHighTom: [
+                ['Modern','High Tom','High Tom_001.wav'], ['Modern','High Tom','High Tom_002.wav']
+            ],
+            modernCrash: [
+                ['Modern','Crash','Crash_001.wav'], ['Modern','Crash','Crash_002.wav']
+            ],
+            tablaLow: [
+                ['Indian','Tabla Low','Ghe-Open-1.1.wav'], ['Indian','Tabla Low','Ghe-Open-2.2.wav'], ['Indian','Tabla Low','Ghe-Open-3.3.wav']
+            ],
+            tablaMid: [
+                ['Indian','Tabla Mid','Ta-1.26.wav'], ['Indian','Tabla Mid','Ta-2.27.wav'], ['Indian','Tabla Mid','Ta-3.28.wav'], ['Indian','Tabla Mid','Ta-4.29.wav'], ['Indian','Tabla Mid','Ta-5.30.wav']
+            ],
+            tablaHigh: [
+                ['Indian','Tabla High','Na-1.1.wav'], ['Indian','Tabla High','Na-2.2.wav'], ['Indian','Tabla High','Na-3.3.wav'], ['Indian','Tabla High','Na-4.4.wav'], ['Indian','Tabla High','Na-5.5.wav'], ['Indian','Tabla High','Na-6.6.wav'], ['Indian','Tabla High','Na-7.7.wav'], ['Indian','Tabla High','Na-8.8.wav'], ['Indian','Tabla High','Na-9.9.wav']
+            ],
+            mridangamLow: [
+                ['Indian','Mridangam Low','mridangam-1_E_minor.wav'], ['Indian','Mridangam Low','mridangam-6_E_minor.wav']
+            ],
+            mridangamHigh: [
+                ['Indian','Mridangam High','mridangam-3_D_major.wav'], ['Indian','Mridangam High','mridangam-5_E_major.wav'], ['Indian','Mridangam High','mridangam-7_F_major.wav']
+            ],
+            dholLow: [
+                ['South Indian','Dhol Low','BDaDHA.wav'], ['South Indian','Dhol Low','BDaDHIN.wav'], ['South Indian','Dhol Low','BDaOPNGE.wav']
+            ],
+            dholHigh: [
+                ['South Indian','Dhol High','DHyTA.wav'], ['South Indian','Dhol High','DHyTHAP.wav'], ['South Indian','Dhol High','DHxTIN.wav'], ['South Indian','Dhol High','DHxTE.wav'], ['South Indian','Dhol High','DHxNA.wav']
+            ],
+            paraiLow: [
+                ['South Indian','Parai Low','EM_THAPPU_PARAI_KICK_ONE SHOT_01.wav'], ['South Indian','Parai Low','EM_THAPPU_PARAI_KICK_ONE SHOT_02.wav'], ['South Indian','Parai Low','EM_THAPPU_PARAI_KICK_ONE SHOT_03.wav'], ['South Indian','Thappu  Folk Low','EM_THAPPU_PARAI_KICK_ONE SHOT_04.wav'], ['South Indian','Thappu  Folk Low','EM_THAPPU_PARAI_KICK_ONE SHOT_05.wav'], ['South Indian','Thappu  Folk Low','EM_THAPPU_PARAI_KICK_ONE SHOT_06.wav']
+            ],
+            paraiHigh: [
+                ['South Indian','Parai High','EM_THAPPU_PARAI_HITS_ONE SHOT_02.wav'], ['South Indian','Parai High','EM_THAPPU_PARAI_HITS_ONE SHOT_03.wav'], ['South Indian','Parai High','EM_THAPPU_PARAI_HITS_ONE SHOT_04.wav'], ['South Indian','Parai High','EM_THAPPU_PARAI_RIMSHOT_ONE SHOT_01.wav'], ['South Indian','Parai High','EM_THAPPU_PARAI_RIMSHOT_ONE SHOT_02.wav'], ['South Indian','Parai High','EM_THAPPU_PARAI_RIMSHOT_ONE SHOT_03.wav'], ['South Indian','Thappu  Folk High','thappu-hit-high-indian-drum_110bpm_D#_minor.wav'], ['South Indian','Thappu  Folk High','thappu-hit-hollow-indian-drum_110bpm_B_major.wav'], ['South Indian','Thappu  Folk High','thappu-hit-strong-indian-drum_110bpm_A#_minor.wav']
+            ],
+            orchSnare: [
+                ['Orchestral','Orchestral Snare','KSHMR_snare_big_roomy.wav'], ['Orchestral','Orchestral Snare','KSHMR_snare_character_snappy_C.wav'], ['Orchestral','Orchestral Snare','KSHMR_snare_big_noisy.wav']
+            ],
+            taikoLow: [
+                ['Orchestral','Taiko Low','Taiko Low_001.wav']
+            ],
+            taikoHigh: [
+                ['Orchestral','Taiko High','Taiko High_001.wav']
+            ],
+            cinematicLowTom: [
+                ['Orchestral','Cinematic Low Tom','KSHMR Acoustic High Tom 01 (A#).wav'], ['Orchestral','Cinematic Low Tom','KSHMR Acoustic High Tom 02 (A#).wav']
+            ],
+            timpaniLow: [
+                ['Orchestral','Timpani Low','KSHMR_Timpani_Hit_01_E.wav'], ['Orchestral','Timpani Low','KSHMR_Timpani_Hit_02_A.wav']
+            ],
+            timpaniMidHigh: [
+                ['Orchestral','Timpani Mid High','KSHMR_Timpani_Flam_01_E.wav'], ['Orchestral','Timpani Mid High','KSHMR_Timpani_Flam_02_A.wav']
+            ],
+            orchestralCrash: [
+                ['Orchestral','Crash','KSHMR_Orchestral_Crash_01.wav'], ['Orchestral','Crash','KSHMR_Orchestral_Crash_03.wav']
+            ]
+        };
+
+        const sampleUrl = parts => SAMPLE_BASE_URL + parts.map(part => encodeURIComponent(part)).join('/');
+        const sampleUrlList = key => (SAMPLE_FILES[key] || []).map(sampleUrl);
+
+        // Cache the downloaded bytes. AudioBuffers themselves cannot be shared
+        // between different OfflineAudioContexts, so we cache ArrayBuffers.
+        const sampleBinaryCache = new Map();
+        const sampleBinaryPromiseCache = new Map();
+
+        async function fetchSampleBytes(url) {
+            if (sampleBinaryCache.has(url)) return sampleBinaryCache.get(url);
+            if (sampleBinaryPromiseCache.has(url)) return sampleBinaryPromiseCache.get(url);
+
+            const promise = fetch(url, { cache: 'force-cache' })
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return response.arrayBuffer();
+                })
+                .then(bytes => {
+                    sampleBinaryCache.set(url, bytes);
+                    sampleBinaryPromiseCache.delete(url);
+                    return bytes;
+                })
+                .catch(error => {
+                    sampleBinaryPromiseCache.delete(url);
+                    console.warn('ToneVault: sample unavailable, skipping:', url, error);
+                    return null;
+                });
+
+            sampleBinaryPromiseCache.set(url, promise);
+            return promise;
+        }
+
+        async function loadSampleBuffersForContext(audioContext, urls) {
+            const results = await Promise.all(urls.map(async url => {
+                const bytes = await fetchSampleBytes(url);
+                if (!bytes) return null;
+
+                try {
+                    // Slice the cached ArrayBuffer so decodeAudioData can safely
+                    // consume it without affecting the cached original.
+                    const copy = bytes.slice(0);
+                    const buffer = await audioContext.decodeAudioData(copy);
+                    return { url, buffer };
+                } catch (error) {
+                    console.warn('ToneVault: could not decode sample, skipping:', url, error);
+                    return null;
+                }
+            }));
+
+            return results.filter(Boolean);
+        }
+
+        const sampleRoundRobin = new Map();
+
+        function resetSampleRoundRobin() {
+            sampleRoundRobin.clear();
+        }
+
+        function chooseSample(poolName, pool) {
+            if (!pool || !pool.length) return null;
+            const index = sampleRoundRobin.get(poolName) || 0;
+            sampleRoundRobin.set(poolName, index + 1);
+            return pool[index % pool.length];
+        }
+
         async function renderRhythmAudioPreview(notes, totalDuration, resolved, options = {}) {
-            
+            const previewDuration = Math.max(1, Number(totalDuration) || 1);
+
             const previewNotes = notes
                 .map(note => ({ ...note }))
-                .filter(note => Number.isFinite(note.time) && note.time >= 0 && note.time < totalDuration)
-                .sort((a, b) => a.time - b.time || a.midi - b.midi);
+                .filter(note => Number.isFinite(note.time) && note.time >= 0 && note.time < previewDuration)
+                .sort((a, b) => a.time - b.time || String(a.midi).localeCompare(String(b.midi)));
 
             const uniquePreviewNotes = [];
             const seenPreviewEvents = new Set();
-            
+
             previewNotes.forEach(note => {
-                const t = Math.max(0, Math.min(note.time, totalDuration - 0.001));
-                // Round to nearest 10ms to find overlapping duplicates
+                const t = Math.max(0, Math.min(note.time, previewDuration - 0.001));
                 const key = `${note.track}|${note.midi}|${Math.round(t * 100)}`;
                 if (!seenPreviewEvents.has(key)) {
                     seenPreviewEvents.add(key);
@@ -1841,194 +2020,225 @@
                 }
             });
 
-            const buffer = await Tone.Offline(async () => {
-                const isIndian = resolved.engine === 'indian';
-                const isSouth = resolved.engine === 'south_indian';
-                const isCinematic = resolved.engine === 'cinematic' || resolved.engine === 'hybrid';
+            resetSampleRoundRobin();
 
-                const master = new Tone.Gain(0.78);
-                const compressor = new Tone.Compressor({ threshold: -18, ratio: 2.2, attack: 0.01, release: 0.18 });
-                const reverb = new Tone.Reverb({
-                    decay: isIndian || isSouth ? 2.8 : isCinematic ? 4.8 : 1.5,
-                    preDelay: 0.025,
-                    wet: isIndian || isSouth ? 0.22 : isCinematic ? 0.38 : 0.08
-                });
-                master.chain(compressor, reverb, Tone.getDestination());
+            // Native OfflineAudioContext is used deliberately here. Tone.Sampler
+            // inside Tone.Offline can render silence when its sample buffers belong
+            // to the live Tone context instead of the offline context.
+            const sampleRate = 44100;
+            const frameCount = Math.ceil((previewDuration + 2.5) * sampleRate);
+            const offline = new OfflineAudioContext(2, frameCount, sampleRate);
 
-                let tablaSampler = null;
-                let mridangamSampler = null;
-                let paraiSampler = null;
+            const master = offline.createGain();
+            master.gain.value = 0.82;
+
+            const compressor = offline.createDynamicsCompressor();
+            compressor.threshold.value = -18;
+            compressor.knee.value = 12;
+            compressor.ratio.value = 2.2;
+            compressor.attack.value = 0.01;
+            compressor.release.value = 0.18;
+
+            const convolver = offline.createConvolver();
+            // No external impulse response: keep the preview clean and reliable.
+            // A small dry path is used instead of a reverb dependency.
+            master.connect(compressor);
+            compressor.connect(offline.destination);
+
+            const isIndian = resolved.engine === 'indian';
+            const isSouth = resolved.engine === 'south_indian';
+            const isCinematic = resolved.engine === 'cinematic' || resolved.engine === 'hybrid';
+
+            const samplePools = {};
+            const poolSpecs = [];
+
+            const addPool = (name, key) => {
+                if (!poolSpecs.some(item => item.name === name)) {
+                    poolSpecs.push({ name, key });
+                }
+            };
+
+            if (isIndian) {
+                addPool('tablaLow', 'tablaLow');
+                addPool('tablaMid', 'tablaMid');
+                addPool('tablaHigh', 'tablaHigh');
+                addPool('modernKick', 'modernKick');
+                addPool('modernClosedHat', 'modernClosedHat');
+                addPool('modernOpenHat', 'modernOpenHat');
+            } else if (isSouth) {
+                addPool('mridangamLow', 'mridangamLow');
+                addPool('mridangamHigh', 'mridangamHigh');
+                addPool('dholLow', 'dholLow');
+                addPool('dholHigh', 'dholHigh');
+                addPool('paraiLow', 'paraiLow');
+                addPool('paraiHigh', 'paraiHigh');
+            }
+
+            if (isCinematic) {
+                addPool('taikoLow', 'taikoLow');
+                addPool('taikoHigh', 'taikoHigh');
+                addPool('cinematicLowTom', 'cinematicLowTom');
+                addPool('orchSnare', 'orchSnare');
+                addPool('timpaniLow', 'timpaniLow');
+                addPool('timpaniMidHigh', 'timpaniMidHigh');
+                addPool('orchestralCrash', 'orchestralCrash');
+            }
+
+            if ((!isIndian && !isSouth && !isCinematic) || resolved.engine === 'hybrid') {
+                addPool('modernKick', 'modernKick');
+                addPool('modernSnare', 'modernSnare');
+                addPool('modernClap', 'modernClap');
+                addPool('modernClosedHat', 'modernClosedHat');
+                addPool('modernOpenHat', 'modernOpenHat');
+                addPool('modernLowTom', 'modernLowTom');
+                addPool('modernHighTom', 'modernHighTom');
+                addPool('modernCrash', 'modernCrash');
+            }
+
+            if (isCinematic) {
+                addPool('modernKick', 'modernKick');
+                addPool('modernClosedHat', 'modernClosedHat');
+                addPool('modernOpenHat', 'modernOpenHat');
+            }
+
+            // Download/decode all required samples before scheduling notes.
+            // Missing files are simply omitted; they cannot make the entire
+            // preview fail.
+            for (const spec of poolSpecs) {
+                const buffers = await loadSampleBuffersForContext(
+                    offline,
+                    sampleUrlList(spec.key)
+                );
+                if (buffers.length) {
+                    samplePools[spec.name] = buffers.map(item => item.buffer);
+                }
+            }
+
+            const lastVoiceTime = new Map();
+
+            function playSample(poolName, durationSeconds, time, velocity) {
+                const pool = samplePools[poolName];
+                if (!pool || !pool.length) return false;
+
+                const buffer = chooseSample(poolName, pool);
+                if (!buffer) return false;
+
+                const source = offline.createBufferSource();
+                source.buffer = buffer;
+
+                const gain = offline.createGain();
+                gain.gain.value = Math.max(0.001, Math.min(1, Number(velocity) || 0.8));
+
+                source.connect(gain);
+                gain.connect(master);
+
+                const safeTime = Math.max(0, Math.min(time, previewDuration - 0.001));
+                const requestedDuration = Math.max(0.02, durationSeconds || 0.1);
+                const actualDuration = Math.min(requestedDuration, buffer.duration);
+
+                try {
+                    source.start(safeTime, 0, actualDuration);
+                    return true;
+                } catch (error) {
+                    console.warn('ToneVault: failed to schedule sample:', error);
+                    return false;
+                }
+            }
+
+            uniquePreviewNotes.forEach(note => {
+                const voiceKey = `${note.track}|${note.midi}`;
+                let t = Math.max(0, Math.min(note.time, previewDuration - 0.001));
+                const previous = lastVoiceTime.get(voiceKey);
+
+                if (previous !== undefined && t <= previous + 0.002) {
+                    t = Math.min(previewDuration - 0.001, previous + 0.002);
+                }
+
+                lastVoiceTime.set(voiceKey, t);
+
+                const v = Math.max(0.01, Math.min(1, note.velocity || 0.8));
+                let played = false;
 
                 if (isIndian) {
-                    tablaSampler = new Tone.Sampler({
-                        urls: {
-                            C4: '000_bass_flick1.wav',
-                            D4: '001_bass_flick2.wav',
-                            E4: '002_bass_lick1.wav',
-                            F4: '003_dead_hit1.wav',
-                            G4: '004_dead_hit2.wav',
-                            A4: '005_dead_hit3.wav'
-                        },
-                        baseUrl: 'https://raw.githubusercontent.com/tidalcycles/Dirt-Samples/master/tabla/',
-                        release: 0.8,
-                        curve: 'exponential'
-                    }).connect(master);
-                    
-                    try {
-                        await Tone.loaded();
-                    } catch (e) {
-                        console.warn("ToneVault: Failed to load Tabla samples. Falling back to synths.", e);
-                        tablaSampler = null;
+                    if (note.midi === MIDI_DRUMS.TABLA_LOW) {
+                        played = playSample('tablaLow', 0.28, t, v * 1.08);
+                    } else if (note.midi === MIDI_DRUMS.TA1) {
+                        played = playSample('tablaMid', 0.22, t, v * 1.06);
+                    } else if (note.midi === MIDI_DRUMS.TA2) {
+                        played = playSample('tablaHigh', 0.22, t, v * 1.04);
                     }
                 }
 
-                if (isSouth && resolved.instrument !== 'parai') {
-                    mridangamSampler = new Tone.Sampler({
-                        urls: {
-                            C4: 'norm_sounds/ka/ka-1.wav',
-                            D4: 'norm_sounds/ta/ta-1.wav',
-                            E4: 'norm_sounds/na/na-1.wav',
-                            F4: 'norm_sounds/dhin/dhin-1.wav',
-                            G4: 'norm_sounds/dhum/dhum-1.wav',
-                            A4: 'norm_sounds/thom/thom-1.wav',
-                            B4: 'norm_sounds/chaapu/chaapu-1.wav'
-                        },
-                        baseUrl: 'https://raw.githubusercontent.com/yaxu/mrid/main/',
-                        release: 0.7,
-                        curve: 'exponential'
-                    }).connect(master);
-                    
-                    try {
-                        await Tone.loaded();
-                    } catch (e) {
-                        console.warn("ToneVault: Failed to load Mridangam samples. Falling back to synths.", e);
-                        mridangamSampler = null;
+                if (!played && isSouth) {
+                    if (resolved.instrument === 'parai') {
+                        if (note.midi === MIDI_DRUMS.DHOL_LOW || note.midi === MIDI_DRUMS.MRIDANGAM_LOW) {
+                            played = playSample('paraiLow', 0.35, t, v * 1.06);
+                        } else if (
+                            note.midi === MIDI_DRUMS.DHOL_HIGH ||
+                            note.midi === MIDI_DRUMS.MRIDANGAM_HIGH ||
+                            note.midi === MIDI_DRUMS.TA1 ||
+                            note.midi === MIDI_DRUMS.TA2 ||
+                            note.midi === MIDI_DRUMS.TABLA_LOW
+                        ) {
+                            played = playSample('paraiHigh', 0.25, t, v * 1.05);
+                        }
+                    } else {
+                        if (note.midi === MIDI_DRUMS.DHOL_LOW) {
+                            played = playSample('dholLow', 0.35, t, v * 1.06);
+                        } else if (note.midi === MIDI_DRUMS.DHOL_HIGH) {
+                            played = playSample('dholHigh', 0.25, t, v * 1.05);
+                        } else if (note.midi === MIDI_DRUMS.MRIDANGAM_LOW) {
+                            played = playSample('mridangamLow', 0.35, t, v * 1.05);
+                        } else if (
+                            note.midi === MIDI_DRUMS.MRIDANGAM_HIGH ||
+                            note.midi === MIDI_DRUMS.TA1 ||
+                            note.midi === MIDI_DRUMS.TA2
+                        ) {
+                            played = playSample('mridangamHigh', 0.25, t, v * 1.04);
+                        }
                     }
                 }
 
-                if (isSouth && resolved.instrument === 'parai') {
-                    paraiSampler = new Tone.Sampler({
-                        urls: {
-                            C4: 'parai_low.wav', D4: 'parai_high.wav', E4: 'parai_edge.wav', F4: 'parai_accent.wav'
-                        },
-                        baseUrl: '/Samples/Parai/',
-                        release: 0.9, curve: 'exponential'
-                    }).connect(master);
-
-                    try { 
-                        await Tone.loaded(); 
-                    } catch (e) {
-                        console.warn('ToneVault: Parai samples could not be loaded. Using procedural fallback.', e);
-                        paraiSampler = null;
+                if (!played && isCinematic) {
+                    if (note.midi === MIDI_DRUMS.TAIKO_LOW) {
+                        played = playSample('taikoLow', 0.8, t, v);
+                    } else if (note.midi === MIDI_DRUMS.LOW_TOM_CIN) {
+                        played = playSample('cinematicLowTom', 0.6, t, v * 0.95);
+                    } else if (note.midi === MIDI_DRUMS.HIGH_TOM_CIN) {
+                        played = playSample('taikoHigh', 0.45, t, v * 0.9);
+                    } else if (note.midi === MIDI_DRUMS.ORCH_SNARE) {
+                        played = playSample('orchSnare', 0.35, t, v);
+                    } else if (note.midi === MIDI_DRUMS.CRASH) {
+                        played = playSample('orchestralCrash', 1.2, t, v);
+                    } else if (note.midi === 'TIMPANI') {
+                        played = playSample(v >= 0.82 ? 'timpaniLow' : 'timpaniMidHigh', 1.0, t, v);
                     }
                 }
 
-                // SYNTH FALLBACKS
-                const kick = new Tone.MembraneSynth({
-                    pitchDecay: 0.035, octaves: 3.5, oscillator: { type: 'sine' },
-                    envelope: { attack: 0.001, decay: 0.5, sustain: 0, release: 0.25 }
-                }).connect(master);
-
-                const snareBody = new Tone.MembraneSynth({
-                    pitchDecay: 0.008, octaves: 1.2, oscillator: { type: 'triangle' },
-                    envelope: { attack: 0.001, decay: 0.16, sustain: 0, release: 0.12 }
-                }).connect(master);
-
-                const snareNoise = new Tone.NoiseSynth({
-                    noise: { type: 'pink' }, envelope: { attack: 0.001, decay: 0.18, sustain: 0, release: 0.05 }
-                }).connect(master);
-
-                const hatFilter = new Tone.Filter(7500, 'highpass').connect(master);
-                const hat = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.001, decay: 0.045, sustain: 0, release: 0.02 } }).connect(hatFilter);
-                const openHat = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.001, decay: 0.28, sustain: 0, release: 0.06 } }).connect(hatFilter);
-
-                const clap = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.001, decay: 0.22, sustain: 0, release: 0.03 } }).connect(new Tone.Filter(1700, 'bandpass').connect(master));
-
-                const paraiBody = new Tone.MembraneSynth({ pitchDecay: 0.006, octaves: 0.55, oscillator: { type: 'triangle' }, envelope: { attack: 0.001, decay: 0.34, sustain: 0.015, release: 0.18 } }).connect(master);
-                const paraiSkin = new Tone.NoiseSynth({ noise: { type: 'pink' }, envelope: { attack: 0.001, decay: 0.075, sustain: 0, release: 0.035 } }).connect(new Tone.Filter(2400, 'bandpass').connect(master));
-                const dholLow = paraiBody; const dholHigh = paraiBody;
-
-                const taikoLow = new Tone.PolySynth(Tone.MembraneSynth, { pitchDecay: 0.025, octaves: 1.0, oscillator: { type: 'sine' }, envelope: { attack: 0.003, decay: 1.0, sustain: 0.08, release: 1.2 } }).connect(master);
-                const lowTom = new Tone.PolySynth(Tone.MembraneSynth, { pitchDecay: 0.02, octaves: 1.2, oscillator: { type: 'triangle' }, envelope: { attack: 0.002, decay: 0.5, sustain: 0.04, release: 0.45 } }).connect(master);
-                const timpani = new Tone.PolySynth(Tone.MembraneSynth, { pitchDecay: 0.01, octaves: 0.8, oscillator: { type: 'sine' }, envelope: { attack: 0.005, decay: 1.25, sustain: 0.1, release: 1.8 } }).connect(master);
-                const orchSnare = new Tone.PolySynth(Tone.MembraneSynth, { pitchDecay: 0.008, octaves: 0.9, oscillator: { type: 'triangle' }, envelope: { attack: 0.002, decay: 0.2, sustain: 0, release: 0.12 } }).connect(master);
-                
-                const orchNoise = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "square" }, envelope: { attack: 0.002, decay: 0.24, sustain: 0, release: 0.06 } }).connect(master);
-                const crash = new Tone.PolySynth(Tone.MetalSynth, { frequency: 220, envelope: { attack: 0.001, decay: 2.8, release: 3.2 }, harmonicity: 5.1, modulationIndex: 28, resonance: 4200, octaves: 1.7 }).connect(master);
-
-                const tablaMap = { [MIDI_DRUMS.TA1]: 'C4', [MIDI_DRUMS.TA2]: 'D4', [MIDI_DRUMS.TABLA_LOW]: 'E4' };
-                const mridangamMap = { [MIDI_DRUMS.MRIDANGAM_HIGH]: 'C4', [MIDI_DRUMS.MRIDANGAM_LOW]: 'G4', [MIDI_DRUMS.TA1]: 'D4', [MIDI_DRUMS.TA2]: 'E4', [MIDI_DRUMS.TABLA_LOW]: 'G4' };
-                const paraiMap = { [MIDI_DRUMS.DHOL_LOW]: 'C4', [MIDI_DRUMS.DHOL_HIGH]: 'D4', [MIDI_DRUMS.MRIDANGAM_HIGH]: 'E4', [MIDI_DRUMS.MRIDANGAM_LOW]: 'F4', [MIDI_DRUMS.TA1]: 'D4', [MIDI_DRUMS.TA2]: 'E4', [MIDI_DRUMS.TABLA_LOW]: 'C4' };
-
-                const lastVoiceTime = new Map();
-
-                uniquePreviewNotes.forEach(note => {
-                    const voiceKey = `${note.track}|${note.midi}`;
-                    let t = Math.max(0, Math.min(note.time, totalDuration - 0.001));
-                    const previous = lastVoiceTime.get(voiceKey);
-                    
-                    if (previous !== undefined && t <= previous + 0.002) {
-                        t = Math.min(totalDuration - 0.001, previous + 0.002);
-                    }
-                    lastVoiceTime.set(voiceKey, t);
-                    const v = note.velocity;
-
-                    if (paraiSampler && paraiMap[note.midi]) {
-                        const sampleNote = paraiMap[note.midi];
-                        const duration =
-                            note.midi === MIDI_DRUMS.DHOL_LOW ||
-                            note.midi === MIDI_DRUMS.MRIDANGAM_LOW
-                                ? '8n'
-                                : '16n';
-
-                        paraiSampler.triggerAttackRelease(
-                            sampleNote,
-                            duration,
-                            t,
-                            Math.min(1, v * 1.08)
-                        );
-                        return;
-                    }
-
-                    if (tablaSampler && tablaMap[note.midi]) {
-                        const sampleNote = tablaMap[note.midi];
-                        const duration = note.midi === MIDI_DRUMS.TABLA_LOW ? '8n' : '16n';
-                        tablaSampler.triggerAttackRelease(sampleNote, duration, t, Math.min(1, v * 1.08));
-                        return;
-                    }
-
-                    if (mridangamSampler && mridangamMap[note.midi]) {
-                        const sampleNote = mridangamMap[note.midi];
-                        const duration = note.midi === MIDI_DRUMS.MRIDANGAM_LOW ? '8n' : '16n';
-                        mridangamSampler.triggerAttackRelease(sampleNote, duration, t, Math.min(1, v * 1.05));
-                        return;
-                    }
-
+                if (!played) {
                     switch (note.midi) {
-                        case MIDI_DRUMS.KICK: kick.triggerAttackRelease('C1', '32n', t, v); break;
-                        case MIDI_DRUMS.SNARE: snareBody.triggerAttackRelease('G2', '32n', t, v); snareNoise.triggerAttackRelease('32n', t, v * 0.8); break;
-                        case MIDI_DRUMS.CH: hat.triggerAttackRelease('32n', t, v * 0.7); break;
-                        case MIDI_DRUMS.OH: openHat.triggerAttackRelease('16n', t, v * 0.7); break;
-                        case MIDI_DRUMS.CLAP: clap.triggerAttackRelease('32n', t, v); break;
-                        case MIDI_DRUMS.TOM_HI: lowTom.triggerAttackRelease('A2', '32n', t, v); break;
-                        case MIDI_DRUMS.TOM_LO: lowTom.triggerAttackRelease('D2', '32n', t, v); break;
-                        case MIDI_DRUMS.DHOL_LOW: 
-                            if (resolved.instrument === 'parai') { paraiBody.triggerAttackRelease('G2', '32n', t, v * 0.9); paraiSkin.triggerAttackRelease('16n', t, v * 0.55); } 
-                            else { dholLow.triggerAttackRelease('D2', '32n', t, v); } break;
-                        case MIDI_DRUMS.DHOL_HIGH: 
-                            if (resolved.instrument === 'parai') { paraiBody.triggerAttackRelease('D3', '32n', t, v * 0.8); paraiSkin.triggerAttackRelease('32n', t, v * 0.72); } 
-                            else { dholHigh.triggerAttackRelease('A2', '32n', t, v); } break;
-                        case MIDI_DRUMS.TAIKO_LOW: taikoLow.triggerAttackRelease('C1', '16n', t, v); break;
-                        case MIDI_DRUMS.LOW_TOM_CIN: lowTom.triggerAttackRelease('D2', '32n', t, v); break;
-                        case MIDI_DRUMS.HIGH_TOM_CIN: lowTom.triggerAttackRelease('A2', '32n', t, v); break;
-                        case 'TIMPANI': timpani.triggerAttackRelease('G1', '16n', t, v); break;
-                        case MIDI_DRUMS.ORCH_SNARE: orchSnare.triggerAttackRelease('C3', '32n', t, v); orchNoise.triggerAttackRelease('C6', '32n', t, v * 0.45); break;
-                        case MIDI_DRUMS.CRASH: crash.triggerAttackRelease('16n', t, v); break;
+                        case MIDI_DRUMS.KICK:
+                            played = playSample('modernKick', 0.35, t, v); break;
+                        case MIDI_DRUMS.SNARE:
+                            played = playSample('modernSnare', 0.35, t, v); break;
+                        case MIDI_DRUMS.CLAP:
+                            played = playSample('modernClap', 0.25, t, v); break;
+                        case MIDI_DRUMS.CH:
+                            played = playSample('modernClosedHat', 0.12, t, v * 0.8); break;
+                        case MIDI_DRUMS.OH:
+                            played = playSample('modernOpenHat', 0.35, t, v * 0.8); break;
+                        case MIDI_DRUMS.TOM_HI:
+                            played = playSample('modernHighTom', 0.4, t, v); break;
+                        case MIDI_DRUMS.TOM_LO:
+                            played = playSample('modernLowTom', 0.4, t, v); break;
+                        case MIDI_DRUMS.CRASH:
+                            played = playSample('modernCrash', 1.0, t, v); break;
                     }
-                });
-            }, Math.max(totalDuration, 1));
+                }
+            });
 
-            const wavBlob = bufferToWave(buffer.get(), buffer.length);
+            const buffer = await offline.startRendering();
+            const wavBlob = bufferToWave(buffer, buffer.length);
 
             if (options.returnBlob) return wavBlob;
 
@@ -2038,6 +2248,7 @@
             if (wavesurfer) {
                 wavesurfer.destroy();
                 previewPlayIcon.className = 'fa-solid fa-play';
+                wavesurfer = null;
             }
 
             setTimeout(() => {
@@ -2053,10 +2264,12 @@
                 });
 
                 wavesurfer.load(wavBlobUrl);
+
                 wavesurfer.on('ready', () => {
                     audioDurationText.textContent = formatTime(wavesurfer.getDuration());
                     wavesurfer.setVolume(parseFloat(previewVolume.value));
                 });
+
                 wavesurfer.on('play', () => previewPlayIcon.className = 'fa-solid fa-pause');
                 wavesurfer.on('pause', () => previewPlayIcon.className = 'fa-solid fa-play');
                 wavesurfer.on('finish', () => previewPlayIcon.className = 'fa-solid fa-play');
