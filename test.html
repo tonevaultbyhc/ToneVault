@@ -1039,6 +1039,10 @@
                             <a href="#" class="download-btn" id="downloadMidiBtn" download="tonevault_drums.mid" target="_blank">
                                 <i class="fa-solid fa-file-music"></i> Download Full Kit MIDI
                             </a>
+
+                            <a href="#" class="download-btn" id="downloadWavBtn" download="tonevault_preview.wav" target="_blank">
+                                <i class="fa-solid fa-file-waveform"></i> Download WAV Preview
+                            </a>
                         </div>
                     </div>
 
@@ -1179,6 +1183,7 @@
         const audioDurationText = document.getElementById('audioDurationText');
         const previewVolume = document.getElementById('previewVolume');
         const downloadMidiBtn = document.getElementById('downloadMidiBtn');
+        const downloadWavBtn = document.getElementById('downloadWavBtn');
         
         const instrumentMidiList = document.getElementById('instrumentMidiList');
         const generatedInstrumentSummary = document.getElementById('generatedInstrumentSummary');
@@ -2436,6 +2441,10 @@
 
             if (wavBlobUrl) URL.revokeObjectURL(wavBlobUrl);
             wavBlobUrl = URL.createObjectURL(wavBlob);
+            if (downloadWavBtn) {
+                downloadWavBtn.href = wavBlobUrl;
+                downloadWavBtn.download = `tonevault_${resolved.rhythm}_preview.wav`;
+            }
 
             if (wavesurfer) {
                 wavesurfer.destroy();
