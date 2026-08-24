@@ -862,7 +862,9 @@
                                 <div class="custom-option selected" data-value="auto">Auto (from Style)</div>
                                 <div class="custom-option" data-value="modern">Modern Electronic</div>
                                 <div class="custom-option" data-value="tabla">Indian Tabla</div>
-                                <div class="custom-option" data-value="parai">Parai (Dappan Koothu)</div>
+                                <div class="custom-option" data-value="parai">Parai / Thappu</div>
+                                <div class="custom-option" data-value="dhol">Dhol</div>
+                                <div class="custom-option" data-value="mridangam">Mridangam</div>
                                 <div class="custom-option" data-value="cinematic">Cinematic Orchestra</div>
                                 <div class="custom-option" data-value="hybrid">Hybrid Cinematic</div>
                             </div>
@@ -871,7 +873,9 @@
                             <option value="auto" selected>Auto (from Style)</option>
                             <option value="modern">Modern Electronic</option>
                             <option value="tabla">Indian Tabla</option>
-                            <option value="parai">Parai (Dappan Koothu)</option>
+                            <option value="parai">Parai / Thappu</option>
+                            <option value="dhol">Dhol</option>
+                            <option value="mridangam">Mridangam</option>
                             <option value="cinematic">Cinematic Orchestra</option>
                             <option value="hybrid">Hybrid Cinematic</option>
                         </select>
@@ -1245,10 +1249,23 @@
             if (hasKeyword(text, 'boom bap')) rhythm = 'boom_bap';
             if (hasKeyword(text, 'trap', 'drill', 'rolls', 'rolling')) rhythm = rhythm || 'trap_roll';
 
-            if (hasKeyword(text, 'tabla', 'teen taal', 'teentaal', 'bayan')) instrument = 'tabla';
-            if (hasKeyword(text, 'parai', 'thappu', 'thappattam', 'dappan koothu', 'kuthu')) instrument = 'parai';
-            if (hasKeyword(text, 'orchestra', 'orchestral', 'timpani', 'taiko', 'gran casa')) instrument = 'cinematic';
-            if (hasKeyword(text, 'hybrid cinematic', 'hybrid')) instrument = 'hybrid';
+            // Instrument keywords are used only when Percussion Set is Auto.
+            // An explicit selection must never be silently overridden.
+            if (requestedInstrument === 'auto') {
+                if (hasKeyword(text, 'tabla', 'teen taal', 'teentaal', 'bayan')) {
+                    instrument = 'tabla';
+                } else if (hasKeyword(text, 'mridangam')) {
+                    instrument = 'mridangam';
+                } else if (hasKeyword(text, 'dhol')) {
+                    instrument = 'dhol';
+                } else if (hasKeyword(text, 'parai', 'thappu', 'thappattam', 'dappan koothu', 'kuthu')) {
+                    instrument = 'parai';
+                } else if (hasKeyword(text, 'orchestra', 'orchestral', 'timpani', 'taiko', 'gran casa')) {
+                    instrument = 'cinematic';
+                } else if (hasKeyword(text, 'hybrid cinematic', 'hybrid')) {
+                    instrument = 'hybrid';
+                }
+            }
 
             const styleDefaults = {
                 hiphop: { rhythm: 'boom_bap', instrument: 'modern' },
@@ -1428,7 +1445,18 @@
         // SOUTH INDIAN / KUTHU PATTERN
         // ============================================================
         function generateSouthIndianPattern(ctx) {
-            const { totalBars, barDuration, sixteenth, density, fillFreq, addHit } = ctx;
+            const { totalBars, barDuration, sixteenth, density, fillFreq, addHit, instrument } = ctx;
+
+            // One two-voice groove, using the correct low/high voice for the
+            // selected South Indian percussion family.
+            const lowMidi = instrument === 'mridangam'
+                ? MIDI_DRUMS.MRIDANGAM_LOW
+                : MIDI_DRUMS.DHOL_LOW;
+
+            const highMidi = instrument === 'mridangam'
+                ? MIDI_DRUMS.MRIDANGAM_HIGH
+                : MIDI_DRUMS.DHOL_HIGH;
+
             const pattern = [
                 'LOW','HIGH','HIGH','LOW',
                 'LOW','HIGH','LOW','HIGH',
@@ -1439,18 +1467,21 @@
             for (let bar = 0; bar < totalBars; bar++) {
                 const start = bar * barDuration;
                 const fillBar = fillFreq > 0 && ((bar + 1) % fillFreq === 0);
-                
+
                 for (let i = 0; i < 16; i++) {
                     const t = start + i * sixteenth;
                     const strong = i % 4 === 0;
-                    addHit(pattern[i] === 'LOW' ? MIDI_DRUMS.DHOL_LOW : MIDI_DRUMS.DHOL_HIGH, t, strong ? 0.94 : 0.66, 0.1, 'drums');
+                    const midi = pattern[i] === 'LOW' ? lowMidi : highMidi;
 
-                    if (density !== 'minimal' && (i === 2 || i === 6 || i === 10 || i === 14)) {
-                        addHit(MIDI_DRUMS.MRIDANGAM_HIGH, t + sixteenth * 0.45, 0.42, 0.05, 'drums');
+                    addHit(midi, t, strong ? 0.94 : 0.66, 0.1, 'drums');
+
+                    // Busy mode adds another articulation from the SAME family.
+                    if (density === 'busy' && (i === 2 || i === 6 || i === 10 || i === 14)) {
+                        addHit(highMidi, t + sixteenth * 0.45, 0.42, 0.05, 'drums');
                     }
 
                     if (fillBar && i >= 12) {
-                        addHit(i % 2 ? MIDI_DRUMS.DHOL_HIGH : MIDI_DRUMS.MRIDANGAM_LOW, t, 0.72, 0.08, 'drums');
+                        addHit(i % 2 ? highMidi : lowMidi, t, 0.72, 0.08, 'drums');
                     }
                 }
             }
@@ -1520,10 +1551,20 @@
             }
 
             if (resolved.engine === 'south_indian') {
-                // 36/45 are shared custom MIDI numbers in the existing engine.
-                if (n === MIDI_DRUMS.DHOL_LOW) return 'Dhol Low / Mridangam Low';
-                if (n === MIDI_DRUMS.DHOL_HIGH) return 'Dhol High';
-                if (n === MIDI_DRUMS.MRIDANGAM_HIGH) return 'Mridangam High';
+                if (resolved.instrument === 'parai') {
+                    if (n === MIDI_DRUMS.DHOL_LOW) return 'Parai Low';
+                    if (n === MIDI_DRUMS.DHOL_HIGH) return 'Parai High';
+                }
+
+                if (resolved.instrument === 'dhol') {
+                    if (n === MIDI_DRUMS.DHOL_LOW) return 'Dhol Low';
+                    if (n === MIDI_DRUMS.DHOL_HIGH) return 'Dhol High';
+                }
+
+                if (resolved.instrument === 'mridangam') {
+                    if (n === MIDI_DRUMS.MRIDANGAM_LOW) return 'Mridangam Low';
+                    if (n === MIDI_DRUMS.MRIDANGAM_HIGH) return 'Mridangam High';
+                }
             }
 
             if (resolved.engine === 'cinematic' || resolved.engine === 'hybrid') {
@@ -2066,12 +2107,16 @@
                 addPool('modernClosedHat', 'modernClosedHat');
                 addPool('modernOpenHat', 'modernOpenHat');
             } else if (isSouth) {
-                addPool('mridangamLow', 'mridangamLow');
-                addPool('mridangamHigh', 'mridangamHigh');
-                addPool('dholLow', 'dholLow');
-                addPool('dholHigh', 'dholHigh');
-                addPool('paraiLow', 'paraiLow');
-                addPool('paraiHigh', 'paraiHigh');
+                if (resolved.instrument === 'parai') {
+                    addPool('paraiLow', 'paraiLow');
+                    addPool('paraiHigh', 'paraiHigh');
+                } else if (resolved.instrument === 'dhol') {
+                    addPool('dholLow', 'dholLow');
+                    addPool('dholHigh', 'dholHigh');
+                } else if (resolved.instrument === 'mridangam') {
+                    addPool('mridangamLow', 'mridangamLow');
+                    addPool('mridangamHigh', 'mridangamHigh');
+                }
             }
 
             if (isCinematic) {
@@ -2171,29 +2216,21 @@
 
                 if (!played && isSouth) {
                     if (resolved.instrument === 'parai') {
-                        if (note.midi === MIDI_DRUMS.DHOL_LOW || note.midi === MIDI_DRUMS.MRIDANGAM_LOW) {
+                        if (note.midi === MIDI_DRUMS.DHOL_LOW) {
                             played = playSample('paraiLow', 0.35, t, v * 1.06);
-                        } else if (
-                            note.midi === MIDI_DRUMS.DHOL_HIGH ||
-                            note.midi === MIDI_DRUMS.MRIDANGAM_HIGH ||
-                            note.midi === MIDI_DRUMS.TA1 ||
-                            note.midi === MIDI_DRUMS.TA2 ||
-                            note.midi === MIDI_DRUMS.TABLA_LOW
-                        ) {
+                        } else if (note.midi === MIDI_DRUMS.DHOL_HIGH) {
                             played = playSample('paraiHigh', 0.25, t, v * 1.05);
                         }
-                    } else {
+                    } else if (resolved.instrument === 'dhol') {
                         if (note.midi === MIDI_DRUMS.DHOL_LOW) {
                             played = playSample('dholLow', 0.35, t, v * 1.06);
                         } else if (note.midi === MIDI_DRUMS.DHOL_HIGH) {
                             played = playSample('dholHigh', 0.25, t, v * 1.05);
-                        } else if (note.midi === MIDI_DRUMS.MRIDANGAM_LOW) {
+                        }
+                    } else if (resolved.instrument === 'mridangam') {
+                        if (note.midi === MIDI_DRUMS.MRIDANGAM_LOW) {
                             played = playSample('mridangamLow', 0.35, t, v * 1.05);
-                        } else if (
-                            note.midi === MIDI_DRUMS.MRIDANGAM_HIGH ||
-                            note.midi === MIDI_DRUMS.TA1 ||
-                            note.midi === MIDI_DRUMS.TA2
-                        ) {
+                        } else if (note.midi === MIDI_DRUMS.MRIDANGAM_HIGH) {
                             played = playSample('mridangamHigh', 0.25, t, v * 1.04);
                         }
                     }
