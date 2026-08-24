@@ -476,6 +476,36 @@
             text-align: center;
         }
 
+        .keyword-example {
+            margin-top: 20px;
+            padding: 15px;
+            border-left: 3px solid #00c8ff;
+            background: rgba(0, 200, 255, 0.04);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .keyword-example strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #fff;
+            font-size: 12px;
+        }
+
+        .keyword-example code {
+            display: block;
+            margin-bottom: 10px;
+            color: #00c8ff;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .keyword-example p {
+            margin: 0;
+            color: #999;
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
         .custom-keyword-note {
             margin-top: 15px;
             padding-top: 15px;
@@ -1044,7 +1074,6 @@
                     <div class="keyword-row"><span class="keyword">tabla</span><span>Uses Indian tabla-style phrasing</span></div>
                     <div class="keyword-row"><span class="keyword">teen taal</span><span>16-matra classical cycle</span></div>
                     <div class="keyword-row"><span class="keyword">kuthu</span><span>Parai-led South Indian folk / dance pulse</span></div>
-                    <div class="keyword-row"><span class="keyword">dhol</span><span>Low/high folk percussion emphasis</span></div>
                     <div class="keyword-row"><span class="keyword">tihai</span><span>Three-part phrase resolving to the downbeat</span></div>
                 </div>
 
@@ -1178,9 +1207,9 @@
             TA1: 60,       
             TA2: 62,       
             TABLA_LOW: 64, 
-            DHOL_LOW: 36,
-            DHOL_HIGH: 45,
-            MRIDANGAM_LOW: 36,
+            PARAI_LOW: 36,
+            PARAI_HIGH: 45,
+            MRIDANGAM_LOW: 41,
             MRIDANGAM_HIGH: 62,
             TAIKO_LOW: 36,
             TAIKO_HIGH: 45
@@ -1280,7 +1309,7 @@
                 const midiNumber = typeof midiNote === 'number' ? midiNote : 43;
 
                 target.addNote({ midi: midiNumber, time: humanTime, duration, velocity: humanVel });
-                notes.push({ midi: midiNote, time: humanTime, duration, velocity: humanVel, track });
+                notes.push({ midi: midiNumber, time: humanTime, duration, velocity: humanVel, track });
             };
         }
 
@@ -1377,7 +1406,7 @@
                     }
 
                     if (rhythm === 'kuthu' && (i === Math.floor(3 * stepsPerBar / 16) || i === Math.floor(7 * stepsPerBar / 16) || i === Math.floor(11 * stepsPerBar / 16) || i === stepsPerBar - 1)) {
-                        addHit(MIDI_DRUMS.DHOL_HIGH, t, 0.78, 0.09, 'drums');
+                        addHit(MIDI_DRUMS.PARAI_HIGH, t, 0.78, 0.09, 'drums');
                     }
                 }
 
@@ -1398,79 +1427,30 @@
         // SOUTH INDIAN / KUTHU PATTERN
         // ============================================================
         function generateSouthIndianPattern(ctx) {
-            const {
-                totalBars, barDuration, sixteenth,
-                density, swingAmount, fillFreq, addHit, text, instrument
-            } = ctx;
-
-            const phrase = [
-                { low:  [0, 4, 8, 12], high: [2, 6, 10, 14] },
-                { low:  [0, 4, 8, 11], high: [2, 6, 9, 14] },
-                { low:  [0, 3, 8, 12], high: [2, 5, 10, 13, 15] },
-                { low:  [0, 4, 8, 12, 14], high: [2, 6, 10, 12, 14, 15] }
+            const { totalBars, barDuration, sixteenth, density, fillFreq, addHit } = ctx;
+            const pattern = [
+                'LOW','HIGH','HIGH','LOW',
+                'LOW','HIGH','LOW','HIGH',
+                'LOW','HIGH','HIGH','LOW',
+                'LOW','HIGH','HIGH','LOW'
             ];
-
-            const sparsePhrase = [
-                { low:[0, 8],       high:[2, 6, 10, 14] },
-                { low:[0, 8, 12],   high:[2, 7, 14] },
-                { low:[0, 4, 8],    high:[2, 6, 11, 14] },
-                { low:[0, 8, 12],   high:[3, 6, 10, 14] }
-            ];
-
-            const busyPhrase = [
-                { low:[0, 3, 4, 8, 11, 12], high:[2, 5, 6, 10, 13, 14] },
-                { low:[0, 4, 7, 8, 11, 12], high:[2, 5, 6, 9, 13, 14, 15] },
-                { low:[0, 3, 4, 8, 11, 12, 15], high:[2, 5, 6, 10, 13, 14] },
-                { low:[0, 4, 7, 8, 11, 12, 14], high:[2, 5, 6, 9, 10, 13, 14, 15] }
-            ];
-
-            const chosenPhrase = density === 'minimal' ? sparsePhrase : density === 'busy' ? busyPhrase : phrase;
-
-            const lowMidi = MIDI_DRUMS.DHOL_LOW;
-            const highMidi = MIDI_DRUMS.DHOL_HIGH;
 
             for (let bar = 0; bar < totalBars; bar++) {
                 const start = bar * barDuration;
-                const phraseBar = bar % 4;
-                const pattern = chosenPhrase[phraseBar];
-                const stepTime = barDuration / 16;
+                const fillBar = fillFreq > 0 && ((bar + 1) % fillFreq === 0);
+                
+                for (let i = 0; i < 16; i++) {
+                    const t = start + i * sixteenth;
+                    const strong = i % 4 === 0;
+                    addHit(pattern[i] === 'LOW' ? MIDI_DRUMS.PARAI_LOW : MIDI_DRUMS.PARAI_HIGH, t, strong ? 0.94 : 0.66, 0.1, 'drums');
 
-                const schedule = (step, midi, velocity, duration = 0.085) => {
-                    let t = start + step * stepTime;
-                    if (swingAmount > 0 && step % 2 === 1) {
-                        t += stepTime * Math.min(0.36, swingAmount * 0.5);
+                    if (density !== 'minimal' && (i === 2 || i === 6 || i === 10 || i === 14)) {
+                        addHit(MIDI_DRUMS.MRIDANGAM_HIGH, t + sixteenth * 0.45, 0.42, 0.05, 'drums');
                     }
-                    addHit(midi, t, velocity, duration, 'drums');
-                };
 
-                pattern.low.forEach((step, i) => {
-                    let velocity = step === 0 ? 0.98 : 0.70;
-                    if (step === 8) velocity = 0.82;
-                    if (phraseBar === 3 && step >= 12) velocity += 0.05;
-                    schedule(step, lowMidi, velocity, 0.105);
-                });
-
-                pattern.high.forEach((step, i) => {
-                    let velocity = (step === 2 || step === 10) ? 0.76 : 0.58;
-                    if (phraseBar === 3 && step >= 14) velocity += 0.10;
-                    schedule(step, highMidi, velocity, 0.07);
-                });
-
-                if (hasKeyword(text, 'call and response', 'call response')) {
-                    if (phraseBar === 0 || phraseBar === 2) schedule(6, highMidi, 0.68, 0.065);
-                    else schedule(13, highMidi, 0.68, 0.065);
-                }
-
-                if (hasKeyword(text, 'driving', 'strong accents', 'aggressive')) {
-                    schedule(8, lowMidi, 0.88, 0.105);
-                }
-
-                const isFillBar = fillFreq > 0 && ((bar + 1) % fillFreq === 0);
-                if (phraseBar === 3 && isFillBar) {
-                    schedule(12, lowMidi, 0.72, 0.08);
-                    schedule(13, highMidi, 0.62, 0.065);
-                    schedule(14, lowMidi, 0.82, 0.08);
-                    schedule(15, highMidi, 0.88, 0.065);
+                    if (fillBar && i >= 12) {
+                        addHit(i % 2 ? MIDI_DRUMS.PARAI_HIGH : MIDI_DRUMS.MRIDANGAM_LOW, t, 0.72, 0.08, 'drums');
+                    }
                 }
             }
         }
@@ -1538,8 +1518,9 @@
             }
 
             if (resolved.engine === 'south_indian') {
-                if (n === MIDI_DRUMS.DHOL_LOW) return 'Dhol Low / Mridangam Low';
-                if (n === MIDI_DRUMS.DHOL_HIGH) return 'Dhol High';
+                if (n === MIDI_DRUMS.PARAI_LOW) return 'Parai Low';
+                if (n === MIDI_DRUMS.PARAI_HIGH) return 'Parai High';
+                if (n === MIDI_DRUMS.MRIDANGAM_LOW) return 'Mridangam Low';
                 if (n === MIDI_DRUMS.MRIDANGAM_HIGH) return 'Mridangam High';
             }
 
@@ -1871,32 +1852,155 @@
         // TONEVAULT AUDIO SYNTHESIS WITH DYNAMIC DURATION SANITIZER
         // ============================================================
         
-        // Caching context for Tone.js
-        let sampleDecodeContext = null;
+        const SAMPLE_RAW_BASE = 'https://raw.githubusercontent.com/tonevaultbyhc/ToneVault/main';
         const decodedSampleCache = new Map();
+        let sampleDecodeContext = null;
 
-        async function fetchSampleBuffer(url) {
-            if (decodedSampleCache.has(url)) return decodedSampleCache.get(url);
+        function encodedSampleUrl(path) {
+            const clean = String(path || '').replace(/^\/+/, '');
+            const encodedPath = clean.split('/').map(part => encodeURIComponent(part)).join('/');
+            return `${SAMPLE_RAW_BASE}/Samples/${encodedPath}`; 
+        }
+
+        function rawSampleUrl(path) {
+            const clean = String(path || '').replace(/^\/+/, '');
+            const encodedPath = clean.split('/').map(part => encodeURIComponent(part)).join('/');
+            return `${SAMPLE_RAW_BASE}/${encodedPath}`;
+        }
+
+        async function fetchSampleBuffer(path) {
+            if (decodedSampleCache.has(path)) return decodedSampleCache.get(path);
 
             const promise = (async () => {
-                try {
-                    const response = await fetch(url, { cache: 'force-cache' });
-                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                    const arrayBuffer = await response.arrayBuffer();
-                    if (!sampleDecodeContext) {
-                        const AC = window.AudioContext || window.webkitAudioContext;
-                        if (!AC) throw new Error('Web Audio API is unavailable');
-                        sampleDecodeContext = new AC();
+                const urls = [encodedSampleUrl(path), rawSampleUrl(path)];
+                let lastError = null;
+
+                for (const url of urls) {
+                    try {
+                        const response = await fetch(url, { cache: 'force-cache' });
+                        if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`);
+                        const arrayBuffer = await response.arrayBuffer();
+
+                        if (!sampleDecodeContext) {
+                            const AC = window.AudioContext || window.webkitAudioContext;
+                            if (!AC) throw new Error('Web Audio API is unavailable');
+                            sampleDecodeContext = new AC();
+                        }
+
+                        return await sampleDecodeContext.decodeAudioData(arrayBuffer.slice(0));
+                    } catch (error) {
+                        lastError = error;
+                        console.warn('ToneVault sample load failed:', url, error);
                     }
-                    return await sampleDecodeContext.decodeAudioData(arrayBuffer);
-                } catch (error) {
-                    console.warn(`ToneVault sample load failed: ${url}`, error);
-                    throw error;
                 }
+
+                throw lastError || new Error(`Unable to load ${path}`);
             })();
 
-            decodedSampleCache.set(url, promise);
+            decodedSampleCache.set(path, promise);
             return promise;
+        }
+
+        const SAMPLE_FILES = {
+            modernKick: [
+                ['Modern','Kick','Kick_001.wav'], ['Modern','Kick','Kick_002.wav'], ['Modern','Kick','Kick_003.wav']
+            ],
+            modernSnare: [
+                ['Modern','Snare','Snare_001.wav'], ['Modern','Snare','Snare_002.wav'], ['Modern','Snare','Snare_003.wav']
+            ],
+            modernClap: [
+                ['Modern','Clap','Clap_001.wav'], ['Modern','Clap','Clap_002.wav']
+            ],
+            modernClosedHat: [
+                ['Modern','Closed Hi-Hat','Closed Hi-Hat_001.wav'], ['Modern','Closed Hi-Hat','Closed Hi-Hat_002.wav']
+            ],
+            modernOpenHat: [
+                ['Modern','Open Hi-Hat','Open Hi-Hat_001.wav'], ['Modern','Open Hi-Hat','Open Hi-Hat_002.wav']
+            ],
+            modernLowTom: [
+                ['Modern','Low Tom','Low Tom_001.wav'], ['Modern','Low Tom','Low Tom_002.wav']
+            ],
+            modernHighTom: [
+                ['Modern','High Tom','High Tom_001.wav'], ['Modern','High Tom','High Tom_002.wav']
+            ],
+            modernCrash: [
+                ['Modern','Crash','Crash_001.wav'], ['Modern','Crash','Crash_002.wav']
+            ],
+            tablaLow: [
+                ['Indian','Tabla Low','Ghe-Open-1.1.wav'], ['Indian','Tabla Low','Ghe-Open-2.2.wav'], ['Indian','Tabla Low','Ghe-Open-3.3.wav']
+            ],
+            tablaMid: [
+                ['Indian','Tabla Mid','Ta-1.26.wav'], ['Indian','Tabla Mid','Ta-2.27.wav'], ['Indian','Tabla Mid','Ta-3.28.wav'], ['Indian','Tabla Mid','Ta-4.29.wav'], ['Indian','Tabla Mid','Ta-5.30.wav']
+            ],
+            tablaHigh: [
+                ['Indian','Tabla High','Na-1.1.wav'], ['Indian','Tabla High','Na-2.2.wav'], ['Indian','Tabla High','Na-3.3.wav'], ['Indian','Tabla High','Na-4.4.wav'], ['Indian','Tabla High','Na-5.5.wav'], ['Indian','Tabla High','Na-6.6.wav'], ['Indian','Tabla High','Na-7.7.wav'], ['Indian','Tabla High','Na-8.8.wav'], ['Indian','Tabla High','Na-9.9.wav']
+            ],
+            mridangamLow: [
+                ['Indian','Mridangam Low','mridangam-1_E_minor.wav'], ['Indian','Mridangam Low','mridangam-6_E_minor.wav']
+            ],
+            mridangamHigh: [
+                ['Indian','Mridangam High','mridangam-3_D_major.wav'], ['Indian','Mridangam High','mridangam-5_E_major.wav'], ['Indian','Mridangam High','mridangam-7_F_major.wav']
+            ],
+            paraiLow: [
+                ['South Indian','Parai Low','EM_THAPPU_PARAI_KICK_ONE SHOT_01.wav'], ['South Indian','Parai Low','EM_THAPPU_PARAI_KICK_ONE SHOT_02.wav'], ['South Indian','Parai Low','EM_THAPPU_PARAI_KICK_ONE SHOT_03.wav'], ['South Indian','Thappu  Folk Low','EM_THAPPU_PARAI_KICK_ONE SHOT_04.wav'], ['South Indian','Thappu  Folk Low','EM_THAPPU_PARAI_KICK_ONE SHOT_05.wav'], ['South Indian','Thappu  Folk Low','EM_THAPPU_PARAI_KICK_ONE SHOT_06.wav']
+            ],
+            paraiHigh: [
+                ['South Indian','Parai High','EM_THAPPU_PARAI_HITS_ONE SHOT_02.wav'], ['South Indian','Parai High','EM_THAPPU_PARAI_HITS_ONE SHOT_03.wav'], ['South Indian','Parai High','EM_THAPPU_PARAI_HITS_ONE SHOT_04.wav'], ['South Indian','Parai High','EM_THAPPU_PARAI_RIMSHOT_ONE SHOT_01.wav'], ['South Indian','Parai High','EM_THAPPU_PARAI_RIMSHOT_ONE SHOT_02.wav'], ['South Indian','Parai High','EM_THAPPU_PARAI_RIMSHOT_ONE SHOT_03.wav'], ['South Indian','Thappu  Folk High','thappu-hit-high-indian-drum_110bpm_D#_minor.wav'], ['South Indian','Thappu  Folk High','thappu-hit-hollow-indian-drum_110bpm_B_major.wav'], ['South Indian','Thappu  Folk High','thappu-hit-strong-indian-drum_110bpm_A#_minor.wav']
+            ],
+            orchSnare: [
+                ['Orchestral','Orchestral Snare','KSHMR_snare_big_roomy.wav'], ['Orchestral','Orchestral Snare','KSHMR_snare_character_snappy_C.wav'], ['Orchestral','Orchestral Snare','KSHMR_snare_big_noisy.wav']
+            ],
+            taikoLow: [
+                ['Orchestral','Taiko Low','Taiko Low_001.wav']
+            ],
+            taikoHigh: [
+                ['Orchestral','Taiko High','Taiko High_001.wav']
+            ],
+            cinematicLowTom: [
+                ['Orchestral','Cinematic Low Tom','KSHMR Acoustic High Tom 01 (A#).wav'], ['Orchestral','Cinematic Low Tom','KSHMR Acoustic High Tom 02 (A#).wav']
+            ],
+            timpaniLow: [
+                ['Orchestral','Timpani Low','KSHMR_Timpani_Hit_01_E.wav'], ['Orchestral','Timpani Low','KSHMR_Timpani_Hit_02_A.wav']
+            ],
+            timpaniMidHigh: [
+                ['Orchestral','Timpani Mid High','KSHMR_Timpani_Flam_01_E.wav'], ['Orchestral','Timpani Mid High','KSHMR_Timpani_Flam_02_A.wav']
+            ],
+            orchestralCrash: [
+                ['Orchestral','Crash','KSHMR_Orchestral_Crash_01.wav'], ['Orchestral','Crash','KSHMR_Orchestral_Crash_03.wav']
+            ]
+        };
+
+        const sampleUrlList = key => (SAMPLE_FILES[key] || []).map(parts => parts.join('/'));
+
+        const SAMPLE_NOTE_NAMES = ['C4','C#4','D4','D#4','E4','F4','F#4','G4','G#4','A4','A#4','B4'];
+        const sampleRoundRobin = new Map();
+
+        function createSampleSampler(urls, master, release = 0.8) {
+            if (!urls.length) return null;
+            const mapped = {};
+            urls.forEach((url, index) => {
+                mapped[SAMPLE_NOTE_NAMES[index % SAMPLE_NOTE_NAMES.length]] = url;
+            });
+            const sampler = new Tone.Sampler({
+                urls: mapped,
+                release,
+                curve: 'exponential'
+            }).connect(master);
+            return { sampler, notes: urls.map((_, i) => SAMPLE_NOTE_NAMES[i % SAMPLE_NOTE_NAMES.length]) };
+        }
+
+        function resetSampleRoundRobin() {
+            sampleRoundRobin.clear();
+        }
+
+        function triggerSample(poolName, samplePools, duration, time, velocity) {
+            const pool = samplePools[poolName];
+            if (!pool || !pool.sampler || !pool.notes.length) return false;
+            const index = sampleRoundRobin.get(poolName) || 0;
+            const sampleNote = pool.notes[index % pool.notes.length];
+            sampleRoundRobin.set(poolName, index + 1);
+            pool.sampler.triggerAttackRelease(sampleNote, duration, time, Math.min(1, velocity));
+            return true;
         }
 
         async function renderRhythmAudioPreview(notes, totalDuration, resolved, options = {}) {
@@ -1918,127 +2022,82 @@
                 }
             });
 
+            resetSampleRoundRobin();
+
             const buffer = await Tone.Offline(async () => {
                 const isIndian = resolved.engine === 'indian';
                 const isSouth = resolved.engine === 'south_indian';
                 const isCinematic = resolved.engine === 'cinematic' || resolved.engine === 'hybrid';
 
-                const master = new Tone.Gain(0.78);
+                const master = new Tone.Gain(0.82);
                 const compressor = new Tone.Compressor({ threshold: -18, ratio: 2.2, attack: 0.01, release: 0.18 });
                 const reverb = new Tone.Reverb({
                     decay: isIndian || isSouth ? 2.8 : isCinematic ? 4.8 : 1.5,
                     preDelay: 0.025,
-                    wet: isIndian || isSouth ? 0.22 : isCinematic ? 0.38 : 0.08
+                    wet: isIndian || isSouth ? 0.18 : isCinematic ? 0.28 : 0.06
                 });
                 master.chain(compressor, reverb, Tone.getDestination());
 
-                let tablaSampler = null;
-                let mridangamSampler = null;
-                let paraiSampler = null;
+                const samplePools = {};
+                const addPool = (name, files, release = 0.8) => {
+                    samplePools[name] = createSampleSampler(sampleUrlList(files), master, release);
+                };
 
                 if (isIndian) {
-                    tablaSampler = new Tone.Sampler({
-                        urls: {
-                            C4: '000_bass_flick1.wav',
-                            D4: '001_bass_flick2.wav',
-                            E4: '002_bass_lick1.wav',
-                            F4: '003_dead_hit1.wav',
-                            G4: '004_dead_hit2.wav',
-                            A4: '005_dead_hit3.wav'
-                        },
-                        baseUrl: 'https://raw.githubusercontent.com/tidalcycles/Dirt-Samples/master/tabla/',
-                        release: 0.8,
-                        curve: 'exponential'
-                    }).connect(master);
-                    
+                    addPool('tablaLow', 'tablaLow', 0.8);
+                    addPool('tablaMid', 'tablaMid', 0.7);
+                    addPool('tablaHigh', 'tablaHigh', 0.65);
+                    addPool('modernKick', 'modernKick', 0.45);
+                    addPool('modernClosedHat', 'modernClosedHat', 0.18);
+                    addPool('modernOpenHat', 'modernOpenHat', 0.5);
+                } else if (isSouth) {
+                    addPool('mridangamLow', 'mridangamLow', 0.8);
+                    addPool('mridangamHigh', 'mridangamHigh', 0.65);
+                    addPool('paraiLow', 'paraiLow', 0.8);
+                    addPool('paraiHigh', 'paraiHigh', 0.65);
+                }
+
+                if (isCinematic) {
+                    addPool('taikoLow', 'taikoLow', 1.2);
+                    addPool('taikoHigh', 'taikoHigh', 1.0);
+                    addPool('cinematicLowTom', 'cinematicLowTom', 0.8);
+                    addPool('orchSnare', 'orchSnare', 0.45);
+                    addPool('timpaniLow', 'timpaniLow', 1.6);
+                    addPool('timpaniMidHigh', 'timpaniMidHigh', 1.4);
+                    addPool('orchestralCrash', 'orchestralCrash', 2.5);
+                }
+
+                if (!isIndian && !isSouth && !isCinematic || resolved.engine === 'hybrid') {
+                    addPool('modernKick', 'modernKick', 0.45);
+                    addPool('modernSnare', 'modernSnare', 0.5);
+                    addPool('modernClap', 'modernClap', 0.35);
+                    addPool('modernClosedHat', 'modernClosedHat', 0.18);
+                    addPool('modernOpenHat', 'modernOpenHat', 0.5);
+                    addPool('modernLowTom', 'modernLowTom', 0.55);
+                    addPool('modernHighTom', 'modernHighTom', 0.45);
+                    addPool('modernCrash', 'modernCrash', 2.0);
+                }
+
+                if (isCinematic) {
+                    addPool('modernKick', 'modernKick', 0.45);
+                    addPool('modernClosedHat', 'modernClosedHat', 0.18);
+                    addPool('modernOpenHat', 'modernOpenHat', 0.5);
+                }
+
+                // Protect sampler load with Try-Catch so missing Github files won't kill offline context
+                const banks = Object.values(samplePools).filter(b => b && b.sampler);
+                for (const bank of banks) {
                     try {
-                        await Tone.loaded();
+                        const urlsToFetch = Object.values(bank.sampler._buffers._buffers).map(b => b ? b.url : null).filter(x => x);
+                        await Promise.all(urlsToFetch.map(url => fetchSampleBuffer(url).then(audioBuf => {
+                            for(let [note, buf] of bank.sampler._buffers) {
+                                if (buf.url === url) bank.sampler._buffers.set(note, audioBuf);
+                            }
+                        })));
                     } catch (e) {
-                        tablaSampler = null;
+                        console.warn('ToneVault: Sampler load bypass', e);
                     }
                 }
-
-                if (isSouth && resolved.instrument !== 'parai') {
-                    mridangamSampler = new Tone.Sampler({
-                        urls: {
-                            C4: 'norm_sounds/ka/ka-1.wav',
-                            D4: 'norm_sounds/ta/ta-1.wav',
-                            E4: 'norm_sounds/na/na-1.wav',
-                            F4: 'norm_sounds/dhin/dhin-1.wav',
-                            G4: 'norm_sounds/dhum/dhum-1.wav',
-                            A4: 'norm_sounds/thom/thom-1.wav',
-                            B4: 'norm_sounds/chaapu/chaapu-1.wav'
-                        },
-                        baseUrl: 'https://raw.githubusercontent.com/yaxu/mrid/main/',
-                        release: 0.7,
-                        curve: 'exponential'
-                    }).connect(master);
-                    
-                    try {
-                        await Tone.loaded();
-                    } catch (e) {
-                        mridangamSampler = null;
-                    }
-                }
-
-                // ----------------------------------------------------
-                // BULLETPROOF PARAI SAMPLER
-                // ----------------------------------------------------
-                if (isSouth && resolved.instrument === 'parai') {
-                    paraiSampler = new Tone.Sampler({
-                        urls: {
-                            C4: 'parai_low.wav', 
-                            D4: 'parai_high.wav', 
-                            E4: 'parai_edge.wav', 
-                            F4: 'parai_accent.wav'
-                        },
-                        baseUrl: '/Samples/Parai/',
-                        release: 0.9, 
-                        curve: 'exponential'
-                    }).connect(master);
-
-                    try { 
-                        await Tone.loaded(); 
-                    } catch (e) {
-                        paraiSampler = null;
-                    }
-                }
-
-                // SYNTH FALLBACKS
-                const kick = new Tone.MembraneSynth({
-                    pitchDecay: 0.035, octaves: 3.5, oscillator: { type: 'sine' },
-                    envelope: { attack: 0.001, decay: 0.5, sustain: 0, release: 0.25 }
-                }).connect(master);
-
-                const snareBody = new Tone.MembraneSynth({
-                    pitchDecay: 0.008, octaves: 1.2, oscillator: { type: 'triangle' },
-                    envelope: { attack: 0.001, decay: 0.16, sustain: 0, release: 0.12 }
-                }).connect(master);
-
-                const snareNoise = new Tone.NoiseSynth({
-                    noise: { type: 'pink' }, envelope: { attack: 0.001, decay: 0.18, sustain: 0, release: 0.05 }
-                }).connect(master);
-
-                const hatFilter = new Tone.Filter(7500, 'highpass').connect(master);
-                const hat = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.001, decay: 0.045, sustain: 0, release: 0.02 } }).connect(hatFilter);
-                const openHat = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.001, decay: 0.28, sustain: 0, release: 0.06 } }).connect(hatFilter);
-
-                const clap = new Tone.NoiseSynth({ noise: { type: 'white' }, envelope: { attack: 0.001, decay: 0.22, sustain: 0, release: 0.03 } }).connect(new Tone.Filter(1700, 'bandpass').connect(master));
-
-                const paraiBody = new Tone.MembraneSynth({ pitchDecay: 0.006, octaves: 0.55, oscillator: { type: 'triangle' }, envelope: { attack: 0.001, decay: 0.34, sustain: 0.015, release: 0.18 } }).connect(master);
-                const paraiSkin = new Tone.NoiseSynth({ noise: { type: 'pink' }, envelope: { attack: 0.001, decay: 0.075, sustain: 0, release: 0.035 } }).connect(new Tone.Filter(2400, 'bandpass').connect(master));
-                const dholLow = paraiBody; const dholHigh = paraiBody;
-
-                const taikoLow = new Tone.PolySynth(Tone.MembraneSynth, { pitchDecay: 0.025, octaves: 1.0, oscillator: { type: 'sine' }, envelope: { attack: 0.003, decay: 1.0, sustain: 0.08, release: 1.2 } }).connect(master);
-                const lowTom = new Tone.PolySynth(Tone.MembraneSynth, { pitchDecay: 0.02, octaves: 1.2, oscillator: { type: 'triangle' }, envelope: { attack: 0.002, decay: 0.5, sustain: 0.04, release: 0.45 } }).connect(master);
-                const timpani = new Tone.PolySynth(Tone.MembraneSynth, { pitchDecay: 0.01, octaves: 0.8, oscillator: { type: 'sine' }, envelope: { attack: 0.005, decay: 1.25, sustain: 0.1, release: 1.8 } }).connect(master);
-                const orchSnare = new Tone.PolySynth(Tone.MembraneSynth, { pitchDecay: 0.008, octaves: 0.9, oscillator: { type: 'triangle' }, envelope: { attack: 0.002, decay: 0.2, sustain: 0, release: 0.12 } }).connect(master);
-                const orchNoise = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "square" }, envelope: { attack: 0.002, decay: 0.24, sustain: 0, release: 0.06 } }).connect(master);
-                const crash = new Tone.PolySynth(Tone.MetalSynth, { frequency: 220, envelope: { attack: 0.001, decay: 2.8, release: 3.2 }, harmonicity: 5.1, modulationIndex: 28, resonance: 4200, octaves: 1.7 }).connect(master);
-
-                const tablaMap = { [MIDI_DRUMS.TA1]: 'C4', [MIDI_DRUMS.TA2]: 'D4', [MIDI_DRUMS.TABLA_LOW]: 'E4' };
-                const mridangamMap = { [MIDI_DRUMS.MRIDANGAM_HIGH]: 'C4', [MIDI_DRUMS.MRIDANGAM_LOW]: 'G4', [MIDI_DRUMS.TA1]: 'D4', [MIDI_DRUMS.TA2]: 'E4', [MIDI_DRUMS.TABLA_LOW]: 'G4' };
-                const paraiMap = { [MIDI_DRUMS.DHOL_LOW]: 'C4', [MIDI_DRUMS.DHOL_HIGH]: 'D4', [MIDI_DRUMS.MRIDANGAM_HIGH]: 'E4', [MIDI_DRUMS.MRIDANGAM_LOW]: 'F4', [MIDI_DRUMS.TA1]: 'D4', [MIDI_DRUMS.TA2]: 'E4', [MIDI_DRUMS.TABLA_LOW]: 'C4' };
 
                 const lastVoiceTime = new Map();
 
@@ -2052,58 +2111,46 @@
                     }
                     lastVoiceTime.set(voiceKey, t);
                     const v = note.velocity;
+                    let played = false;
 
-                    if (paraiSampler && paraiMap[note.midi]) {
-                        const sampleNote = paraiMap[note.midi];
-                        const duration =
-                            note.midi === MIDI_DRUMS.DHOL_LOW ||
-                            note.midi === MIDI_DRUMS.MRIDANGAM_LOW
-                                ? '8n'
-                                : '16n';
-
-                        paraiSampler.triggerAttackRelease(
-                            sampleNote,
-                            duration,
-                            t,
-                            Math.min(1, v * 1.08)
-                        );
-                        return;
+                    if (isIndian) {
+                        if (note.midi === MIDI_DRUMS.TABLA_LOW) played = triggerSample('tablaLow', samplePools, '8n', t, v * 1.08);
+                        else if (note.midi === MIDI_DRUMS.TA1) played = triggerSample('tablaMid', samplePools, '16n', t, v * 1.06);
+                        else if (note.midi === MIDI_DRUMS.TA2) played = triggerSample('tablaHigh', samplePools, '16n', t, v * 1.04);
                     }
 
-                    if (tablaSampler && tablaMap[note.midi]) {
-                        const sampleNote = tablaMap[note.midi];
-                        const duration = note.midi === MIDI_DRUMS.TABLA_LOW ? '8n' : '16n';
-                        tablaSampler.triggerAttackRelease(sampleNote, duration, t, Math.min(1, v * 1.08));
-                        return;
+                    if (!played && isSouth) {
+                        if (resolved.instrument === 'parai') {
+                            if (note.midi === MIDI_DRUMS.PARAI_LOW) played = triggerSample('paraiLow', samplePools, '8n', t, v * 1.06);
+                            else if (note.midi === MIDI_DRUMS.PARAI_HIGH || note.midi === MIDI_DRUMS.MRIDANGAM_HIGH || note.midi === MIDI_DRUMS.TA1 || note.midi === MIDI_DRUMS.TA2 || note.midi === MIDI_DRUMS.TABLA_LOW) played = triggerSample('paraiHigh', samplePools, '16n', t, v * 1.05);
+                        } else {
+                            if (note.midi === MIDI_DRUMS.PARAI_LOW) played = triggerSample('dholLow', samplePools, '8n', t, v * 1.06);
+                            else if (note.midi === MIDI_DRUMS.PARAI_HIGH) played = triggerSample('dholHigh', samplePools, '16n', t, v * 1.05);
+                            else if (note.midi === MIDI_DRUMS.MRIDANGAM_LOW) played = triggerSample('mridangamLow', samplePools, '8n', t, v * 1.05);
+                            else if (note.midi === MIDI_DRUMS.MRIDANGAM_HIGH || note.midi === MIDI_DRUMS.TA1 || note.midi === MIDI_DRUMS.TA2) played = triggerSample('mridangamHigh', samplePools, '16n', t, v * 1.04);
+                        }
                     }
 
-                    if (mridangamSampler && mridangamMap[note.midi]) {
-                        const sampleNote = mridangamMap[note.midi];
-                        const duration = note.midi === MIDI_DRUMS.MRIDANGAM_LOW ? '8n' : '16n';
-                        mridangamSampler.triggerAttackRelease(sampleNote, duration, t, Math.min(1, v * 1.05));
-                        return;
+                    if (!played && isCinematic) {
+                        if (note.midi === MIDI_DRUMS.TAIKO_LOW) played = triggerSample('taikoLow', samplePools, '8n', t, v);
+                        else if (note.midi === MIDI_DRUMS.LOW_TOM_CIN) played = triggerSample('cinematicLowTom', samplePools, '8n', t, v * 0.95);
+                        else if (note.midi === MIDI_DRUMS.HIGH_TOM_CIN) played = triggerSample('cinematicLowTom', samplePools, '16n', t, v * 0.9);
+                        else if (note.midi === MIDI_DRUMS.ORCH_SNARE) played = triggerSample('orchSnare', samplePools, '16n', t, v);
+                        else if (note.midi === MIDI_DRUMS.CRASH) played = triggerSample('orchestralCrash', samplePools, '8n', t, v);
+                        else if (note.midi === 'TIMPANI' || note.midi === 43) played = triggerSample(v >= 0.82 ? 'timpaniLow' : 'timpaniMidHigh', samplePools, '4n', t, v);
                     }
 
-                    switch (note.midi) {
-                        case MIDI_DRUMS.KICK: kick.triggerAttackRelease('C1', '32n', t, v); break;
-                        case MIDI_DRUMS.SNARE: snareBody.triggerAttackRelease('G2', '32n', t, v); snareNoise.triggerAttackRelease('32n', t, v * 0.8); break;
-                        case MIDI_DRUMS.CH: hat.triggerAttackRelease('32n', t, v * 0.7); break;
-                        case MIDI_DRUMS.OH: openHat.triggerAttackRelease('16n', t, v * 0.7); break;
-                        case MIDI_DRUMS.CLAP: clap.triggerAttackRelease('32n', t, v); break;
-                        case MIDI_DRUMS.TOM_HI: lowTom.triggerAttackRelease('A2', '32n', t, v); break;
-                        case MIDI_DRUMS.TOM_LO: lowTom.triggerAttackRelease('D2', '32n', t, v); break;
-                        case MIDI_DRUMS.DHOL_LOW: 
-                            if (resolved.instrument === 'parai') { paraiBody.triggerAttackRelease('G2', '32n', t, v * 0.9); paraiSkin.triggerAttackRelease('16n', t, v * 0.55); } 
-                            else { dholLow.triggerAttackRelease('D2', '32n', t, v); } break;
-                        case MIDI_DRUMS.DHOL_HIGH: 
-                            if (resolved.instrument === 'parai') { paraiBody.triggerAttackRelease('D3', '32n', t, v * 0.8); paraiSkin.triggerAttackRelease('32n', t, v * 0.72); } 
-                            else { dholHigh.triggerAttackRelease('A2', '32n', t, v); } break;
-                        case MIDI_DRUMS.TAIKO_LOW: taikoLow.triggerAttackRelease('C1', '16n', t, v); break;
-                        case MIDI_DRUMS.LOW_TOM_CIN: lowTom.triggerAttackRelease('D2', '32n', t, v); break;
-                        case MIDI_DRUMS.HIGH_TOM_CIN: lowTom.triggerAttackRelease('A2', '32n', t, v); break;
-                        case 'TIMPANI': timpani.triggerAttackRelease('G1', '16n', t, v); break;
-                        case MIDI_DRUMS.ORCH_SNARE: orchSnare.triggerAttackRelease('C3', '32n', t, v); orchNoise.triggerAttackRelease('C6', '32n', t, v * 0.45); break;
-                        case MIDI_DRUMS.CRASH: crash.triggerAttackRelease('16n', t, v); break;
+                    if (!played) {
+                        switch (note.midi) {
+                            case MIDI_DRUMS.KICK: played = triggerSample('modernKick', samplePools, '16n', t, v); break;
+                            case MIDI_DRUMS.SNARE: played = triggerSample('modernSnare', samplePools, '16n', t, v); break;
+                            case MIDI_DRUMS.CLAP: played = triggerSample('modernClap', samplePools, '16n', t, v); break;
+                            case MIDI_DRUMS.CH: played = triggerSample('modernClosedHat', samplePools, '32n', t, v * 0.8); break;
+                            case MIDI_DRUMS.OH: played = triggerSample('modernOpenHat', samplePools, '8n', t, v * 0.8); break;
+                            case MIDI_DRUMS.TOM_HI: played = triggerSample('modernHighTom', samplePools, '16n', t, v); break;
+                            case MIDI_DRUMS.TOM_LO: played = triggerSample('modernLowTom', samplePools, '16n', t, v); break;
+                            case MIDI_DRUMS.CRASH: played = triggerSample('modernCrash', samplePools, '8n', t, v); break;
+                        }
                     }
                 });
             }, Math.max(totalDuration, 1));
@@ -2118,6 +2165,7 @@
             if (wavesurfer) {
                 wavesurfer.destroy();
                 previewPlayIcon.className = 'fa-solid fa-play';
+                wavesurfer = null;
             }
 
             setTimeout(() => {
