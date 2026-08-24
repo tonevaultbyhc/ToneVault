@@ -1672,7 +1672,8 @@
                         generatedNotes,
                         exactMaxTime,
                         resolved,
-                        currentTempo
+                        currentTempo,
+                        timeSig
                     );
 
                     progressBarFill.style.width = '100%';
@@ -1967,7 +1968,7 @@
 
 
         // ============================================================
-        // V9: PHRASE KUTHU + REAL SAMPLE STEM WAV EXPORT
+        // V10: PHRASE KUTHU + REAL SAMPLE STEM WAV + MIDI EXPORT
         // ============================================================
 
         const STEM_SAMPLE_BANK = {
@@ -2175,13 +2176,47 @@
 
         function stemKeyForNoteLegacyRemoved() { return null; }
 
+        function createIndividualStemMidi(notes, stemKey, tempo, timeSig, totalDuration) {
+            const midi = new Midi();
+            midi.header.setTempo(tempo);
+
+            const parts = String(timeSig || '4/4').split('/');
+            const beatsPerBar = Number(parts[0]) || 4;
+            const beatUnit = Number(parts[1]) || 4;
+            midi.header.timeSignatures.push({ ticks: 0, timeSignature: [beatsPerBar, beatUnit] });
+
+            const track = midi.addTrack();
+            track.channel = 9;
+            const bank = STEM_SAMPLE_BANK[stemKey];
+            track.name = bank ? `${bank.label} - ToneVault` : `ToneVault ${stemKey}`;
+
+            notes
+                .filter(note => stemKeyForNote(note, currentResolvedForStemMidi) === stemKey)
+                .filter(note => note.time >= 0 && note.time < totalDuration)
+                .sort((a,b) => a.time - b.time)
+                .forEach(note => {
+                    track.addNote({
+                        midi: Number(note.midi),
+                        time: Math.max(0, Number(note.time) || 0),
+                        duration: Math.max(0.03, Number(note.duration) || 0.08),
+                        velocity: Math.max(0.01, Math.min(1, Number(note.velocity) || 0.8))
+                    });
+                });
+
+            return midi;
+        }
+
+        // The current resolved style is captured while building individual MIDI stems.
+        let currentResolvedForStemMidi = null;
+
         async function renderSeparateInstrumentWav(notes, totalDuration, resolved, stemKey) {
             const result = await renderSampleMix(notes, totalDuration, resolved, stemKey);
             if (!result.buffer) return null;
             return bufferToWave(result.buffer, result.buffer.length);
         }
 
-        async function renderSeparateInstrumentPreviews(notes, totalDuration, resolved, tempo) {
+        async function renderSeparateInstrumentPreviews(notes, totalDuration, resolved, tempo, timeSig) {
+            currentResolvedForStemMidi = resolved;
             stemDownloadsList.innerHTML = '';
             stemDownloads.style.display = 'block';
 
@@ -2245,6 +2280,11 @@
                 download.href = '#';
                 download.innerHTML = '<i class="fa-solid fa-file-waveform"></i> Download WAV';
 
+                const downloadMidi = document.createElement('a');
+                downloadMidi.className = 'download-btn';
+                downloadMidi.href = '#';
+                downloadMidi.innerHTML = '<i class="fa-solid fa-file-music"></i> Download MIDI';
+
                 const status = document.createElement('span');
                 status.className = 'stem-status';
                 status.textContent = 'Preparing...';
@@ -2252,6 +2292,7 @@
                 controls.appendChild(play);
                 controls.appendChild(volume);
                 controls.appendChild(download);
+                controls.appendChild(downloadMidi);
                 controls.appendChild(status);
 
                 card.appendChild(header);
@@ -2273,6 +2314,12 @@
                     const url = URL.createObjectURL(blob);
                     download.href = url;
                     download.download = `tonevault_${bank.label.toLowerCase().replace(/[^a-z0-9]+/g,'_')}_${tempo}bpm.wav`;
+
+                    const stemMidi = createIndividualStemMidi(notes, stemKey, tempo, timeSig, totalDuration);
+                    const stemMidiBlob = new Blob([stemMidi.toArray()], { type: 'audio/midi' });
+                    const stemMidiUrl = URL.createObjectURL(stemMidiBlob);
+                    downloadMidi.href = stemMidiUrl;
+                    downloadMidi.download = `tonevault_${bank.label.toLowerCase().replace(/[^a-z0-9]+/g,'_')}_${tempo}bpm.mid`;
 
                     const ws = WaveSurfer.create({
                         container: wave,
