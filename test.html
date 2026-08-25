@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToneVault - AI Rhythm & Groove Generator (V2)</title>
+    <title>ToneVault - AI Rhythm & Groove Generator</title>
     
     <!-- FONTAWESOME ICONS CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -459,18 +459,6 @@
 
                 if (index === 0) triggerSpan.textContent = opt.text;
             });
-
-            const customOptions = optionsContainer.querySelectorAll('.custom-option');
-            customOptions.forEach(opt => {
-                opt.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    triggerSpan.textContent = opt.textContent;
-                    customOptions.forEach(o => o.classList.remove('selected'));
-                    opt.classList.add('selected');
-                    select.value = opt.dataset.value;
-                    document.getElementById(selectId + 'Wrapper').classList.remove('open');
-                });
-            });
         }
 
         // Initialize Dynamic Load
@@ -487,11 +475,17 @@
             }
         });
 
-        // Setup custom dropdown behaviors
+        // -------------------------------------------------------------
+        // BULLETPROOF CUSTOM DROPDOWN EVENT DELEGATION
+        // -------------------------------------------------------------
         function setupCustomDropdown(selectId) {
+            const hiddenSelect = document.getElementById(selectId);
             const wrapper = document.getElementById(selectId + 'Wrapper');
             const trigger = document.getElementById(selectId + 'Trigger');
-            
+            const optionsContainer = document.getElementById(selectId + 'Options');
+            const triggerText = trigger.querySelector('span');
+
+            // Open/Close toggle
             trigger.addEventListener('click', (e) => {
                 e.stopPropagation();
                 document.querySelectorAll('.custom-select-wrapper').forEach(w => {
@@ -499,12 +493,31 @@
                 });
                 wrapper.classList.toggle('open');
             });
+
+            // Delegate option clicks so dynamically added items work perfectly!
+            optionsContainer.addEventListener('click', (e) => {
+                const opt = e.target.closest('.custom-option');
+                if (!opt) return;
+
+                e.stopPropagation();
+                triggerText.textContent = opt.textContent;
+                
+                optionsContainer.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                
+                hiddenSelect.value = opt.dataset.value;
+                wrapper.classList.remove('open');
+                
+                // CRITICAL: Fire change event so listener above catches genre changes
+                hiddenSelect.dispatchEvent(new Event('change'));
+            });
         }
 
         window.addEventListener('click', () => {
             document.querySelectorAll('.custom-select-wrapper').forEach(w => w.classList.remove('open'));
         });
 
+        // Bind all dropdowns
         ['genreSelect','rhythmSelect','instrumentSelect','timeSigSelect','densitySelect','swingSelect','humanizeSelect','fillSelect']
             .forEach(setupCustomDropdown);
             
@@ -781,6 +794,8 @@
         // -------------------------------------------------------------
         // OFFLINE AUDIO MIXER (CREATES MASTER & STEM WAVS)
         // -------------------------------------------------------------
+        let lastBufferMapSize = 0;
+
         async function renderAudioMix(noteList, selectedKit, filterMidi = null) {
             const activeNotes = noteList.filter(n => filterMidi === null || n.midi === filterMidi);
             if (!activeNotes.length) return null;
@@ -799,6 +814,9 @@
                     if (audioBuf) bufferMap.set(midi, audioBuf);
                 }
             }
+
+            lastBufferMapSize = bufferMap.size;
+            if (bufferMap.size === 0) return null; // Break cleanly if no samples exist
 
             activeNotes.forEach(note => {
                 const buffer = bufferMap.get(note.midi);
@@ -866,10 +884,13 @@
 
                     // 1. Build Master
                     const masterWavBlob = await renderAudioMix(generatedNotes, resolvedKit);
-                    if (wavBlobUrl) URL.revokeObjectURL(wavBlobUrl);
-                    wavBlobUrl = URL.createObjectURL(masterWavBlob);
-                    downloadMainWavBtn.href = wavBlobUrl;
-                    downloadMainWavBtn.download = `tonevault_${genre}_${resolvedKit}_${currentTempo}bpm_full.wav`;
+                    
+                    if (masterWavBlob) {
+                        if (wavBlobUrl) URL.revokeObjectURL(wavBlobUrl);
+                        wavBlobUrl = URL.createObjectURL(masterWavBlob);
+                        downloadMainWavBtn.href = wavBlobUrl;
+                        downloadMainWavBtn.download = `tonevault_${genre}_${resolvedKit}_${currentTempo}bpm_full.wav`;
+                    }
 
                     const masterMidiBlob = createMidiBlob(generatedNotes, `${genre.toUpperCase()} Full Kit`, currentTempo, beatsPerBar, beatUnit);
                     if (midiBlobUrl) URL.revokeObjectURL(midiBlobUrl);
@@ -892,10 +913,17 @@
                         height: 60,
                         normalize: true
                     });
-                    wavesurfer.load(wavBlobUrl);
-                    wavesurfer.on('ready', () => {
-                        audioDurationText.textContent = formatTime(wavesurfer.getDuration());
-                    });
+                    
+                    if (masterWavBlob) {
+                        wavesurfer.load(wavBlobUrl);
+                        wavesurfer.on('ready', () => {
+                            audioDurationText.textContent = formatTime(wavesurfer.getDuration());
+                        });
+                    } else {
+                        // Empty waveform visually handling missing samples
+                        audioDurationText.textContent = "0:00 (No Samples Loaded)";
+                    }
+                    
                     wavesurfer.on('play', () => previewPlayIcon.className = 'fa-solid fa-pause');
                     wavesurfer.on('pause', () => previewPlayIcon.className = 'fa-solid fa-play');
                     wavesurfer.on('finish', () => previewPlayIcon.className = 'fa-solid fa-play');
@@ -921,14 +949,16 @@
 
                         const stemNotes = generatedNotes.filter(n => n.midi === midi);
                         const stemWavBlob = await renderAudioMix(stemNotes, resolvedKit, midi);
-                        if (!stemWavBlob) continue;
-
-                        const stemWavUrl = URL.createObjectURL(stemWavBlob);
-                        stemBlobUrls.push(stemWavUrl);
-
+                        
                         const stemMidiBlob = createMidiBlob(stemNotes, `${genre} - ${stemInfo.name}`, currentTempo, beatsPerBar, beatUnit);
                         const stemMidiUrl = URL.createObjectURL(stemMidiBlob);
                         stemBlobUrls.push(stemMidiUrl);
+
+                        let stemWavUrl = '#';
+                        if (stemWavBlob) {
+                            stemWavUrl = URL.createObjectURL(stemWavBlob);
+                            stemBlobUrls.push(stemWavUrl);
+                        }
 
                         const row = document.createElement('div');
                         row.className = 'instrument-midi-row';
@@ -940,7 +970,7 @@
                             </div>
                             <button class="instrument-play-btn" title="Play Stem"><i class="fa-solid fa-play"></i></button>
                             <div class="instrument-waveform"></div>
-                            <a href="${stemWavUrl}" class="download-btn" download="tonevault_${genre}_${stemInfo.name.toLowerCase()}_${currentTempo}bpm.wav">
+                            <a href="${stemWavUrl}" class="download-btn" download="tonevault_${genre}_${stemInfo.name.toLowerCase()}_${currentTempo}bpm.wav" ${!stemWavBlob ? 'style="opacity:0.3;pointer-events:none;"' : ''}>
                                 <i class="fa-solid fa-file-waveform"></i> WAV
                             </a>
                             <a href="${stemMidiUrl}" class="download-btn" download="tonevault_${genre}_${stemInfo.name.toLowerCase()}_${currentTempo}bpm.mid">
@@ -955,19 +985,31 @@
                             waveColor: '#3f3f3f', progressColor: '#00d4ff', cursorColor: '#ffffff',
                             barWidth: 2, barRadius: 2, height: 48, normalize: true
                         });
-                        stemWs.load(stemWavUrl);
-                        stemWaveSurfers.set(midi, stemWs);
+                        
+                        if (stemWavBlob) {
+                            stemWs.load(stemWavUrl);
+                            stemWaveSurfers.set(midi, stemWs);
 
-                        stemPlayBtn.addEventListener('click', () => {
-                            stemWaveSurfers.forEach((otherWs, m) => { if (m !== midi && otherWs.isPlaying()) otherWs.pause(); });
-                            stemWs.playPause();
-                        });
-                        stemWs.on('play', () => stemPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i>');
-                        stemWs.on('pause', () => stemPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>');
-                        stemWs.on('finish', () => stemPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>');
+                            stemPlayBtn.addEventListener('click', () => {
+                                stemWaveSurfers.forEach((otherWs, m) => { if (m !== midi && otherWs.isPlaying()) otherWs.pause(); });
+                                stemWs.playPause();
+                            });
+                            stemWs.on('play', () => stemPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i>');
+                            stemWs.on('pause', () => stemPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>');
+                            stemWs.on('finish', () => stemPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>');
+                        } else {
+                            stemPlayBtn.style.opacity = '0.3';
+                            stemPlayBtn.style.pointerEvents = 'none';
+                        }
                     }
 
-                    if (instrumentMidiList.innerHTML === '') instrumentMidiList.innerHTML = '<div style="color:#777; font-size:0.85rem;">Samples for this kit are currently missing from the server.</div>';
+                    // Explicit UI Error if no samples loaded
+                    if (lastBufferMapSize === 0) {
+                        instrumentMidiList.innerHTML = `<div style="color:#ff4444; font-size:0.95rem; padding: 10px; background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.2); border-radius: 8px;">
+                            <i class="fa-solid fa-triangle-exclamation"></i> <b>No Audio Previews Generated</b><br>
+                            <span style="color: #bbb; font-size: 0.85rem;">The MIDI was created successfully, but the WAV previews are silent because the audio samples for the <b>${resolvedKit}</b> kit are missing from your GitHub repository.<br><br>Upload the .wav files to your GitHub /Samples/ folder to hear the audio!</span>
+                        </div>` + instrumentMidiList.innerHTML;
+                    }
 
                     progressBarFill.style.width = '100%';
                     statusText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#00d4ff;"></i> Rhythm Ready!`;
