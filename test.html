@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToneVault - AI Rhythm & Groove Generator (V4)</title>
+    <title>ToneVault - AI Rhythm & Groove Generator (V5)</title>
     
     <!-- FONTAWESOME ICONS CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -130,7 +130,7 @@
                 
                 <div class="settings-grid">
                     
-                    <!-- 1. Style Selection (Pop + Boom Bap + Trap/Drill + House) -->
+                    <!-- 1. Style Selection (Added Lo-Fi) -->
                     <div class="setting-group">
                         <label><i class="fa-solid fa-compact-disc"></i> Groove Style</label>
                         <div class="custom-select-wrapper" id="genreSelectWrapper">
@@ -143,6 +143,7 @@
                                 <div class="custom-option" data-value="boombap">Boom Bap / Hip-Hop</div>
                                 <div class="custom-option" data-value="trap">Modern Trap / Drill</div>
                                 <div class="custom-option" data-value="house">House / EDM</div>
+                                <div class="custom-option" data-value="lofi">Lo-Fi / Chillhop</div>
                             </div>
                         </div>
                         <select id="genreSelect" style="display: none;">
@@ -150,6 +151,7 @@
                             <option value="boombap">Boom Bap / Hip-Hop</option>
                             <option value="trap">Modern Trap / Drill</option>
                             <option value="house">House / EDM</option>
+                            <option value="lofi">Lo-Fi / Chillhop</option>
                         </select>
                     </div>
 
@@ -405,6 +407,15 @@
                         <div class="keyword-row"><span class="keyword">minimal</span><span>Deep, stripped back, sparse grooves</span></div>
                     </div>
                 </div>
+                
+                <!-- LOFI GUIDE -->
+                <div id="guide-lofi" class="genre-guide">
+                    <div class="keyword-category">
+                        <h4>LO-FI / CHILLHOP</h4>
+                        <div class="keyword-row"><span class="keyword">sleepy</span><span>Extremely sparse, lazy kick placement</span></div>
+                        <div class="keyword-row"><span class="keyword">jazzy</span><span>Heavy swing, syncopated ghost notes</span></div>
+                    </div>
+                </div>
 
                 <div class="custom-keyword-note">
                     <i class="fa-solid fa-lightbulb" style="color: #00d4ff; margin-right: 5px;"></i>
@@ -426,7 +437,7 @@
     <script type="module">
 
         // -------------------------------------------------------------
-        // DYNAMIC DROPDOWN CONFIGURATION MATRIX (Added House/EDM)
+        // DYNAMIC DROPDOWN CONFIGURATION MATRIX (Added Lo-Fi)
         // -------------------------------------------------------------
         const STYLE_CONFIGS = {
             pop: {
@@ -493,6 +504,21 @@
                 defaultKit: 'modern',
                 defaultTempo: 126,
                 placeholder: 'e.g. tech house, minimal, deep, 4/4...'
+            },
+            lofi: {
+                rhythms: [
+                    {val: 'auto', text: 'Auto (from Keywords)'},
+                    {val: 'sleepy', text: 'Sleepy / Minimal'},
+                    {val: 'jazzy', text: 'Jazzy / Swung'}
+                ],
+                kits: [
+                    {val: 'auto', text: 'Auto (Vintage Lo-Fi)'},
+                    {val: 'acoustic', text: 'Acoustic Studio Kit'},
+                    {val: 'modern', text: 'Modern Electronic'}
+                ],
+                defaultKit: 'lofi',
+                defaultTempo: 78,
+                placeholder: 'e.g. sleepy, minimal, jazzy, swung, chill...'
             }
         };
 
@@ -732,6 +758,10 @@
                     if (text.includes('tech') || text.includes('bouncy')) rhythm = 'tech';
                     else if (text.includes('minimal') || text.includes('deep')) rhythm = 'minimal';
                     else rhythm = 'classic';
+                } else if (genre === 'lofi') {
+                    if (text.includes('sleepy') || text.includes('minimal')) rhythm = 'sleepy';
+                    else if (text.includes('jazzy') || text.includes('swung')) rhythm = 'jazzy';
+                    else rhythm = 'default';
                 }
             }
 
@@ -845,36 +875,50 @@
                         // 4. HOUSE / EDM
                         // ==========================================
                         if (genre === 'house') {
-                            // KICKS
                             if (rhythm === 'classic' || rhythm === 'tech' || rhythm === 'minimal') {
                                 if (downbeat && (density !== 'minimal' || Math.random() > 0.15)) {
                                     addNote(STANDARD_MIDI.KICK, stepTime, 0.92);
                                 }
                             }
-
-                            // CLAPS
-                            if (isBackbeat) {
-                                addNote(STANDARD_MIDI.CLAP, stepTime, rhythm === 'minimal' ? 0.7 : 0.9);
-                            }
-                            
-                            // Tech House Syncopated Claps
-                            if (rhythm === 'tech' && beat === 2 && step === 3) {
-                                addNote(STANDARD_MIDI.CLAP, stepTime, 0.65); 
-                            }
-
-                            // HATS (Open hat on the offbeat is standard for House)
+                            if (isBackbeat) addNote(STANDARD_MIDI.CLAP, stepTime, rhythm === 'minimal' ? 0.7 : 0.9);
+                            if (rhythm === 'tech' && beat === 2 && step === 3) addNote(STANDARD_MIDI.CLAP, stepTime, 0.65); 
                             if (step === 2) addNote(STANDARD_MIDI.OH, stepTime, 0.7); 
-                            
                             if (density !== 'minimal') {
                                 if (step === 0 || step === 1 || step === 3) addNote(STANDARD_MIDI.CH, stepTime, 0.45);
                             }
-
-                            // TOMS / PERC (Tech House bounce)
                             if (rhythm === 'tech') {
                                 if (step === 3 && Math.random() > 0.6) addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.55);
                                 if (beat === 1 && step === 2) addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.65);
                             }
                         }
+
+                        // ==========================================
+                        // 5. LO-FI / CHILLHOP
+                        // ==========================================
+                        if (genre === 'lofi') {
+                            let drag = sixteenth * 0.3; // Intentional lazy timing
+
+                            if (rhythm === 'sleepy') {
+                                if (downbeat && (beat === 0 || beat === 2)) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.85);
+                                if (isBackbeat) addNote(STANDARD_MIDI.SNARE, stepTime, 0.9);
+                                if (density !== 'minimal' && beat === 1 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.6);
+                                if (step === 0) addNote(STANDARD_MIDI.CH, stepTime + drag, 0.5);
+                            } else if (rhythm === 'jazzy') {
+                                if (downbeat && (beat === 0 || beat === 2)) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.9);
+                                if (beat === 1 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.7);
+                                if (beat === 3 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.6);
+                                if (isBackbeat) addNote(STANDARD_MIDI.SNARE, stepTime, 0.9);
+                                if (beat === 2 && step === 3 && Math.random() > 0.5) addNote(STANDARD_MIDI.SNARE, stepTime + drag, 0.4); 
+                                if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime + drag, 0.6);
+                                if (step === 2 && beat % 2 !== 0) addNote(STANDARD_MIDI.OH, stepTime + drag, 0.5);
+                            } else {
+                                if (downbeat && (beat === 0 || beat === 2)) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.9);
+                                if (beat === 1 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.7);
+                                if (isBackbeat) addNote(STANDARD_MIDI.SNARE, stepTime, 0.9);
+                                addNote(STANDARD_MIDI.CH, stepTime + drag, downbeat ? 0.7 : 0.4);
+                            }
+                        }
+
                     }
                 }
             }
