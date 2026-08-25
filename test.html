@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToneVault - AI Rhythm & Groove Generator (V5)</title>
+    <title>ToneVault - AI Rhythm & Groove Generator (V6)</title>
     
     <!-- FONTAWESOME ICONS CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -83,13 +83,18 @@
         .generated-instruments-header strong { color: #ffffff; font-size: 1rem; letter-spacing: 0.5px; }
         .generated-instruments-header span { color: #777; font-size: 0.78rem; }
         .instrument-midi-list { display: grid; grid-template-columns: 1fr; gap: 10px; }
-        .instrument-midi-row { display: grid; grid-template-columns: 165px 38px minmax(180px, 1fr) auto auto; align-items: center; gap: 12px; padding: 12px 14px; background: rgba(10, 10, 10, 0.65); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 10px; }
+        .instrument-midi-row { display: grid; grid-template-columns: 165px 50px minmax(140px, 1fr) auto auto; align-items: center; gap: 12px; padding: 12px 14px; background: rgba(10, 10, 10, 0.65); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 10px; }
         .instrument-midi-info { display: flex; align-items: center; gap: 10px; }
         .instrument-midi-info i { color: #00d4ff; width: 18px; text-align: center; }
         .instrument-midi-name { color: #ddd; font-size: 0.9rem; font-weight: 600; }
         .instrument-midi-count { color: #777; font-size: 0.72rem; margin-left: 5px; }
-        .instrument-play-btn { width: 34px; height: 34px; border-radius: 50%; border: 1px solid rgba(0, 212, 255, 0.3); background: rgba(0, 212, 255, 0.08); color: #00d4ff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+        
+        .stem-play-col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .instrument-play-btn { width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(0, 212, 255, 0.3); background: rgba(0, 212, 255, 0.08); color: #00d4ff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
         .instrument-play-btn:hover, .instrument-play-btn.active { background: #00d4ff; color: #000; }
+        .stem-volume-slider { -webkit-appearance: none; width: 40px; height: 3px; background: rgba(255, 255, 255, 0.15); border-radius: 2px; outline: none; accent-color: #00d4ff; cursor: pointer;}
+        .stem-volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 8px; height: 8px; border-radius: 50%; background: #00d4ff; }
+
         .instrument-waveform { min-width: 0; height: 48px; }
 
         /* SIDEBAR GUIDE */
@@ -97,9 +102,9 @@
         .keyword-guide-header { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 15px; }
         .keyword-guide-header strong { color: #ffffff; letter-spacing: 0.5px; text-transform: uppercase; }
         .keyword-category { margin-bottom: 20px; }
-        .keyword-category h4 { margin: 0 0 10px 0; color: #00c8ff; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
-        .keyword-row { display: flex; align-items: center; gap: 12px; padding: 5px 0; font-size: 12px; }
-        .keyword { min-width: 100px; padding: 4px 8px; border-radius: 4px; background: rgba(0, 200, 255, 0.08); color: #00c8ff; font-family: monospace; font-size: 11px; text-align: center; }
+        .keyword-category h4 { margin: 0 0 10px 0; color: #00c8ff; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; }
+        .keyword-row { display: flex; align-items: center; gap: 12px; padding: 4px 0; font-size: 11px; }
+        .keyword { min-width: 85px; padding: 3px 6px; border-radius: 4px; background: rgba(0, 200, 255, 0.08); color: #00c8ff; font-family: monospace; font-size: 10px; text-align: center; }
         .custom-keyword-note { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 11px; color: #888; font-style: italic; line-height: 1.5; }
 
         /* Hide inactive guides */
@@ -112,7 +117,7 @@
         .creator-credit a { color: #00d4ff; text-decoration: none; font-weight: bold; }
 
         @media (max-width: 992px) { .layout-container { grid-template-columns: 1fr; max-width: 900px; } }
-        @media (max-width: 768px) { .settings-grid { grid-template-columns: 1fr; gap: 15px; } .preview-toolbar { flex-direction: column; align-items: stretch; } .instrument-midi-row { grid-template-columns: 1fr auto; } .instrument-midi-info { grid-column: 1; } .instrument-play-btn { grid-column: 2; grid-row: 1; } .instrument-waveform { grid-column: 1 / -1; width: 100%; } .instrument-midi-download { grid-column: 1 / -1; justify-content: center; } .keyword-row { flex-direction: column; align-items: flex-start; gap: 4px; } }
+        @media (max-width: 768px) { .settings-grid { grid-template-columns: 1fr; gap: 15px; } .preview-toolbar { flex-direction: column; align-items: stretch; } .instrument-midi-row { grid-template-columns: 1fr auto; } .instrument-midi-info { grid-column: 1; } .stem-play-col { grid-column: 2; grid-row: 1; flex-direction: row; } .instrument-waveform { grid-column: 1 / -1; width: 100%; } .download-btn { justify-content: center; } .keyword-row { flex-direction: column; align-items: flex-start; gap: 4px; } }
     </style>
 </head>
 <body>
@@ -130,7 +135,7 @@
                 
                 <div class="settings-grid">
                     
-                    <!-- 1. Style Selection (Added Lo-Fi) -->
+                    <!-- 1. Style Selection -->
                     <div class="setting-group">
                         <label><i class="fa-solid fa-compact-disc"></i> Groove Style</label>
                         <div class="custom-select-wrapper" id="genreSelectWrapper">
@@ -334,7 +339,7 @@
                         <div class="preview-toolbar">
                             <div class="volume-control-wrapper">
                                 <i class="fa-solid fa-volume-high"></i>
-                                <input type="range" class="volume-slider" id="previewVolume" min="0" max="1" step="0.05" value="1">
+                                <input type="range" class="volume-slider" id="previewVolume" min="0" max="1" step="0.05" value="0.85">
                             </div>
                             
                             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
@@ -372,9 +377,16 @@
                 <div id="guide-pop" class="genre-guide active">
                     <div class="keyword-category">
                         <h4>POP / MODERN POP</h4>
-                        <div class="keyword-row"><span class="keyword">driving</span><span>Straight 4-on-the-floor dance pop</span></div>
+                        <div class="keyword-row"><span class="keyword">driving</span><span>4-on-the-floor dance pop</span></div>
                         <div class="keyword-row"><span class="keyword">syncopated</span><span>Off-beat push kicks & disco bounce</span></div>
                         <div class="keyword-row"><span class="keyword">ballad</span><span>Half-time emotional pop feel</span></div>
+                        <div class="keyword-row"><span class="keyword">upbeat</span><span>Fast and energetic rhythm</span></div>
+                        <div class="keyword-row"><span class="keyword">disco</span><span>Classic 70s/80s pop bounce</span></div>
+                        <div class="keyword-row"><span class="keyword">funk</span><span>Tight grooves with ghost notes</span></div>
+                        <div class="keyword-row"><span class="keyword">stadium</span><span>Massive arena-rock pop feel</span></div>
+                        <div class="keyword-row"><span class="keyword">acoustic</span><span>Singer-songwriter style drums</span></div>
+                        <div class="keyword-row"><span class="keyword">groovy</span><span>Pocket-heavy rhythmic pop</span></div>
+                        <div class="keyword-row"><span class="keyword">minimal</span><span>Stripped back and sparse beats</span></div>
                     </div>
                 </div>
 
@@ -385,6 +397,12 @@
                         <div class="keyword-row"><span class="keyword">classic</span><span>90s Golden Era boom bap feel</span></div>
                         <div class="keyword-row"><span class="keyword">lazy</span><span>J-Dilla style delayed kicks/hats</span></div>
                         <div class="keyword-row"><span class="keyword">ghost</span><span>Busy snare/kick ghost note textures</span></div>
+                        <div class="keyword-row"><span class="keyword">dusty</span><span>Vintage texture and timing</span></div>
+                        <div class="keyword-row"><span class="keyword">off-grid</span><span>Unquantized, loose feel</span></div>
+                        <div class="keyword-row"><span class="keyword">heavy swing</span><span>Extreme MPC-style swing</span></div>
+                        <div class="keyword-row"><span class="keyword">chill</span><span>Relaxed and slow paced</span></div>
+                        <div class="keyword-row"><span class="keyword">east coast</span><span>Gritty, hard-hitting snares</span></div>
+                        <div class="keyword-row"><span class="keyword">sparse</span><span>Very few hits, lots of gaps</span></div>
                     </div>
                 </div>
 
@@ -395,6 +413,12 @@
                         <div class="keyword-row"><span class="keyword">trap</span><span>Half-time 808 bounce</span></div>
                         <div class="keyword-row"><span class="keyword">drill</span><span>UK Drill triplet & syncopated feel</span></div>
                         <div class="keyword-row"><span class="keyword">rolls</span><span>Rapid 32nd-note hat subdivisions</span></div>
+                        <div class="keyword-row"><span class="keyword">bouncy</span><span>Highly syncopated Atlanta style</span></div>
+                        <div class="keyword-row"><span class="keyword">halftime</span><span>Snare strictly on beat 3</span></div>
+                        <div class="keyword-row"><span class="keyword">triplet</span><span>Triplets embedded in the hi-hats</span></div>
+                        <div class="keyword-row"><span class="keyword">fast hats</span><span>Continuous 16th/32nd note runs</span></div>
+                        <div class="keyword-row"><span class="keyword">dark drill</span><span>Brooding, sparse drill spacing</span></div>
+                        <div class="keyword-row"><span class="keyword">intense</span><span>Aggressive velocity and rolls</span></div>
                     </div>
                 </div>
 
@@ -402,9 +426,15 @@
                 <div id="guide-house" class="genre-guide">
                     <div class="keyword-category">
                         <h4>HOUSE / EDM</h4>
-                        <div class="keyword-row"><span class="keyword">classic</span><span>Standard 4/4 club beat with off-beat hats</span></div>
+                        <div class="keyword-row"><span class="keyword">classic</span><span>Standard 4/4 beat with off-beat hats</span></div>
                         <div class="keyword-row"><span class="keyword">tech house</span><span>Bouncy syncopated claps & toms</span></div>
                         <div class="keyword-row"><span class="keyword">minimal</span><span>Deep, stripped back, sparse grooves</span></div>
+                        <div class="keyword-row"><span class="keyword">deep</span><span>Low velocity, subtle electronic feel</span></div>
+                        <div class="keyword-row"><span class="keyword">progressive</span><span>Building, driving 4/4 energy</span></div>
+                        <div class="keyword-row"><span class="keyword">tropical</span><span>Upbeat, slightly swung dance</span></div>
+                        <div class="keyword-row"><span class="keyword">driving</span><span>Relentless kick and bass rhythm</span></div>
+                        <div class="keyword-row"><span class="keyword">tribal</span><span>Tom-heavy rhythm beds</span></div>
+                        <div class="keyword-row"><span class="keyword">shuffle</span><span>Swung 16th note house groove</span></div>
                     </div>
                 </div>
                 
@@ -414,6 +444,13 @@
                         <h4>LO-FI / CHILLHOP</h4>
                         <div class="keyword-row"><span class="keyword">sleepy</span><span>Extremely sparse, lazy kick placement</span></div>
                         <div class="keyword-row"><span class="keyword">jazzy</span><span>Heavy swing, syncopated ghost notes</span></div>
+                        <div class="keyword-row"><span class="keyword">swung</span><span>Behind-the-beat human timing</span></div>
+                        <div class="keyword-row"><span class="keyword">drag</span><span>Noticeably late kick drums</span></div>
+                        <div class="keyword-row"><span class="keyword">chillhop</span><span>Standard instrumental hiphop beat</span></div>
+                        <div class="keyword-row"><span class="keyword">relaxed</span><span>Low density and velocity</span></div>
+                        <div class="keyword-row"><span class="keyword">unquantized</span><span>Dilla-style organic grid</span></div>
+                        <div class="keyword-row"><span class="keyword">pocket</span><span>Deep in the groove placement</span></div>
+                        <div class="keyword-row"><span class="keyword">late night</span><span>Muffled, minimal energy</span></div>
                     </div>
                 </div>
 
@@ -437,7 +474,7 @@
     <script type="module">
 
         // -------------------------------------------------------------
-        // DYNAMIC DROPDOWN CONFIGURATION MATRIX (Added Lo-Fi)
+        // DYNAMIC DROPDOWN CONFIGURATION MATRIX
         // -------------------------------------------------------------
         const STYLE_CONFIGS = {
             pop: {
@@ -455,7 +492,7 @@
                 ],
                 defaultKit: 'modern',
                 defaultTempo: 120,
-                placeholder: 'e.g. driving, syncopated, disco, ballad...'
+                placeholder: 'e.g. driving, syncopated, disco, ballad, groovy...'
             },
             boombap: {
                 rhythms: [
@@ -471,7 +508,7 @@
                 ],
                 defaultKit: 'lofi',
                 defaultTempo: 88,
-                placeholder: 'e.g. lazy, ghost notes, classic 90s...'
+                placeholder: 'e.g. lazy, ghost notes, classic 90s, dusty, chill...'
             },
             trap: {
                 rhythms: [
@@ -487,7 +524,7 @@
                 ],
                 defaultKit: 'modern',
                 defaultTempo: 142,
-                placeholder: 'e.g. trap, drill, fast rolls, bouncy...'
+                placeholder: 'e.g. trap, drill, fast rolls, bouncy, halftime...'
             },
             house: {
                 rhythms: [
@@ -503,7 +540,7 @@
                 ],
                 defaultKit: 'modern',
                 defaultTempo: 126,
-                placeholder: 'e.g. tech house, minimal, deep, 4/4...'
+                placeholder: 'e.g. tech house, minimal, deep, 4/4, driving...'
             },
             lofi: {
                 rhythms: [
@@ -518,7 +555,7 @@
                 ],
                 defaultKit: 'lofi',
                 defaultTempo: 78,
-                placeholder: 'e.g. sleepy, minimal, jazzy, swung, chill...'
+                placeholder: 'e.g. sleepy, minimal, jazzy, swung, chill, dusty...'
             }
         };
 
@@ -557,7 +594,7 @@
                 document.getElementById('tempoInput').value = config.defaultTempo;
                 document.getElementById('thoughtsInput').placeholder = config.placeholder;
 
-                // Update Sidebar Guide visibility
+                // Update Sidebar Guide visibility dynamically
                 document.querySelectorAll('.genre-guide').forEach(el => el.classList.remove('active'));
                 const activeGuide = document.getElementById('guide-' + genre);
                 if (activeGuide) activeGuide.classList.add('active');
@@ -928,7 +965,7 @@
         }
 
         // -------------------------------------------------------------
-        // OFFLINE AUDIO MIXER & MIDI BUILDER (UNCHANGED CORE)
+        // OFFLINE AUDIO MIXER (CREATES MASTER & STEM WAVS)
         // -------------------------------------------------------------
         let lastBufferMapSize = 0;
 
@@ -1033,7 +1070,11 @@
                     
                     if (masterWavBlob) {
                         wavesurfer.load(wavBlobUrl);
-                        wavesurfer.on('ready', () => { audioDurationText.textContent = formatTime(wavesurfer.getDuration()); });
+                        wavesurfer.on('ready', () => { 
+                            audioDurationText.textContent = formatTime(wavesurfer.getDuration()); 
+                            // BUG FIX: Set Master Volume to match slider immediately upon loading
+                            wavesurfer.setVolume(parseFloat(previewVolume.value));
+                        });
                     } else {
                         audioDurationText.textContent = "0:00 (No Samples Loaded)";
                     }
@@ -1073,13 +1114,18 @@
 
                         const row = document.createElement('div');
                         row.className = 'instrument-midi-row';
+                        
+                        // NEW FEATURE: Stem Volume Slider injected into the row
                         row.innerHTML = `
                             <div class="instrument-midi-info">
                                 <i class="fa-solid ${stemInfo.icon}"></i>
                                 <span class="instrument-midi-name">${stemInfo.name}</span>
                                 <span class="instrument-midi-count">${stemNotes.length} hits</span>
                             </div>
-                            <button class="instrument-play-btn" title="Play Stem"><i class="fa-solid fa-play"></i></button>
+                            <div class="stem-play-col">
+                                <button class="instrument-play-btn" title="Play Stem"><i class="fa-solid fa-play"></i></button>
+                                <input type="range" class="stem-volume-slider" min="0" max="1" step="0.05" value="1" title="Stem Volume">
+                            </div>
                             <div class="instrument-waveform"></div>
                             <a href="${stemWavUrl}" class="download-btn" download="tonevault_${genre}_${stemInfo.name.toLowerCase()}_${currentTempo}bpm.wav" ${!stemWavBlob ? 'style="opacity:0.3;pointer-events:none;"' : ''}>
                                 <i class="fa-solid fa-file-waveform"></i> WAV
@@ -1091,6 +1137,7 @@
                         instrumentMidiList.appendChild(row);
 
                         const stemPlayBtn = row.querySelector('.instrument-play-btn');
+                        const stemVolSlider = row.querySelector('.stem-volume-slider');
                         const stemWs = WaveSurfer.create({
                             container: row.querySelector('.instrument-waveform'),
                             waveColor: '#3f3f3f', progressColor: '#00d4ff', cursorColor: '#ffffff',
@@ -1100,6 +1147,15 @@
                         if (stemWavBlob) {
                             stemWs.load(stemWavUrl);
                             stemWaveSurfers.set(midi, stemWs);
+                            
+                            // Initialize stem volume and bind slider
+                            stemWs.on('ready', () => {
+                                stemWs.setVolume(parseFloat(stemVolSlider.value));
+                            });
+                            stemVolSlider.addEventListener('input', (e) => {
+                                stemWs.setVolume(parseFloat(e.target.value));
+                            });
+
                             stemPlayBtn.addEventListener('click', () => {
                                 stemWaveSurfers.forEach((otherWs, m) => { if (m !== midi && otherWs.isPlaying()) otherWs.pause(); });
                                 stemWs.playPause();
@@ -1110,6 +1166,8 @@
                         } else {
                             stemPlayBtn.style.opacity = '0.3';
                             stemPlayBtn.style.pointerEvents = 'none';
+                            stemVolSlider.style.opacity = '0.3';
+                            stemVolSlider.style.pointerEvents = 'none';
                         }
                     }
 
