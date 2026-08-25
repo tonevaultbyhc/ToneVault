@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToneVault - AI Rhythm & Groove Generator</title>
+    <title>ToneVault - AI Rhythm & Groove Generator (Pop Engine)</title>
     
     <!-- FONTAWESOME ICONS CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- WAVESURFER.JS FOR AUDIO WAVEFORMS -->
+    <!-- WAVESURFER.JS -->
     <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
 
     <!-- TONE.JS & @TONEJS/MIDI -->
@@ -18,9 +18,7 @@
     <!-- UNIVERSAL DESIGN EDITOR -->
     <link rel="stylesheet" href="/style.css">
 
-    <!-- Page-Specific Styles -->
     <style>
-        /* CSS RESET FOR PERFECT CENTERING */
         *, *::before, *::after {
             box-sizing: border-box;
         }
@@ -59,7 +57,6 @@
             line-height: 1.6;
         }
 
-        /* 2-COLUMN LAYOUT CONTAINER */
         .layout-container {
             width: 100%;
             max-width: 1200px;
@@ -79,7 +76,6 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
-        /* SETTINGS SECTION */
         .settings-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -122,16 +118,11 @@
             position: relative;
             user-select: none;
             width: 100%;
-            z-index: 1; /* Baseline stack order */
+            z-index: 1;
         }
         
         .custom-select-wrapper.open {
             z-index: 100;
-        }
-
-        .custom-select-wrapper.disabled {
-            opacity: 0.5;
-            pointer-events: none;
         }
 
         .custom-select-trigger {
@@ -184,18 +175,12 @@
             z-index: 50;
             overflow-y: auto;
             max-height: 250px;
-            scrollbar-width: thin;
-            scrollbar-color: #00d4ff rgba(0,0,0,0.2);
         }
 
         .custom-select-wrapper.open .custom-select-options {
             opacity: 1;
             visibility: visible;
         }
-
-        .custom-select-options::-webkit-scrollbar { width: 6px; }
-        .custom-select-options::-webkit-scrollbar-thumb { background: #00d4ff; border-radius: 3px; }
-        .custom-select-options::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
 
         .custom-option {
             padding: 12px 15px;
@@ -204,17 +189,6 @@
             cursor: pointer;
             transition: all 0.2s ease;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .custom-option-header {
-            padding: 10px 15px 5px 15px;
-            color: #00d4ff;
-            font-size: 0.75rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            pointer-events: none;
-            background: rgba(0,0,0,0.2);
         }
 
         .custom-option:last-child {
@@ -233,7 +207,7 @@
             font-weight: bold;
         }
 
-        /* WAVEFORM CONTAINER PREVIEW */
+        /* WAVEFORM PREVIEW */
         .waveform-preview-container {
             background: rgba(10, 10, 10, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.08);
@@ -258,7 +232,6 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            flex-direction: row;
         }
 
         .play-pause-btn {
@@ -285,7 +258,6 @@
             width: 100%;
         }
 
-        /* POST-GENERATION PREVIEW TOOLBAR */
         .preview-toolbar {
             display: flex;
             justify-content: space-between;
@@ -297,7 +269,6 @@
             flex-wrap: wrap;
         }
 
-        /* VOLUME CONTROL */
         .volume-control-wrapper {
             display: flex;
             align-items: center;
@@ -421,7 +392,100 @@
             color: #000;
         }
 
-        /* KEYWORD GUIDE STYLES */
+        /* SEPARATE GENERATED INSTRUMENT STEMS */
+        .generated-instruments-panel {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .generated-instruments-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .generated-instruments-header strong {
+            color: #ffffff;
+            font-size: 1rem;
+            letter-spacing: 0.5px;
+        }
+
+        .generated-instruments-header span {
+            color: #777;
+            font-size: 0.78rem;
+        }
+
+        .instrument-midi-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .instrument-midi-row {
+            display: grid;
+            grid-template-columns: 165px 38px minmax(180px, 1fr) auto auto;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            background: rgba(10, 10, 10, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 10px;
+        }
+
+        .instrument-midi-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .instrument-midi-info i {
+            color: #00d4ff;
+            width: 18px;
+            text-align: center;
+        }
+
+        .instrument-midi-name {
+            color: #ddd;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .instrument-midi-count {
+            color: #777;
+            font-size: 0.72rem;
+            margin-left: 5px;
+        }
+
+        .instrument-play-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            background: rgba(0, 212, 255, 0.08);
+            color: #00d4ff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .instrument-play-btn:hover,
+        .instrument-play-btn.active {
+            background: #00d4ff;
+            color: #000;
+        }
+
+        .instrument-waveform {
+            min-width: 0;
+            height: 48px;
+        }
+
+        /* SIDEBAR GUIDE */
         .keyword-guide {
             padding: 25px 20px;
             background: rgba(20, 20, 20, 0.95);
@@ -476,36 +540,6 @@
             text-align: center;
         }
 
-        .keyword-example {
-            margin-top: 20px;
-            padding: 15px;
-            border-left: 3px solid #00c8ff;
-            background: rgba(0, 200, 255, 0.04);
-            border-radius: 0 8px 8px 0;
-        }
-
-        .keyword-example strong {
-            display: block;
-            margin-bottom: 8px;
-            color: #fff;
-            font-size: 12px;
-        }
-
-        .keyword-example code {
-            display: block;
-            margin-bottom: 10px;
-            color: #00c8ff;
-            font-size: 11px;
-            line-height: 1.5;
-        }
-
-        .keyword-example p {
-            margin: 0;
-            color: #999;
-            font-size: 11px;
-            line-height: 1.5;
-        }
-
         .custom-keyword-note {
             margin-top: 15px;
             padding-top: 15px;
@@ -516,7 +550,7 @@
             line-height: 1.5;
         }
 
-        /* HIDE PAGE SCROLLBARS BUT EXPLICITLY SHOW CUSTOM DROPDOWN SCROLLBAR */
+        /* SCROLLBAR CUSTOMIZATION */
         html::-webkit-scrollbar, body::-webkit-scrollbar {
             display: none;
         }
@@ -534,356 +568,111 @@
         .custom-select-options::-webkit-scrollbar-thumb {
             background: #00d4ff !important;
             border-radius: 3px;
-            display: block !important;
         }
 
         .custom-select-options::-webkit-scrollbar-track {
             background: rgba(0, 0, 0, 0.2) !important;
-            display: block !important;
         }
 
-        /* CREATOR CREDIT FOOTER LINK */
         .creator-credit {
             text-align: center;
-            margin-top: 80px; 
-            margin-bottom: 80px; 
+            margin: 80px 0;
             font-size: 0.9rem;
             color: #888;
-            padding: 0 15px;
         }
 
         .creator-credit a {
             color: #00d4ff;
             text-decoration: none;
             font-weight: bold;
-            transition: color 0.2s ease;
-        }
-
-        .creator-credit a:hover {
-            color: #ffffff;
-            text-decoration: underline;
-        }
-
-        /* V2 RHYTHM / INSTRUMENT HELP */
-        .setting-group small.helper-text {
-            display: block;
-            margin-top: 6px;
-            color: #777;
-            font-size: 0.72rem;
-            line-height: 1.4;
-        }
-
-        /* SEPARATE GENERATED INSTRUMENT MIDI DOWNLOADS */
-        .generated-instruments-panel {
-            margin-top: 25px;
-            padding-top: 25px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .generated-instruments-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-        }
-
-        .generated-instruments-header strong {
-            color: #ffffff;
-            font-size: 1rem;
-            letter-spacing: 0.5px;
-        }
-
-        .generated-instruments-header span {
-            color: #777;
-            font-size: 0.78rem;
-        }
-
-        .instrument-midi-list {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 10px;
-        }
-
-        .instrument-midi-row {
-            display: grid;
-            grid-template-columns: 165px 38px minmax(180px, 1fr) auto;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 14px;
-            background: rgba(10, 10, 10, 0.65);
-            border: 1px solid rgba(255, 255, 255, 0.07);
-            border-radius: 10px;
-        }
-
-        .instrument-midi-row:hover {
-            border-color: rgba(0, 212, 255, 0.2);
-        }
-
-        .instrument-midi-info {
-            min-width: 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .instrument-midi-info i {
-            color: #00d4ff;
-            width: 18px;
-            text-align: center;
-        }
-
-        .instrument-midi-name {
-            color: #ddd;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .instrument-midi-count {
-            color: #777;
-            font-size: 0.72rem;
-            margin-left: 5px;
-        }
-
-        .instrument-midi-download {
-            flex-shrink: 0;
-        }
-
-        .instrument-play-btn {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            background: rgba(0, 212, 255, 0.08);
-            color: #00d4ff;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-        }
-
-        .instrument-play-btn:hover,
-        .instrument-play-btn.active {
-            background: #00d4ff;
-            color: #000;
-        }
-
-        .instrument-waveform {
-            min-width: 0;
-            height: 48px;
-        }
-
-        .instrument-preview-label {
-            color: #777;
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            letter-spacing: 0.7px;
-            white-space: nowrap;
-        }
-
-        .instrument-midi-empty {
-            color: #777;
-            font-size: 0.82rem;
-            padding: 12px 0;
-        }
-
-        /* RESPONSIVE DESIGN */
-        @media (max-width: 992px) {
-            .layout-container { 
-                grid-template-columns: 1fr; 
-                max-width: 900px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .settings-grid { grid-template-columns: 1fr; gap: 15px; }
-            .preview-toolbar { flex-direction: column; align-items: stretch; }
-            .instrument-midi-row { grid-template-columns: 1fr auto; }
-            .instrument-midi-info { grid-column: 1; }
-            .instrument-play-btn { grid-column: 2; grid-row: 1; }
-            .instrument-waveform { grid-column: 1 / -1; width: 100%; }
-            .instrument-midi-download { grid-column: 1 / -1; justify-content: center; }
-            .keyword-row { flex-direction: column; align-items: flex-start; gap: 4px; }
-        }
-
-        @media (max-width: 480px) {
-            .page-header { margin-top: 40px; }
-            .page-header h1 { font-size: 2rem; }
-            .page-header p { font-size: 0.95rem; }
-            .stem-card { padding: 20px; }
-            .keyword-guide { padding: 20px 15px; }
-            .creator-credit { font-size: 0.8rem; margin-top: 50px; }
-            .download-btn { justify-content: center; }
-        }
-    
-        /* INSTRUMENT PREVIEW VOLUME */
-        .instrument-volume-control {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            margin-left: 8px;
-            color: #888;
-        }
-
-        .instrument-volume-control i {
-            color: #aaa;
-            font-size: 0.82rem;
-        }
-
-        .instrument-volume-slider {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 78px;
-            height: 4px;
-            background: rgba(255,255,255,0.15);
-            border-radius: 3px;
-            outline: none;
-            accent-color: #00d4ff;
-        }
-
-        .instrument-volume-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #00d4ff;
-            cursor: pointer;
-        }
-
-        @media (max-width: 768px) {
-            .instrument-volume-control {
-                margin-left: 0;
-            }
         }
     </style>
 </head>
 <body>
 
-    <!-- UNIVERSAL HEADER -->
     <site-header></site-header>
 
-    <!-- PAGE CONTENT AREA -->
     <main>
-        
-        <!-- PAGE HEADER -->
         <div class="page-header">
             <h1>Rhythm & Groove <span>Generator</span></h1>
-            <p>Generate structured MIDI grooves with humanization, Indian rhythmic phrasing, cinematic orchestral percussion, and style-aware preview sounds.</p>
+            <p>Generate highly structured, sample-accurate drum beats with individual stem audio and MIDI isolation.</p>
         </div>
 
-        <!-- 2-COLUMN LAYOUT WRAPPER -->
         <div class="layout-container">
-            
-            <!-- LEFT COLUMN: MAIN GENERATOR TOOL -->
             <div class="stem-card">
                 
-                <!-- MUSICAL STRUCTURE INPUTS -->
                 <div class="settings-grid">
                     
-                    <!-- Genre Dropdown -->
+                    <!-- 1. Style Selection -->
                     <div class="setting-group">
                         <label><i class="fa-solid fa-compact-disc"></i> Groove Style</label>
                         <div class="custom-select-wrapper" id="genreSelectWrapper">
                             <div class="custom-select-trigger" id="genreSelectTrigger">
-                                <span>Boom Bap / Hip-Hop</span>
+                                <span>Pop / Modern Pop</span>
                                 <i class="fa-solid fa-chevron-down"></i>
                             </div>
                             <div class="custom-select-options" id="genreSelectOptions">
-                                <div class="custom-option-header">Modern Electronic</div>
-                                <div class="custom-option selected" data-value="hiphop">Boom Bap / Hip-Hop</div>
-                                <div class="custom-option" data-value="trap">Modern Trap / Drill</div>
-                                <div class="custom-option" data-value="house">House / EDM</div>
-                                <div class="custom-option" data-value="lofi">Lo-Fi / Chillhop</div>
-                                
-                                <div class="custom-option-header">Indian Traditions</div>
-                                <div class="custom-option" data-value="indian_classical">Indian Classical (Teen Taal 16-Beat)</div>
-                                <div class="custom-option" data-value="kuthu">South Indian (Dappan Koothu)</div>
-                                
-                                <div class="custom-option-header">Cinematic Orchestral</div>
-                                <div class="custom-option" data-value="orchestral_epic">Epic Trailer (Big Hits)</div>
-                                <div class="custom-option" data-value="orchestral_dark">Dark Tension (Slow Pulse)</div>
+                                <div class="custom-option selected" data-value="pop">Pop / Modern Pop</div>
                             </div>
                         </div>
                         <select id="genreSelect" style="display: none;">
-                            <option value="hiphop" selected>Boom Bap / Hip-Hop</option>
-                            <option value="trap">Modern Trap / Drill</option>
-                            <option value="house">House / EDM</option>
-                            <option value="lofi">Lo-Fi / Chillhop</option>
-                            <option value="indian_classical">Indian Classical (Teen Taal)</option>
-                            <option value="kuthu">South Indian (Dappan Koothu)</option>
-                            <option value="orchestral_epic">Epic Trailer (Big Hits)</option>
-                            <option value="orchestral_dark">Dark Tension (Slow Pulse)</option>
+                            <option value="pop" selected>Pop / Modern Pop</option>
                         </select>
                     </div>
 
-                    <!-- RHYTHM / CHARACTER -->
+                    <!-- 2. Rhythm Character -->
                     <div class="setting-group">
                         <label><i class="fa-solid fa-wave-square"></i> Rhythm Character</label>
                         <div class="custom-select-wrapper" id="rhythmSelectWrapper">
                             <div class="custom-select-trigger" id="rhythmSelectTrigger">
-                                <span>Auto (from Style)</span>
+                                <span>Auto (Driving / 4-on-floor)</span>
                                 <i class="fa-solid fa-chevron-down"></i>
                             </div>
                             <div class="custom-select-options" id="rhythmSelectOptions">
-                                <div class="custom-option selected" data-value="auto">Auto (from Style)</div>
-                                <div class="custom-option" data-value="boom_bap">Boom Bap</div>
-                                <div class="custom-option" data-value="trap_roll">Trap / Drill</div>
-                                <div class="custom-option" data-value="four_floor">Four-on-the-Floor</div>
-                                <div class="custom-option" data-value="kuthu">Dappan Koothu</div>
-                                <div class="custom-option" data-value="teen_taal">Teen Taal</div>
-                                <div class="custom-option" data-value="cinematic_pulse">Cinematic Pulse</div>
-                                <div class="custom-option" data-value="cinematic_build">Cinematic Build</div>
+                                <div class="custom-option selected" data-value="auto">Auto (Driving / 4-on-floor)</div>
+                                <div class="custom-option" data-value="driving">Driving (4-on-the-Floor)</div>
+                                <div class="custom-option" data-value="syncopated">Syncopated Groove</div>
+                                <div class="custom-option" data-value="halftime">Half-Time Ballad</div>
                             </div>
                         </div>
                         <select id="rhythmSelect" style="display:none;">
-                            <option value="auto" selected>Auto (from Style)</option>
-                            <option value="boom_bap">Boom Bap</option>
-                            <option value="trap_roll">Trap / Drill</option>
-                            <option value="four_floor">Four-on-the-Floor</option>
-                            <option value="kuthu">Dappan Koothu</option>
-                            <option value="teen_taal">Teen Taal</option>
-                            <option value="cinematic_pulse">Cinematic Pulse</option>
-                            <option value="cinematic_build">Cinematic Build</option>
+                            <option value="auto" selected>Auto (Driving / 4-on-floor)</option>
+                            <option value="driving">Driving (4-on-the-Floor)</option>
+                            <option value="syncopated">Syncopated Groove</option>
+                            <option value="halftime">Half-Time Ballad</option>
                         </select>
                     </div>
 
-                    <!-- PERCUSSION / PREVIEW SOUND SET -->
+                    <!-- 3. Percussion Set -->
                     <div class="setting-group">
                         <label><i class="fa-solid fa-drum"></i> Percussion Set</label>
                         <div class="custom-select-wrapper" id="instrumentSelectWrapper">
                             <div class="custom-select-trigger" id="instrumentSelectTrigger">
-                                <span>Auto (from Style)</span>
+                                <span>Auto (Modern Electro-Pop)</span>
                                 <i class="fa-solid fa-chevron-down"></i>
                             </div>
                             <div class="custom-select-options" id="instrumentSelectOptions">
-                                <div class="custom-option selected" data-value="auto">Auto (from Style)</div>
-                                <div class="custom-option" data-value="modern">Modern Electronic</div>
-                                <div class="custom-option" data-value="tabla">Indian Tabla</div>
-                                <div class="custom-option" data-value="parai">Parai (Dappan Koothu)</div>
-                                <div class="custom-option" data-value="cinematic">Cinematic Orchestra</div>
-                                <div class="custom-option" data-value="hybrid">Hybrid Cinematic</div>
+                                <div class="custom-option selected" data-value="auto">Auto (Modern Electro-Pop)</div>
+                                <div class="custom-option" data-value="acoustic">Acoustic Studio Kit</div>
+                                <div class="custom-option" data-value="cinematic">Hybrid Cinematic</div>
+                                <div class="custom-option" data-value="lofi">Lo-Fi / Vintage</div>
                             </div>
                         </div>
                         <select id="instrumentSelect" style="display:none;">
-                            <option value="auto" selected>Auto (from Style)</option>
-                            <option value="modern">Modern Electronic</option>
-                            <option value="tabla">Indian Tabla</option>
-                            <option value="parai">Parai (Dappan Koothu)</option>
-                            <option value="cinematic">Cinematic Orchestra</option>
-                            <option value="hybrid">Hybrid Cinematic</option>
+                            <option value="auto" selected>Auto (Modern Electro-Pop)</option>
+                            <option value="acoustic">Acoustic Studio Kit</option>
+                            <option value="cinematic">Hybrid Cinematic</option>
+                            <option value="lofi">Lo-Fi / Vintage</option>
                         </select>
                     </div>
 
-                    <!-- Tempo Input -->
+                    <!-- 4. Tempo Input -->
                     <div class="setting-group">
                         <label for="tempoInput"><i class="fa-solid fa-metronome"></i> Tempo (BPM)</label>
-                        <input type="number" id="tempoInput" value="95" min="40" max="240" placeholder="e.g. 95">
+                        <input type="number" id="tempoInput" value="120" min="40" max="240" placeholder="e.g. 120">
                     </div>
                     
-                    <!-- Time Signature Dropdown -->
+                    <!-- 5. Time Signature -->
                     <div class="setting-group">
                         <label><i class="fa-solid fa-clock"></i> Time Signature</label>
                         <div class="custom-select-wrapper" id="timeSigSelectWrapper">
@@ -893,24 +682,24 @@
                             </div>
                             <div class="custom-select-options" id="timeSigSelectOptions">
                                 <div class="custom-option selected" data-value="4/4">4/4 (Standard)</div>
-                                <div class="custom-option" data-value="3/4">3/4 (Waltz/Triplets)</div>
+                                <div class="custom-option" data-value="3/4">3/4 (Waltz)</div>
                                 <div class="custom-option" data-value="6/8">6/8 (Compound)</div>
                             </div>
                         </div>
                         <select id="timeSigSelect" style="display: none;">
                             <option value="4/4" selected>4/4 (Standard)</option>
-                            <option value="3/4">3/4 (Waltz/Triplets)</option>
+                            <option value="3/4">3/4 (Waltz)</option>
                             <option value="6/8">6/8 (Compound)</option>
                         </select>
                     </div>
 
-                    <!-- Exact Length Input -->
+                    <!-- 6. Exact Length -->
                     <div class="setting-group">
-                        <label for="barsInput"><i class="fa-solid fa-arrows-split-up-and-left"></i> Exact Length (Bars)</label>
-                        <input type="number" id="barsInput" value="8" min="1" max="64" placeholder="e.g. 8, 16">
+                        <label for="barsInput"><i class="fa-solid fa-arrows-split-up-and-left"></i> Length (Bars)</label>
+                        <input type="number" id="barsInput" value="8" min="1" max="64" placeholder="e.g. 8">
                     </div>
 
-                    <!-- ADVANCED GROOVE CONTROLS -->
+                    <!-- 7. Density -->
                     <div class="setting-group">
                         <label><i class="fa-solid fa-layer-group"></i> Beat Density</label>
                         <div class="custom-select-wrapper" id="densitySelectWrapper">
@@ -931,6 +720,7 @@
                         </select>
                     </div>
 
+                    <!-- 8. Swing -->
                     <div class="setting-group">
                         <label><i class="fa-solid fa-water"></i> Swing / Shuffle</label>
                         <div class="custom-select-wrapper" id="swingSelectWrapper">
@@ -951,6 +741,7 @@
                         </select>
                     </div>
 
+                    <!-- 9. Humanize -->
                     <div class="setting-group">
                         <label><i class="fa-solid fa-person"></i> Humanize Level</label>
                         <div class="custom-select-wrapper" id="humanizeSelectWrapper">
@@ -960,17 +751,18 @@
                             </div>
                             <div class="custom-select-options" id="humanizeSelectOptions">
                                 <div class="custom-option" data-value="0">Robotic (Locked to Grid)</div>
-                                <div class="custom-option selected" data-value="0.02">Subtle (Pro Drummer)</div>
-                                <div class="custom-option" data-value="0.05">Loose (Lo-Fi / Drunk)</div>
+                                <div class="custom-option selected" data-value="0.015">Subtle (Pro Drummer)</div>
+                                <div class="custom-option" data-value="0.045">Loose (Live Player)</div>
                             </div>
                         </div>
                         <select id="humanizeSelect" style="display: none;">
                             <option value="0">Robotic (Locked to Grid)</option>
-                            <option value="0.02" selected>Subtle (Pro Drummer)</option>
-                            <option value="0.05">Loose (Lo-Fi / Drunk)</option>
+                            <option value="0.015" selected>Subtle (Pro Drummer)</option>
+                            <option value="0.045">Loose (Live Player)</option>
                         </select>
                     </div>
 
+                    <!-- 10. Fills -->
                     <div class="setting-group">
                         <label><i class="fa-solid fa-bolt"></i> Fill Frequency</label>
                         <div class="custom-select-wrapper" id="fillSelectWrapper">
@@ -992,29 +784,29 @@
                     </div>
                 </div>
 
-                <!-- THOUGHTS & WORDS TEXTAREA -->
+                <!-- Keywords Textarea -->
                 <div class="setting-group" style="margin-bottom: 25px;">
-                    <label for="thoughtsInput"><i class="fa-solid fa-brain"></i> Thoughts / Inspiration / Keywords</label>
-                    <textarea id="thoughtsInput" rows="2" placeholder="e.g. driving, off-beat snare, tribal, four-on-the-floor..."></textarea>
+                    <label for="thoughtsInput"><i class="fa-solid fa-brain"></i> Thoughts / Keywords / Inspiration</label>
+                    <textarea id="thoughtsInput" rows="2" placeholder="e.g. driving, dance-pop, syncopated, disco, ballad..."></textarea>
                 </div>
 
-                <!-- SUBMIT BUTTON -->
                 <button id="processBtn" class="action-btn">
-                    <i class="fa-solid fa-drum-steelpan"></i> Generate Rhythm
+                    <i class="fa-solid fa-drum-steelpan"></i> Generate Pop Rhythm
                 </button>
 
-                <!-- STATUS MESSAGE & PROGRESS BAR -->
+                <!-- Status Screen -->
                 <div id="statusMessage">
-                    <div class="status-text" id="statusText"><i class="fa-solid fa-spinner fa-spin"></i> Mapping Drum Grid...</div>
+                    <div class="status-text" id="statusText"><i class="fa-solid fa-spinner fa-spin"></i> Arranging Pop Matrix...</div>
                     <div class="progress-bar-container">
                         <div class="progress-bar-fill" id="progressBarFill"></div>
                     </div>
                 </div>
 
-                <!-- RESULTS CONTAINER -->
+                <!-- Results Output -->
                 <div id="resultsArea">
-                    <h3><i class="fa-solid fa-file-audio"></i> Generated Drum Track</h3>
+                    <h3><i class="fa-solid fa-file-audio"></i> Generated Pop Track</h3>
                     
+                    <!-- Main Master Waveform -->
                     <div class="waveform-preview-container" id="waveformPreviewContainer">
                         <div class="waveform-header">
                             <span><i class="fa-solid fa-waveform-lines"></i> Full Kit Preview</span>
@@ -1025,94 +817,73 @@
                             <div class="waveform-box" id="waveform"></div>
                         </div>
 
-                        <!-- POST-GENERATION PREVIEW TOOLBAR -->
                         <div class="preview-toolbar">
                             <div class="volume-control-wrapper">
                                 <i class="fa-solid fa-volume-high"></i>
                                 <input type="range" class="volume-slider" id="previewVolume" min="0" max="1" step="0.05" value="1">
                             </div>
                             
-                            <a href="#" class="download-btn" id="downloadMidiBtn" download="tonevault_drums.mid" target="_blank">
-                                <i class="fa-solid fa-file-music"></i> Download Full Kit MIDI
-                            </a>
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <a href="#" class="download-btn" id="downloadMainWavBtn" download="tonevault_pop_preview.wav" target="_blank">
+                                    <i class="fa-solid fa-file-waveform"></i> Download WAV
+                                </a>
+                                <a href="#" class="download-btn" id="downloadMidiBtn" download="tonevault_pop_full_kit.mid" target="_blank">
+                                    <i class="fa-solid fa-file-music"></i> Download Full MIDI
+                                </a>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- SEPARATE GENERATED INSTRUMENT MIDI FILES -->
+                    <!-- Individual Instrument Stem Section -->
                     <div class="generated-instruments-panel" id="generatedInstrumentsPanel">
                         <div class="generated-instruments-header">
-                            <strong><i class="fa-solid fa-layer-group" style="color:#00d4ff; margin-right:7px;"></i> Generated Instruments</strong>
-                            <span id="generatedInstrumentSummary">Separate MIDI files from this generation</span>
+                            <strong><i class="fa-solid fa-layer-group" style="color:#00d4ff; margin-right:7px;"></i> Isolated Stems</strong>
+                            <span id="generatedInstrumentSummary">Stems generated from this kit</span>
                         </div>
                         <div class="instrument-midi-list" id="instrumentMidiList">
-                            <div class="instrument-midi-empty">Generate a rhythm to see the individual instrument MIDI files.</div>
+                            <div style="color:#777; font-size:0.85rem;">Click Generate to build your stems.</div>
                         </div>
                     </div>
                 </div>
 
             </div>
 
-            <!-- RIGHT COLUMN: KEYWORD GUIDE SIDEBAR -->
+            <!-- Sidebar Guide -->
             <aside class="keyword-guide">
                 <div class="keyword-guide-header">
                     <i class="fa-solid fa-book-open" style="color: #00d4ff;"></i>
-                    <strong>Rhythm Keyword Guide</strong>
+                    <strong>Pop Keyword Guide</strong>
                 </div>
 
                 <div class="keyword-category">
-                    <h4>PATTERN BEHAVIOR</h4>
-                    <div class="keyword-row"><span class="keyword">driving</span><span>Stronger, more continuous pulse</span></div>
-                    <div class="keyword-row"><span class="keyword">syncopated</span><span>More off-beat and anticipatory hits</span></div>
-                    <div class="keyword-row"><span class="keyword">four-on-floor</span><span>Kick on every quarter note</span></div>
-                    <div class="keyword-row"><span class="keyword">sparse</span><span>Fewer notes and more breathing room</span></div>
-                    <div class="keyword-row"><span class="keyword">busy</span><span>More subdivisions, ghost notes and fills</span></div>
-                    <div class="keyword-row"><span class="keyword">rolling</span><span>Repeating fast subdivisions / rolls</span></div>
-                </div>
-
-                <div class="keyword-category">
-                    <h4>INDIAN RHYTHM</h4>
-                    <div class="keyword-row"><span class="keyword">tabla</span><span>Uses Indian tabla-style phrasing</span></div>
-                    <div class="keyword-row"><span class="keyword">teen taal</span><span>16-matra classical cycle</span></div>
-                    <div class="keyword-row"><span class="keyword">kuthu</span><span>Parai-led South Indian folk / dance pulse</span></div>
-                    <div class="keyword-row"><span class="keyword">tihai</span><span>Three-part phrase resolving to the downbeat</span></div>
-                </div>
-
-                <div class="keyword-category">
-                    <h4>CINEMATIC / ORCHESTRAL</h4>
-                    <div class="keyword-row"><span class="keyword">cinematic</span><span>Large orchestral percussion palette</span></div>
-                    <div class="keyword-row"><span class="keyword">epic</span><span>Heavy low hits and strong impacts</span></div>
-                    <div class="keyword-row"><span class="keyword">tension</span><span>Rising subdivisions and restrained hits</span></div>
-                    <div class="keyword-row"><span class="keyword">build</span><span>Increasing density toward the phrase ending</span></div>
-                    <div class="keyword-row"><span class="keyword">taiko</span><span>Large low cinematic drum character</span></div>
+                    <h4>PATTERN PHRASING</h4>
+                    <div class="keyword-row"><span class="keyword">driving</span><span>Straight 4-on-the-floor dance pop</span></div>
+                    <div class="keyword-row"><span class="keyword">syncopated</span><span>Off-beat push kicks & disco bounce</span></div>
+                    <div class="keyword-row"><span class="keyword">ballad</span><span>Half-time emotional pop feel</span></div>
+                    <div class="keyword-row"><span class="keyword">sparse</span><span>Minimal verses with lots of space</span></div>
                 </div>
 
                 <div class="custom-keyword-note">
                     <i class="fa-solid fa-lightbulb" style="color: #00d4ff; margin-right: 5px;"></i>
-                    Keywords are interpreted as musical instructions. You can combine the examples or write your own words; recognized keywords change the pattern engine while unknown words are safely ignored.
+                    Keywords modify the placement grid prior to humanization.
                 </div>
             </aside>
-
         </div>
 
-        <!-- CREATOR CREDIT -->
         <div class="creator-credit">
             Rhythmic Engine Powered by <a href="https://tonejs.github.io/" target="_blank">Tone.js</a> | Integrated & Maintained by <a href="https://tonevault.qd.je" target="_blank">ToneVault by HC</a>
         </div>
-
     </main>
 
-    <!-- UNIVERSAL FOOTER -->
     <site-footer></site-footer>
 
-    <!-- UNIVERSAL HTML COMPONENT EDITOR -->
     <script src="/components.js"></script>
 
-    <!-- CLIENT-SIDE RHYTHM GENERATION & MIDI LOGIC -->
+    <!-- POP GENERATION ENGINE -->
     <script type="module">
-        // ============================================================
-        // TONEVAULT RHYTHM ENGINE V2
-        // ============================================================
-
+        // -------------------------------------------------------------
+        // CUSTOM DROPDOWN INIT
+        // -------------------------------------------------------------
         function setupCustomDropdown(selectId) {
             const hiddenSelect = document.getElementById(selectId);
             const wrapper = document.getElementById(selectId + 'Wrapper');
@@ -1149,9 +920,9 @@
         ['genreSelect','rhythmSelect','instrumentSelect','timeSigSelect','densitySelect','swingSelect','humanizeSelect','fillSelect']
             .forEach(setupCustomDropdown);
 
-        // ============================================================
-        // DOM REFERENCES
-        // ============================================================
+        // -------------------------------------------------------------
+        // DOM REFS
+        // -------------------------------------------------------------
         const tempoInput = document.getElementById('tempoInput');
         const barsInput = document.getElementById('barsInput');
         const timeSigSelect = document.getElementById('timeSigSelect');
@@ -1159,9 +930,7 @@
         const swingSelect = document.getElementById('swingSelect');
         const humanizeSelect = document.getElementById('humanizeSelect');
         const fillSelect = document.getElementById('fillSelect');
-        const genreSelect = document.getElementById('genreSelect');
         const rhythmSelect = document.getElementById('rhythmSelect');
-        const instrumentSelect = document.getElementById('instrumentSelect');
         const thoughtsInput = document.getElementById('thoughtsInput');
         const processBtn = document.getElementById('processBtn');
         const statusMessage = document.getElementById('statusMessage');
@@ -1174,7 +943,7 @@
         const audioDurationText = document.getElementById('audioDurationText');
         const previewVolume = document.getElementById('previewVolume');
         const downloadMidiBtn = document.getElementById('downloadMidiBtn');
-        
+        const downloadMainWavBtn = document.getElementById('downloadMainWavBtn');
         const instrumentMidiList = document.getElementById('instrumentMidiList');
         const generatedInstrumentSummary = document.getElementById('generatedInstrumentSummary');
 
@@ -1183,15 +952,13 @@
         let midiBlobUrl = null;
         let generatedNotes = [];
         let exactMaxTime = 8;
-        let currentEngine = 'modern';
-        let instrumentMidiUrls = [];
-        let instrumentPreviewUrls = [];
-        const instrumentWaveSurfers = new Map();
+        let stemWaveSurfers = new Map();
+        let stemBlobUrls = [];
 
-        // ============================================================
-        // GM + CUSTOM MIDI MAP
-        // ============================================================
-        const MIDI_DRUMS = {
+        // -------------------------------------------------------------
+        // GENERAL MIDI MAPPINGS FOR POP
+        // -------------------------------------------------------------
+        const POP_MIDI = {
             KICK: 36,
             SNARE: 38,
             CLAP: 39,
@@ -1199,94 +966,38 @@
             OH: 46,
             TOM_LO: 41,
             TOM_HI: 45,
-            CRASH: 49,
-            ORCH_SNARE: 40,
-            LOW_TOM_CIN: 45,
-            HIGH_TOM_CIN: 47,
-            TIMPANI: 47,
-            TA1: 60,       
-            TA2: 62,       
-            TABLA_LOW: 64, 
-            PARAI_LOW: 36,
-            PARAI_HIGH: 45,
-            MRIDANGAM_LOW: 41,
-            MRIDANGAM_HIGH: 62,
-            TAIKO_LOW: 36,
-            TAIKO_HIGH: 45
+            CRASH: 49
         };
 
-        // ============================================================
-        // STYLE / KEYWORD RESOLUTION
-        // ============================================================
-        function normalizeWords(text) {
-            return String(text || '')
-                .toLowerCase()
-                .replace(/[–—]/g, '-')
-                .replace(/[^a-z0-9/ -]/g, ' ')
-                .replace(/\s+/g, ' ')
-                .trim();
-        }
+        const POP_STEM_INFO = {
+            36: { name: 'Kick', icon: 'fa-drum', sample: 'Modern/Kick/Kick_001.wav' },
+            38: { name: 'Snare', icon: 'fa-drum-steelpan', sample: 'Modern/Snare/Snare_001.wav' },
+            39: { name: 'Clap', icon: 'fa-hands-clapping', sample: 'Modern/Clap/Clap_001.wav' },
+            42: { name: 'Closed Hi-Hat', icon: 'fa-circle', sample: 'Modern/Closed Hi-Hat/Closed Hi-Hat_001.wav' },
+            46: { name: 'Open Hi-Hat', icon: 'fa-circle-dot', sample: 'Modern/Open Hi-Hat/Open Hi-Hat_001.wav' },
+            41: { name: 'Low Tom', icon: 'fa-drum', sample: 'Modern/Low Tom/Low Tom_001.wav' },
+            45: { name: 'High Tom', icon: 'fa-drum', sample: 'Modern/High Tom/High Tom_001.wav' },
+            49: { name: 'Crash Cymbal', icon: 'fa-compact-disc', sample: 'Modern/Crash/Crash_001.wav' }
+        };
 
-        function hasKeyword(text, ...words) {
-            return words.some(word => text.includes(word));
-        }
+        const SAMPLE_BASE_URL = 'https://raw.githubusercontent.com/tonevaultbyhc/ToneVault/main/Samples/';
+        const audioBufferCache = new Map();
+        let audioContext = null;
 
-        function getStyleConfig(genre, requestedRhythm, requestedInstrument, thoughts) {
-            const text = normalizeWords(thoughts);
-            let rhythm = requestedRhythm !== 'auto' ? requestedRhythm : null;
-            let instrument = requestedInstrument !== 'auto' ? requestedInstrument : null;
-
-            if (hasKeyword(text, 'teen taal', 'teentaal', 'tabla')) rhythm = 'teen_taal';
-            if (hasKeyword(text, 'kuthu', 'dappan koothu', 'koothu')) rhythm = 'kuthu';
-            if (hasKeyword(text, 'cinematic build', 'orchestral build', 'build')) rhythm = 'cinematic_build';
-            if (hasKeyword(text, 'cinematic pulse', 'cinematic', 'epic', 'taiko')) rhythm = rhythm || 'cinematic_pulse';
-            if (hasKeyword(text, 'four-on-floor', 'four on floor', '4 on floor')) rhythm = 'four_floor';
-            if (hasKeyword(text, 'boom bap')) rhythm = 'boom_bap';
-            if (hasKeyword(text, 'trap', 'drill', 'rolls', 'rolling')) rhythm = rhythm || 'trap_roll';
-
-            if (hasKeyword(text, 'tabla', 'teen taal', 'teentaal', 'bayan')) instrument = 'tabla';
-            if (hasKeyword(text, 'parai', 'thappu', 'thappattam', 'dappan koothu', 'kuthu')) instrument = 'parai';
-            if (hasKeyword(text, 'orchestra', 'orchestral', 'timpani', 'taiko', 'gran casa')) instrument = 'cinematic';
-            if (hasKeyword(text, 'hybrid cinematic', 'hybrid')) instrument = 'hybrid';
-
-            const styleDefaults = {
-                hiphop: { rhythm: 'boom_bap', instrument: 'modern' },
-                trap: { rhythm: 'trap_roll', instrument: 'modern' },
-                house: { rhythm: 'four_floor', instrument: 'modern' },
-                kuthu: { rhythm: 'kuthu', instrument: 'parai' },
-                indian_classical: { rhythm: 'teen_taal', instrument: 'tabla' },
-                orchestral_epic: { rhythm: 'cinematic_build', instrument: 'cinematic' },
-                orchestral_dark: { rhythm: 'cinematic_pulse', instrument: 'cinematic' },
-                lofi: { rhythm: 'boom_bap', instrument: 'modern' }
-            };
-
-            const defaults = styleDefaults[genre] || styleDefaults.hiphop;
-            rhythm = rhythm || defaults.rhythm;
-            instrument = instrument || defaults.instrument;
-
-            if (genre.includes('orchestral') && hasKeyword(text, 'build', 'tension', 'rising')) {
-                rhythm = 'cinematic_build';
+        async function fetchSample(relativePath) {
+            if (audioBufferCache.has(relativePath)) return audioBufferCache.get(relativePath);
+            
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
             }
 
-            let engine = 'modern';
-            if (['teen_taal'].includes(rhythm) || instrument === 'tabla') engine = 'indian';
-            else if (['kuthu'].includes(rhythm) || instrument === 'parai') engine = 'south_indian';
-            else if (['cinematic_pulse','cinematic_build'].includes(rhythm) || instrument === 'cinematic') engine = 'cinematic';
-            else if (instrument === 'hybrid') engine = 'hybrid';
-
-            return { rhythm, instrument, engine, text };
-        }
-
-        // ============================================================
-        // MUSICAL TIMING
-        // ============================================================
-        function getTiming(currentTempo, timeSig) {
-            const [beatsPerBar, beatUnit] = timeSig.split('/').map(Number);
-            const secondsPerBeat = 60 / currentTempo;
-            const secondsPerTimeUnit = secondsPerBeat * (4 / beatUnit);
-            const barDuration = beatsPerBar * secondsPerTimeUnit;
-            const sixteenth = secondsPerTimeUnit * 0.25;
-            return { beatsPerBar, beatUnit, secondsPerBeat, secondsPerTimeUnit, barDuration, sixteenth };
+            const cleanUrl = SAMPLE_BASE_URL + relativePath.split('/').map(encodeURIComponent).join('/');
+            const response = await fetch(cleanUrl);
+            if (!response.ok) throw new Error(`HTTP ${response.status} loading ${cleanUrl}`);
+            const arrayBuffer = await response.arrayBuffer();
+            const decoded = await audioContext.decodeAudioData(arrayBuffer);
+            audioBufferCache.set(relativePath, decoded);
+            return decoded;
         }
 
         function formatTime(seconds) {
@@ -1295,927 +1006,355 @@
             return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
         }
 
-        // ============================================================
-        // GENERIC NOTE HELPER
-        // ============================================================
-        function createNoteAdder({ drumTrack, orchTrack, exactMaxTime, humanizeAmount, notes }) {
-            return function addHit(midiNote, time, velocity, duration = 0.1, track = 'drums') {
-                let humanTime = time + (Math.random() - 0.5) * humanizeAmount;
-                humanTime = Math.max(0, humanTime);
-                if (humanTime >= exactMaxTime) return;
+        // -------------------------------------------------------------
+        // POP RHYTHMIC ENGINE ALGORITHM
+        // -------------------------------------------------------------
+        function generatePopNotes() {
+            const currentTempo = Math.max(40, Math.min(240, parseInt(tempoInput.value) || 120));
+            const totalBars = Math.max(1, Math.min(64, parseInt(barsInput.value) || 8));
+            const [beatsPerBar, beatUnit] = timeSigSelect.value.split('/').map(Number);
+            const density = densitySelect.value;
+            const swingAmount = parseFloat(swingSelect.value) || 0;
+            const humanizeAmount = parseFloat(humanizeSelect.value) || 0;
+            const fillFreq = parseInt(fillSelect.value) || 0;
+            const selectedRhythm = rhythmSelect.value;
+            const text = thoughtsInput.value.toLowerCase();
 
-                let humanVel = Math.max(0.08, Math.min(1, velocity + (Math.random() - 0.5) * 0.12));
-                const target = track === 'orch' ? orchTrack : drumTrack;
-                const midiNumber = typeof midiNote === 'number' ? midiNote : 43;
-
-                target.addNote({ midi: midiNumber, time: humanTime, duration, velocity: humanVel });
-                notes.push({ midi: midiNumber, time: humanTime, duration, velocity: humanVel, track });
-            };
-        }
-
-        // ============================================================
-        // MODERN PATTERNS
-        // ============================================================
-        function generateModernPattern(ctx) {
-            const { totalBars, beatsPerBar, barDuration, sixteenth, density, swingAmount, fillFreq, rhythm, addHit, text } = ctx;
-
-            for (let bar = 0; bar < totalBars; bar++) {
-                const isFillBar = fillFreq > 0 && ((bar + 1) % fillFreq === 0);
-                for (let beat = 0; beat < beatsPerBar; beat++) {
-                    for (let step = 0; step < 4; step++) {
-                        const baseTime = bar * barDuration + beat * (barDuration / beatsPerBar) + step * sixteenth;
-                        let t = baseTime + (step % 2 ? sixteenth * swingAmount : 0);
-                        const down = step === 0;
-                        const backbeat = down && (beat === 1 || beat === 3);
-                        const fill = isFillBar && beat >= Math.max(0, beatsPerBar - 2);
-
-                        if (rhythm === 'four_floor') {
-                            addHit(MIDI_DRUMS.KICK, t, down ? 0.92 : 0.78);
-                            if (beat === 1 || beat === 3) addHit(MIDI_DRUMS.CLAP, t, 0.72);
-                            if (step === 0 || step === 2 || density === 'busy') addHit(MIDI_DRUMS.CH, t, 0.42 + (step === 0 ? 0.2 : 0));
-                            if (density === 'busy' && step === 3 && Math.random() > 0.5) addHit(MIDI_DRUMS.OH, t, 0.48);
-                            continue;
-                        }
-
-                        if (rhythm === 'boom_bap') {
-                            if (down && (beat === 0 || beat === 2)) addHit(MIDI_DRUMS.KICK, t, 0.9);
-                            if (beat === 1 && step === 3 && !text.includes('sparse')) addHit(MIDI_DRUMS.KICK, t, 0.62);
-                            if (backbeat) addHit(MIDI_DRUMS.SNARE, t, 0.86);
-                            if (density !== 'minimal' && (step === 0 || step === 2)) addHit(MIDI_DRUMS.CH, t, 0.46);
-                            if (density === 'busy' && step === 3 && Math.random() > 0.35) addHit(MIDI_DRUMS.CH, t, 0.34);
-                            continue;
-                        }
-
-                        if (rhythm === 'trap_roll') {
-                            if (down && (beat === 0 || beat === 2)) addHit(MIDI_DRUMS.KICK, t, 0.92);
-                            if (beat === 1 && step === 3) addHit(MIDI_DRUMS.KICK, t, 0.7);
-                            if (backbeat) addHit(MIDI_DRUMS.SNARE, t, 0.82);
-                            addHit(MIDI_DRUMS.CH, t, step === 0 ? 0.62 : 0.38);
-                            if (density === 'busy' && step >= 2 && Math.random() > 0.5) addHit(MIDI_DRUMS.CH, t + sixteenth * 0.5, 0.3, 0.06);
-                            continue;
-                        }
-
-                        // Fallback generic groove
-                        if (down && (beat === 0 || beat === 2)) addHit(MIDI_DRUMS.KICK, t, 0.9);
-                        if (backbeat) addHit(MIDI_DRUMS.SNARE, t, 0.86);
-                        if (step === 0 || step === 2) addHit(MIDI_DRUMS.CH, t, 0.45);
-
-                        if (fill && (step === 0 || step === 2)) {
-                            addHit(MIDI_DRUMS.TOM_HI, t, 0.72);
-                            addHit(MIDI_DRUMS.TOM_LO, t + sixteenth * 0.5, 0.62);
-                        }
-                    }
-                }
-            }
-        }
-
-        // ============================================================
-        // INDIAN RHYTHM PATTERNS
-        // ============================================================
-        function generateIndianPattern(ctx) {
-            const { totalBars, beatsPerBar, barDuration, sixteenth, density, fillFreq, rhythm, addHit, text } = ctx;
-
-            const teenTaal16 = [
-                ['LOW','HI','HI','LOW'],
-                ['LOW','HI','HI','LOW'],
-                ['LOW','HI','HI','HI'],
-                ['HI','LOW','HI','LOW']
-            ];
-            const kuthu16 = ['LOW','HI','HI','LOW','LOW','HI','LOW','HI','LOW','HI','HI','LOW','LOW','HI','HI','LOW'];
-
-            for (let bar = 0; bar < totalBars; bar++) {
-                const phraseStart = bar * barDuration;
-                const isFillBar = fillFreq > 0 && ((bar + 1) % fillFreq === 0);
-                const pattern = rhythm === 'kuthu' ? kuthu16 : teenTaal16.flat();
-                const stepsPerBar = beatsPerBar * 4;
-
-                for (let i = 0; i < stepsPerBar; i++) {
-                    const t = phraseStart + i * sixteenth;
-                    const patternIndex = Math.min(15, Math.floor(i * 16 / stepsPerBar));
-                    const token = pattern[patternIndex];
-                    const accent = [0, 4, 8, 12].some(x => Math.floor(x * stepsPerBar / 16) === i);
-
-                    if (token === 'LOW') {
-                        addHit(MIDI_DRUMS.TABLA_LOW, t, accent ? 0.92 : 0.68, 0.12, 'drums');
-                    } else {
-                        addHit(MIDI_DRUMS.TA1, t, accent ? 0.72 : 0.56, 0.1, 'drums');
-                    }
-
-                    if (density !== 'minimal' && i % 4 === 1) {
-                        addHit(MIDI_DRUMS.TA2, t + sixteenth * 0.45, 0.38, 0.06, 'drums');
-                    }
-
-                    if (rhythm === 'kuthu' && (i === Math.floor(3 * stepsPerBar / 16) || i === Math.floor(7 * stepsPerBar / 16) || i === Math.floor(11 * stepsPerBar / 16) || i === stepsPerBar - 1)) {
-                        addHit(MIDI_DRUMS.PARAI_HIGH, t, 0.78, 0.09, 'drums');
-                    }
-                }
-
-                if (hasKeyword(text, 'tihai') || isFillBar) {
-                    const phraseStartIndex = Math.max(0, stepsPerBar - 4);
-                    for (let rep = 0; rep < 3; rep++) {
-                        const base = phraseStart + Math.min(stepsPerBar - 1, phraseStartIndex + rep) * sixteenth;
-                        addHit(MIDI_DRUMS.TA1, base, 0.7, 0.07, 'drums');
-                        if (rep < 2) addHit(MIDI_DRUMS.TA2, base + sixteenth * 0.5, 0.5, 0.05, 'drums');
-                    }
-                }
-
-                addHit(MIDI_DRUMS.TABLA_LOW, phraseStart, 1.0, 0.16, 'drums');
-            }
-        }
-
-        // ============================================================
-        // SOUTH INDIAN / KUTHU PATTERN
-        // ============================================================
-        function generateSouthIndianPattern(ctx) {
-            const { totalBars, barDuration, sixteenth, density, fillFreq, addHit } = ctx;
-            const pattern = [
-                'LOW','HIGH','HIGH','LOW',
-                'LOW','HIGH','LOW','HIGH',
-                'LOW','HIGH','HIGH','LOW',
-                'LOW','HIGH','HIGH','LOW'
-            ];
-
-            for (let bar = 0; bar < totalBars; bar++) {
-                const start = bar * barDuration;
-                const fillBar = fillFreq > 0 && ((bar + 1) % fillFreq === 0);
-                
-                for (let i = 0; i < 16; i++) {
-                    const t = start + i * sixteenth;
-                    const strong = i % 4 === 0;
-                    addHit(pattern[i] === 'LOW' ? MIDI_DRUMS.PARAI_LOW : MIDI_DRUMS.PARAI_HIGH, t, strong ? 0.94 : 0.66, 0.1, 'drums');
-
-                    if (density !== 'minimal' && (i === 2 || i === 6 || i === 10 || i === 14)) {
-                        addHit(MIDI_DRUMS.MRIDANGAM_HIGH, t + sixteenth * 0.45, 0.42, 0.05, 'drums');
-                    }
-
-                    if (fillBar && i >= 12) {
-                        addHit(i % 2 ? MIDI_DRUMS.PARAI_HIGH : MIDI_DRUMS.MRIDANGAM_LOW, t, 0.72, 0.08, 'drums');
-                    }
-                }
-            }
-        }
-
-        // ============================================================
-        // CINEMATIC ORCHESTRAL PATTERNS
-        // ============================================================
-        function generateCinematicPattern(ctx) {
-            const { totalBars, barDuration, sixteenth, density, fillFreq, rhythm, addHit, text } = ctx;
-
-            for (let bar = 0; bar < totalBars; bar++) {
-                const start = bar * barDuration;
-                const isFillBar = fillFreq > 0 && ((bar + 1) % fillFreq === 0);
-                const build = rhythm === 'cinematic_build' || hasKeyword(text, 'build', 'tension', 'rising');
-                const progression = totalBars <= 1 ? 1 : bar / (totalBars - 1);
-                const energy = build ? 0.55 + progression * 0.4 : 0.75;
-                const isImpactBar = ((bar + 1) % 4 === 0 || bar === totalBars - 1);
-
-                for (let beat = 0; beat < 4; beat++) {
-                    const beatTime = start + beat * sixteenth * 4;
-                    if (beat === 0 || beat === 2) {
-                        if (beat === 0 && isImpactBar) {
-                            addHit('TIMPANI', beatTime, 0.95, 1.2, 'orch');
-                            addHit(MIDI_DRUMS.TAIKO_LOW, beatTime, 0.92, 0.8, 'drums');
-                        } else {
-                            addHit(MIDI_DRUMS.TAIKO_LOW, beatTime, 0.82 * energy, 0.35, 'drums');
-                            addHit('TIMPANI', beatTime, 0.72 * energy, 0.8, 'orch');
-                        }
-                    }
-                    if (density !== 'minimal' && (beat === 1 || beat === 3)) {
-                        addHit(MIDI_DRUMS.LOW_TOM_CIN, beatTime, 0.58 * energy, 0.24, 'drums');
-                    }
-                }
-
-                const subdivision = build ? 2 : 4;
-                for (let i = 0; i < 16; i += subdivision) {
-                    if ((isFillBar || (build && bar >= totalBars - 2)) && i >= 12) continue; 
-                    const t = start + i * sixteenth;
-                    if (i % 4 === 0) addHit(MIDI_DRUMS.ORCH_SNARE, t, 0.5 * energy, 0.12, 'drums');
-                    else if (density === 'busy') addHit(MIDI_DRUMS.HIGH_TOM_CIN, t, 0.32 * energy, 0.1, 'drums');
-                }
-
-                if (isFillBar || (build && bar >= totalBars - 2)) {
-                    for (let i = 12; i < 16; i++) {
-                        const t = start + i * sixteenth;
-                        addHit(i % 2 ? MIDI_DRUMS.HIGH_TOM_CIN : MIDI_DRUMS.LOW_TOM_CIN, t, 0.5 + (i - 12) * 0.1, 0.12, 'drums');
-                    }
-                    addHit(MIDI_DRUMS.CRASH, start + 15.5 * sixteenth, 0.85, 0.4, 'drums');
-                }
-            }
-        }
-
-        // ============================================================
-        // GENERATED INSTRUMENT IDENTIFICATION / MIDI EXPORT
-        // ============================================================
-        function getGeneratedInstrumentName(note, resolved) {
-            if (note.midi === 'TIMPANI') return 'Timpani';
-
-            const n = Number(note.midi);
-
-            if (resolved.engine === 'indian') {
-                if (n === MIDI_DRUMS.TABLA_LOW) return 'Tabla Low';
-                if (n === MIDI_DRUMS.TA1) return 'Tabla High';
-                if (n === MIDI_DRUMS.TA2) return 'Tabla Mid';
+            let rhythm = selectedRhythm;
+            if (rhythm === 'auto') {
+                if (text.includes('syncopated') || text.includes('bounce') || text.includes('disco')) rhythm = 'syncopated';
+                else if (text.includes('ballad') || text.includes('slow') || text.includes('halftime')) rhythm = 'halftime';
+                else rhythm = 'driving';
             }
 
-            if (resolved.engine === 'south_indian') {
-                if (n === MIDI_DRUMS.PARAI_LOW) return 'Parai Low';
-                if (n === MIDI_DRUMS.PARAI_HIGH) return 'Parai High';
-                if (n === MIDI_DRUMS.MRIDANGAM_LOW) return 'Mridangam Low';
-                if (n === MIDI_DRUMS.MRIDANGAM_HIGH) return 'Mridangam High';
-            }
-
-            if (resolved.engine === 'cinematic' || resolved.engine === 'hybrid') {
-                if (n === MIDI_DRUMS.TAIKO_LOW) return 'Taiko Low';
-                if (n === MIDI_DRUMS.LOW_TOM_CIN) return 'Cinematic Low Tom';
-                if (n === MIDI_DRUMS.HIGH_TOM_CIN) return 'Cinematic High Tom';
-                if (n === MIDI_DRUMS.ORCH_SNARE) return 'Orchestral Snare';
-                if (n === MIDI_DRUMS.CRASH) return 'Crash Cymbal';
-            }
-
-            const modernMap = {
-                [MIDI_DRUMS.KICK]: 'Kick',
-                [MIDI_DRUMS.SNARE]: 'Snare',
-                [MIDI_DRUMS.CLAP]: 'Clap',
-                [MIDI_DRUMS.CH]: 'Closed Hi-Hat',
-                [MIDI_DRUMS.OH]: 'Open Hi-Hat',
-                [MIDI_DRUMS.TOM_LO]: 'Low Tom',
-                [MIDI_DRUMS.TOM_HI]: 'High Tom',
-                [MIDI_DRUMS.ORCH_SNARE]: 'Orchestral Snare',
-                [MIDI_DRUMS.CRASH]: 'Crash Cymbal'
-            };
-
-            return modernMap[n] || `MIDI Note ${n}`;
-        }
-
-        function getInstrumentIcon(name) {
-            const lower = name.toLowerCase();
-            if (lower.includes('kick')) return 'fa-drum';
-            if (lower.includes('snare')) return 'fa-drum-steelpan';
-            if (lower.includes('hat') || lower.includes('cymbal')) return 'fa-circle';
-            if (lower.includes('tabla') || lower.includes('mridangam') || lower.includes('dhol') || lower.includes('parai')) return 'fa-drum';
-            if (lower.includes('timpani') || lower.includes('tom') || lower.includes('taiko')) return 'fa-drum';
-            return 'fa-music';
-        }
-
-        function clearInstrumentMidiUrls() {
-            instrumentWaveSurfers.forEach(ws => {
-                try { ws.destroy(); } catch (e) {}
-            });
-            instrumentWaveSurfers.clear();
-
-            instrumentMidiUrls.forEach(url => URL.revokeObjectURL(url));
-            instrumentPreviewUrls.forEach(url => URL.revokeObjectURL(url));
-            instrumentMidiUrls = [];
-            instrumentPreviewUrls = [];
-        }
-
-        function createInstrumentMidiBlob(notes, instrumentName, currentTempo, timeSig) {
-            const [beatsPerBar, beatUnit] = timeSig.split('/').map(Number);
-            const midi = new Midi();
-            midi.header.setTempo(currentTempo);
-            midi.header.timeSignatures.push({
-                ticks: 0,
-                timeSignature: [beatsPerBar, beatUnit]
-            });
-
-            const track = midi.addTrack();
-            track.name = `ToneVault ${instrumentName}`;
-
-            if (instrumentName === 'Timpani') {
-                track.channel = 0;
-                track.instrument.number = 47;
-            } else {
-                track.channel = 9;
-            }
-
-            notes
-                .slice()
-                .sort((a, b) => a.time - b.time)
-                .forEach(note => {
-                    const midiNumber = note.midi === 'TIMPANI' ? 43 : Number(note.midi);
-                    if (!Number.isFinite(midiNumber)) return;
-                    track.addNote({
-                        midi: midiNumber,
-                        time: Math.max(0, note.time),
-                        duration: Math.max(0.01, note.duration || 0.1),
-                        velocity: Math.max(0.01, Math.min(1, note.velocity || 0.8))
-                    });
-                });
-
-            return new Blob([midi.toArray()], { type: 'audio/midi' });
-        }
-
-        async function buildInstrumentMidiDownloads(resolved, currentTempo, timeSig, totalDuration) {
-            clearInstrumentMidiUrls();
-            instrumentMidiList.innerHTML = '';
-
-            const groups = new Map();
-            generatedNotes.forEach(note => {
-                const name = getGeneratedInstrumentName(note, resolved);
-                if (!groups.has(name)) groups.set(name, []);
-                groups.get(name).push(note);
-            });
-
-            if (!groups.size) {
-                instrumentMidiList.innerHTML = '<div class="instrument-midi-empty">No generated instrument events were found.</div>';
-                generatedInstrumentSummary.textContent = 'No separate MIDI files available';
-                return;
-            }
-
-            generatedInstrumentSummary.textContent = `${groups.size} separate MIDI ${groups.size === 1 ? 'file' : 'files'} generated from this kit`;
-
-            const rows = [];
-            let index = 0;
-
-            groups.forEach((notes, name) => {
-                const blob = createInstrumentMidiBlob(notes, name, currentTempo, timeSig);
-                const midiUrl = URL.createObjectURL(blob);
-                instrumentMidiUrls.push(midiUrl);
-
-                const row = document.createElement('div');
-                row.className = 'instrument-midi-row';
-
-                const info = document.createElement('div');
-                info.className = 'instrument-midi-info';
-                info.innerHTML = `<i class="fa-solid ${getInstrumentIcon(name)}"></i><span class="instrument-midi-name"></span><span class="instrument-midi-count">${notes.length} notes</span>`;
-                info.querySelector('.instrument-midi-name').textContent = name;
-
-                const playBtn = document.createElement('button');
-                playBtn.className = 'instrument-play-btn';
-                playBtn.title = `Play ${name}`;
-                playBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
-
-                const waveform = document.createElement('div');
-                waveform.className = 'instrument-waveform';
-                waveform.id = `instrumentWave_${index}`;
-
-                const link = document.createElement('a');
-                link.className = 'download-btn instrument-midi-download';
-                link.href = midiUrl;
-                link.download = `tonevault_${name.toLowerCase().replace(/[^a-z0-9]+/g, '_')}_${currentTempo}bpm.mid`;
-                link.innerHTML = '<i class="fa-solid fa-file-music"></i> Download MIDI';
-
-                row.appendChild(info);
-                row.appendChild(playBtn);
-                row.appendChild(waveform);
-                row.appendChild(link);
-                instrumentMidiList.appendChild(row);
-
-                rows.push({ notes, name, playBtn, playIcon: playBtn.querySelector('i'), waveform, index });
-                index++;
-            });
-
-            generatedInstrumentSummary.textContent = `${groups.size} instruments — rendering individual previews...`;
-
-            for (const item of rows) {
-                try {
-                    const previewBlob = await renderRhythmAudioPreview(
-                        item.notes,
-                        totalDuration,
-                        resolved,
-                        { returnBlob: true }
-                    );
-
-                    const previewUrl = URL.createObjectURL(previewBlob);
-                    instrumentPreviewUrls.push(previewUrl);
-
-                    const ws = WaveSurfer.create({
-                        container: item.waveform,
-                        waveColor: '#3f3f3f',
-                        progressColor: '#00d4ff',
-                        cursorColor: '#ffffff',
-                        barWidth: 2,
-                        barRadius: 2,
-                        height: 48,
-                        normalize: true
-                    });
-
-                    instrumentWaveSurfers.set(item.name, ws);
-                    ws.load(previewUrl);
-
-                    item.playBtn.addEventListener('click', async () => {
-                        await Tone.start();
-
-                        instrumentWaveSurfers.forEach((otherWs, key) => {
-                            if (key !== item.name && otherWs.isPlaying()) {
-                                otherWs.pause();
-                            }
-                        });
-
-                        ws.playPause();
-                    });
-
-                    ws.on('play', () => {
-                        item.playBtn.classList.add('active');
-                        item.playIcon.className = 'fa-solid fa-pause';
-                    });
-
-                    ws.on('pause', () => {
-                        item.playBtn.classList.remove('active');
-                        item.playIcon.className = 'fa-solid fa-play';
-                    });
-
-                    ws.on('finish', () => {
-                        item.playBtn.classList.remove('active');
-                        item.playIcon.className = 'fa-solid fa-play';
-                    });
-
-                } catch (previewError) {
-                    console.warn(`ToneVault: ${item.name} preview could not be rendered.`, previewError);
-                    item.waveform.innerHTML = '<span class="instrument-preview-label">Preview unavailable</span>';
-                }
-            }
-
-            generatedInstrumentSummary.textContent = `${groups.size} separate MIDI ${groups.size === 1 ? 'file' : 'files'} + audio previews generated from this kit`;
-        }
-
-        function generateMIDI({ currentTempo, totalBars, timeSig, density, swingAmount, humanizeAmount, fillFreq, genre, rhythm, instrument, thoughts }) {
-            const timing = getTiming(currentTempo, timeSig);
-            const { beatsPerBar, beatUnit, barDuration, sixteenth } = timing;
+            const secondsPerBeat = 60 / currentTempo;
+            const secondsPerTimeUnit = secondsPerBeat * (4 / beatUnit);
+            const barDuration = beatsPerBar * secondsPerTimeUnit;
+            const sixteenth = secondsPerTimeUnit * 0.25;
             exactMaxTime = totalBars * barDuration;
 
-            const resolved = getStyleConfig(genre, rhythm, instrument, thoughts);
-            currentEngine = resolved.engine;
+            generatedNotes = [];
 
+            function addNote(midiNumber, rawTime, baseVelocity, duration = 0.1) {
+                let humanTime = rawTime + (Math.random() - 0.5) * humanizeAmount;
+                humanTime = Math.max(0, humanTime);
+                if (humanTime >= exactMaxTime) return;
+                let humanVel = Math.max(0.1, Math.min(1, baseVelocity + (Math.random() - 0.5) * 0.1));
+                generatedNotes.push({ midi: midiNumber, time: humanTime, velocity: humanVel, duration });
+            }
+
+            for (let bar = 0; bar < totalBars; bar++) {
+                const isFillBar = fillFreq > 0 && ((bar + 1) % fillFreq === 0);
+                const isFinalBar = (bar === totalBars - 1);
+                const barStart = bar * barDuration;
+
+                // CRASH on Bar 1 or after fills
+                if (bar === 0 || (fillFreq > 0 && bar % fillFreq === 0)) {
+                    addNote(POP_MIDI.CRASH, barStart, 0.85, 1.5);
+                }
+
+                for (let beat = 0; beat < beatsPerBar; beat++) {
+                    const beatStart = barStart + beat * secondsPerTimeUnit;
+
+                    for (let step = 0; step < 4; step++) {
+                        let stepTime = beatStart + step * sixteenth;
+                        if (step % 2 !== 0 && swingAmount > 0) stepTime += (sixteenth * swingAmount * 0.5);
+
+                        const downbeat = (step === 0);
+                        const isBackbeat = downbeat && (beat === 1 || beat === 3);
+                        const inFillZone = (isFillBar || isFinalBar) && (beat >= beatsPerBar - 1);
+
+                        if (inFillZone) {
+                            if (step === 0 || step === 2) {
+                                addNote(step === 0 ? POP_MIDI.TOM_HI : POP_MIDI.TOM_LO, stepTime, 0.85);
+                            }
+                            continue;
+                        }
+
+                        // KICK & SNARE ROUTING
+                        if (rhythm === 'driving') {
+                            // 4-on-the-Floor Pop
+                            if (downbeat) addNote(POP_MIDI.KICK, stepTime, 0.95);
+                            if (isBackbeat) {
+                                addNote(POP_MIDI.SNARE, stepTime, 0.9);
+                                addNote(POP_MIDI.CLAP, stepTime, 0.7);
+                            }
+                        } else if (rhythm === 'syncopated') {
+                            // Syncopated Pop / Funk Bounce
+                            if (downbeat && (beat === 0 || beat === 2)) addNote(POP_MIDI.KICK, stepTime, 0.95);
+                            if (beat === 1 && step === 3) addNote(POP_MIDI.KICK, stepTime, 0.75); // Push
+                            if (beat === 3 && step === 2 && density !== 'minimal') addNote(POP_MIDI.KICK, stepTime, 0.65);
+                            if (isBackbeat) addNote(POP_MIDI.SNARE, stepTime, 0.9);
+                        } else if (rhythm === 'halftime') {
+                            // Half-time Pop Ballad
+                            if (downbeat && beat === 0) addNote(POP_MIDI.KICK, stepTime, 0.95);
+                            if (downbeat && beat === 2) addNote(POP_MIDI.SNARE, stepTime, 0.95);
+                            if (density === 'busy' && beat === 1 && step === 2) addNote(POP_MIDI.KICK, stepTime, 0.6);
+                        }
+
+                        // HI-HAT ROUTING
+                        if (density === 'minimal') {
+                            if (step === 0 || step === 2) addNote(POP_MIDI.CH, stepTime, 0.5);
+                        } else if (density === 'standard') {
+                            if (rhythm === 'driving' && step === 2) {
+                                addNote(POP_MIDI.OH, stepTime, 0.65); // Off-beat open hat
+                            } else {
+                                addNote(POP_MIDI.CH, stepTime, downbeat ? 0.7 : 0.45);
+                            }
+                        } else if (density === 'busy') {
+                            addNote(POP_MIDI.CH, stepTime, downbeat ? 0.75 : 0.5);
+                            if (step === 2 && Math.random() > 0.6) addNote(POP_MIDI.OH, stepTime, 0.6);
+                        }
+                    }
+                }
+            }
+
+            generatedNotes.sort((a, b) => a.time - b.time);
+            return { currentTempo, beatsPerBar, beatUnit };
+        }
+
+        // -------------------------------------------------------------
+        // OFFLINE AUDIO MIXER (CREATES MASTER & STEM WAVS)
+        // -------------------------------------------------------------
+        async function renderAudioMix(noteList, filterMidi = null) {
+            const activeNotes = noteList.filter(n => filterMidi === null || n.midi === filterMidi);
+            if (!activeNotes.length) return null;
+
+            const sampleRate = 44100;
+            const renderDuration = Math.max(1, exactMaxTime + 1.5);
+            const offlineCtx = new OfflineAudioContext(2, Math.ceil(renderDuration * sampleRate), sampleRate);
+
+            // Pre-load necessary samples
+            const neededMidis = [...new Set(activeNotes.map(n => n.midi))];
+            const bufferMap = new Map();
+            for (const midi of neededMidis) {
+                if (POP_STEM_INFO[midi]) {
+                    bufferMap.set(midi, await fetchSample(POP_STEM_INFO[midi].sample));
+                }
+            }
+
+            // Schedule audio buffers
+            activeNotes.forEach(note => {
+                const buffer = bufferMap.get(note.midi);
+                if (!buffer) return;
+
+                const source = offlineCtx.createBufferSource();
+                source.buffer = buffer;
+
+                const gainNode = offlineCtx.createGain();
+                gainNode.gain.setValueAtTime(note.velocity, note.time);
+
+                source.connect(gainNode);
+                gainNode.connect(offlineCtx.destination);
+                source.start(note.time);
+            });
+
+            const renderedBuffer = await offlineCtx.startRendering();
+            return bufferToWave(renderedBuffer, renderedBuffer.length);
+        }
+
+        // -------------------------------------------------------------
+        // MIDI BUILDER
+        // -------------------------------------------------------------
+        function createMidiBlob(noteList, trackName, currentTempo, beatsPerBar, beatUnit) {
             const midi = new Midi();
             midi.header.setTempo(currentTempo);
             midi.header.timeSignatures.push({ ticks: 0, timeSignature: [beatsPerBar, beatUnit] });
 
-            const drumTrack = midi.addTrack();
-            drumTrack.channel = 9;
-            drumTrack.name = `ToneVault ${resolved.rhythm}`;
+            const track = midi.addTrack();
+            track.name = trackName;
+            track.channel = 9;
 
-            const orchTrack = midi.addTrack();
-            orchTrack.channel = 0;
-            orchTrack.instrument.number = 47;
-            orchTrack.name = 'ToneVault Cinematic Percussion';
+            noteList.forEach(n => {
+                track.addNote({
+                    midi: n.midi,
+                    time: n.time,
+                    duration: n.duration,
+                    velocity: n.velocity
+                });
+            });
 
-            generatedNotes = [];
-            const addHit = createNoteAdder({ drumTrack, orchTrack, exactMaxTime, humanizeAmount, notes: generatedNotes });
-
-            const ctx = {
-                totalBars, beatsPerBar, barDuration, sixteenth, density, swingAmount, fillFreq,
-                rhythm: resolved.rhythm, instrument: resolved.instrument, text: resolved.text, addHit
-            };
-
-            if (resolved.engine === 'indian') generateIndianPattern(ctx);
-            else if (resolved.engine === 'south_indian') generateSouthIndianPattern(ctx);
-            else if (resolved.engine === 'cinematic' || resolved.engine === 'hybrid') generateCinematicPattern(ctx);
-            else generateModernPattern(ctx);
-
-            return { midi, resolved, timing };
+            return new Blob([midi.toArray()], { type: 'audio/midi' });
         }
 
-        previewPlayBtn.addEventListener('click', async () => {
-            await Tone.start();
-            if (wavesurfer) wavesurfer.playPause();
-        });
-
-        previewVolume.addEventListener('input', e => {
-            if (wavesurfer) wavesurfer.setVolume(parseFloat(e.target.value));
-        });
-
+        // -------------------------------------------------------------
+        // EXECUTION & UI INTEGRATION
+        // -------------------------------------------------------------
         processBtn.addEventListener('click', async () => {
-            await Tone.start();
             processBtn.disabled = true;
             statusMessage.style.display = 'block';
-            
-            // HIDE OLD RESULTS PROPERLY
             resultsArea.style.display = 'none';
-            waveformPreviewContainer.style.display = 'none';
-            if (wavesurfer) {
-                wavesurfer.destroy();
-                wavesurfer = null;
-            }
-            
             progressBarFill.style.width = '20%';
-            statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Reading musical intent...`;
+            statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Writing pop matrix...`;
 
             setTimeout(async () => {
                 try {
-                    const currentTempo = Math.max(40, Math.min(240, parseInt(tempoInput.value) || 120));
-                    const totalBars = Math.max(1, Math.min(64, parseInt(barsInput.value) || 8));
-                    const timeSig = timeSigSelect.value;
-                    const density = densitySelect.value;
-                    const swingAmount = parseFloat(swingSelect.value) || 0;
-                    const humanizeAmount = parseFloat(humanizeSelect.value) || 0;
-                    const fillFreq = parseInt(fillSelect.value) || 0;
-                    const genre = genreSelect.value;
-                    const rhythm = rhythmSelect.value;
-                    const instrument = instrumentSelect.value;
-                    const thoughts = thoughtsInput.value;
+                    const { currentTempo, beatsPerBar, beatUnit } = generatePopNotes();
 
-                    progressBarFill.style.width = '45%';
-                    statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Building ${genreSelect.options[genreSelect.selectedIndex].text} phrase...`;
+                    progressBarFill.style.width = '50%';
+                    statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Rendering acoustic studio samples...`;
 
-                    const { midi, resolved } = generateMIDI({
-                        currentTempo, totalBars, timeSig, density, swingAmount,
-                        humanizeAmount, fillFreq, genre, rhythm, instrument, thoughts
-                    });
+                    // 1. Build Master Full Kit
+                    const masterWavBlob = await renderAudioMix(generatedNotes);
+                    if (wavBlobUrl) URL.revokeObjectURL(wavBlobUrl);
+                    wavBlobUrl = URL.createObjectURL(masterWavBlob);
+                    downloadMainWavBtn.href = wavBlobUrl;
+                    downloadMainWavBtn.download = `tonevault_pop_${currentTempo}bpm_full.wav`;
 
-                    const midiArray = midi.toArray();
-                    const midiBlob = new Blob([midiArray], { type: 'audio/midi' });
+                    const masterMidiBlob = createMidiBlob(generatedNotes, 'Pop Full Kit', currentTempo, beatsPerBar, beatUnit);
                     if (midiBlobUrl) URL.revokeObjectURL(midiBlobUrl);
-                    midiBlobUrl = URL.createObjectURL(midiBlob);
+                    midiBlobUrl = URL.createObjectURL(masterMidiBlob);
                     downloadMidiBtn.href = midiBlobUrl;
-                    downloadMidiBtn.download = `tonevault_${resolved.rhythm}_${currentTempo}bpm_full_kit.mid`;
+                    downloadMidiBtn.download = `tonevault_pop_${currentTempo}bpm_full.mid`;
 
-                    await buildInstrumentMidiDownloads(resolved, currentTempo, timeSig, exactMaxTime);
-
-                    progressBarFill.style.width = '70%';
-                    statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Rendering ${resolved.instrument} preview...`;
-
+                    // 2. Setup Master WaveSurfer
                     resultsArea.style.display = 'block';
                     waveformPreviewContainer.style.display = 'block';
+                    if (wavesurfer) wavesurfer.destroy();
+
+                    wavesurfer = WaveSurfer.create({
+                        container: '#waveform',
+                        waveColor: '#444',
+                        progressColor: '#00d4ff',
+                        cursorColor: '#ffffff',
+                        barWidth: 3,
+                        barRadius: 3,
+                        height: 60,
+                        normalize: true
+                    });
+                    wavesurfer.load(wavBlobUrl);
+                    wavesurfer.on('ready', () => {
+                        audioDurationText.textContent = formatTime(wavesurfer.getDuration());
+                    });
+                    wavesurfer.on('play', () => previewPlayIcon.className = 'fa-solid fa-pause');
+                    wavesurfer.on('pause', () => previewPlayIcon.className = 'fa-solid fa-play');
+                    wavesurfer.on('finish', () => previewPlayIcon.className = 'fa-solid fa-play');
+
+                    // 3. Render Individual Stems
+                    progressBarFill.style.width = '80%';
+                    statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Isolating individual instrument stems...`;
                     
-                    await renderRhythmAudioPreview(generatedNotes, exactMaxTime, resolved);
+                    stemWaveSurfers.forEach(ws => ws.destroy());
+                    stemWaveSurfers.clear();
+                    stemBlobUrls.forEach(url => URL.revokeObjectURL(url));
+                    stemBlobUrls = [];
+                    instrumentMidiList.innerHTML = '';
+
+                    const distinctMidis = [...new Set(generatedNotes.map(n => n.midi))];
+                    generatedInstrumentSummary.textContent = `${distinctMidis.length} isolated stems available`;
+
+                    for (const midi of distinctMidis) {
+                        const stemInfo = POP_STEM_INFO[midi];
+                        const stemNotes = generatedNotes.filter(n => n.midi === midi);
+                        const stemWavBlob = await renderAudioMix(stemNotes, midi);
+                        const stemWavUrl = URL.createObjectURL(stemWavBlob);
+                        stemBlobUrls.push(stemWavUrl);
+
+                        const stemMidiBlob = createMidiBlob(stemNotes, `Pop - ${stemInfo.name}`, currentTempo, beatsPerBar, beatUnit);
+                        const stemMidiUrl = URL.createObjectURL(stemMidiBlob);
+                        stemBlobUrls.push(stemMidiUrl);
+
+                        const row = document.createElement('div');
+                        row.className = 'instrument-midi-row';
+
+                        row.innerHTML = `
+                            <div class="instrument-midi-info">
+                                <i class="fa-solid ${stemInfo.icon}"></i>
+                                <span class="instrument-midi-name">${stemInfo.name}</span>
+                                <span class="instrument-midi-count">${stemNotes.length} hits</span>
+                            </div>
+                            <button class="instrument-play-btn" title="Play Stem"><i class="fa-solid fa-play"></i></button>
+                            <div class="instrument-waveform"></div>
+                            <a href="${stemWavUrl}" class="download-btn" download="tonevault_pop_${stemInfo.name.toLowerCase()}_${currentTempo}bpm.wav">
+                                <i class="fa-solid fa-file-waveform"></i> WAV
+                            </a>
+                            <a href="${stemMidiUrl}" class="download-btn" download="tonevault_pop_${stemInfo.name.toLowerCase()}_${currentTempo}bpm.mid">
+                                <i class="fa-solid fa-file-music"></i> MIDI
+                            </a>
+                        `;
+
+                        instrumentMidiList.appendChild(row);
+
+                        const stemPlayBtn = row.querySelector('.instrument-play-btn');
+                        const stemWaveBox = row.querySelector('.instrument-waveform');
+
+                        const stemWs = WaveSurfer.create({
+                            container: stemWaveBox,
+                            waveColor: '#3f3f3f',
+                            progressColor: '#00d4ff',
+                            cursorColor: '#ffffff',
+                            barWidth: 2,
+                            barRadius: 2,
+                            height: 48,
+                            normalize: true
+                        });
+                        stemWs.load(stemWavUrl);
+                        stemWaveSurfers.set(midi, stemWs);
+
+                        stemPlayBtn.addEventListener('click', () => {
+                            stemWaveSurfers.forEach((otherWs, m) => {
+                                if (m !== midi && otherWs.isPlaying()) otherWs.pause();
+                            });
+                            stemWs.playPause();
+                        });
+
+                        stemWs.on('play', () => stemPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i>');
+                        stemWs.on('pause', () => stemPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>');
+                        stemWs.on('finish', () => stemPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>');
+                    }
 
                     progressBarFill.style.width = '100%';
-                    statusText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#00d4ff;"></i> ${resolved.rhythm.replaceAll('_',' ')} ready`;
+                    statusText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#00d4ff;"></i> Pop Rhythm Ready!`;
                     setTimeout(() => {
-                        statusMessage.style.display = 'none';
-                        progressBarFill.style.width = '0%';
-                    }, 900);
+                        statusMessage.style.display = "none";
+                        progressBarFill.style.width = "0%";
+                    }, 800);
 
                     processBtn.disabled = false;
                     resultsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                } catch (error) {
-                    console.error('FULL GENERATION ERROR:', error);
-                    alert('Generation failed: ' + error.message);
+
+                } catch (err) {
+                    console.error('Generation Error:', err);
+                    alert('Generation Failed: ' + err.message);
                     processBtn.disabled = false;
                     statusMessage.style.display = 'none';
                 }
-            }, 150);
+            }, 100);
         });
 
-        // ============================================================
-        // TONEVAULT AUDIO SYNTHESIS WITH DYNAMIC DURATION SANITIZER
-        // ============================================================
-        
-        const SAMPLE_RAW_BASE = 'https://raw.githubusercontent.com/tonevaultbyhc/ToneVault/main';
-        const decodedSampleCache = new Map();
-        let sampleDecodeContext = null;
+        // Master WaveSurfer Play Button Listener
+        previewPlayBtn.addEventListener('click', () => {
+            if (wavesurfer) wavesurfer.playPause();
+        });
 
-        function encodedSampleUrl(path) {
-            const clean = String(path || '').replace(/^\/+/, '');
-            const encodedPath = clean.split('/').map(part => encodeURIComponent(part)).join('/');
-            return `${SAMPLE_RAW_BASE}/Samples/${encodedPath}`; 
-        }
+        previewVolume.addEventListener('input', (e) => {
+            if (wavesurfer) wavesurfer.setVolume(parseFloat(e.target.value));
+        });
 
-        function rawSampleUrl(path) {
-            const clean = String(path || '').replace(/^\/+/, '');
-            const encodedPath = clean.split('/').map(part => encodeURIComponent(part)).join('/');
-            return `${SAMPLE_RAW_BASE}/${encodedPath}`;
-        }
-
-        async function fetchSampleBuffer(path) {
-            if (decodedSampleCache.has(path)) return decodedSampleCache.get(path);
-
-            const promise = (async () => {
-                const urls = [encodedSampleUrl(path), rawSampleUrl(path)];
-                let lastError = null;
-
-                for (const url of urls) {
-                    try {
-                        const response = await fetch(url, { cache: 'force-cache' });
-                        if (!response.ok) throw new Error(`HTTP ${response.status} for ${url}`);
-                        const arrayBuffer = await response.arrayBuffer();
-
-                        if (!sampleDecodeContext) {
-                            const AC = window.AudioContext || window.webkitAudioContext;
-                            if (!AC) throw new Error('Web Audio API is unavailable');
-                            sampleDecodeContext = new AC();
-                        }
-
-                        return await sampleDecodeContext.decodeAudioData(arrayBuffer.slice(0));
-                    } catch (error) {
-                        lastError = error;
-                        console.warn('ToneVault sample load failed:', url, error);
-                    }
-                }
-
-                throw lastError || new Error(`Unable to load ${path}`);
-            })();
-
-            decodedSampleCache.set(path, promise);
-            return promise;
-        }
-
-        const SAMPLE_FILES = {
-            modernKick: [
-                ['Modern','Kick','Kick_001.wav'], ['Modern','Kick','Kick_002.wav'], ['Modern','Kick','Kick_003.wav']
-            ],
-            modernSnare: [
-                ['Modern','Snare','Snare_001.wav'], ['Modern','Snare','Snare_002.wav'], ['Modern','Snare','Snare_003.wav']
-            ],
-            modernClap: [
-                ['Modern','Clap','Clap_001.wav'], ['Modern','Clap','Clap_002.wav']
-            ],
-            modernClosedHat: [
-                ['Modern','Closed Hi-Hat','Closed Hi-Hat_001.wav'], ['Modern','Closed Hi-Hat','Closed Hi-Hat_002.wav']
-            ],
-            modernOpenHat: [
-                ['Modern','Open Hi-Hat','Open Hi-Hat_001.wav'], ['Modern','Open Hi-Hat','Open Hi-Hat_002.wav']
-            ],
-            modernLowTom: [
-                ['Modern','Low Tom','Low Tom_001.wav'], ['Modern','Low Tom','Low Tom_002.wav']
-            ],
-            modernHighTom: [
-                ['Modern','High Tom','High Tom_001.wav'], ['Modern','High Tom','High Tom_002.wav']
-            ],
-            modernCrash: [
-                ['Modern','Crash','Crash_001.wav'], ['Modern','Crash','Crash_002.wav']
-            ],
-            tablaLow: [
-                ['Indian','Tabla Low','Ghe-Open-1.1.wav'], ['Indian','Tabla Low','Ghe-Open-2.2.wav'], ['Indian','Tabla Low','Ghe-Open-3.3.wav']
-            ],
-            tablaMid: [
-                ['Indian','Tabla Mid','Ta-1.26.wav'], ['Indian','Tabla Mid','Ta-2.27.wav'], ['Indian','Tabla Mid','Ta-3.28.wav'], ['Indian','Tabla Mid','Ta-4.29.wav'], ['Indian','Tabla Mid','Ta-5.30.wav']
-            ],
-            tablaHigh: [
-                ['Indian','Tabla High','Na-1.1.wav'], ['Indian','Tabla High','Na-2.2.wav'], ['Indian','Tabla High','Na-3.3.wav'], ['Indian','Tabla High','Na-4.4.wav'], ['Indian','Tabla High','Na-5.5.wav'], ['Indian','Tabla High','Na-6.6.wav'], ['Indian','Tabla High','Na-7.7.wav'], ['Indian','Tabla High','Na-8.8.wav'], ['Indian','Tabla High','Na-9.9.wav']
-            ],
-            mridangamLow: [
-                ['Indian','Mridangam Low','mridangam-1_E_minor.wav'], ['Indian','Mridangam Low','mridangam-6_E_minor.wav']
-            ],
-            mridangamHigh: [
-                ['Indian','Mridangam High','mridangam-3_D_major.wav'], ['Indian','Mridangam High','mridangam-5_E_major.wav'], ['Indian','Mridangam High','mridangam-7_F_major.wav']
-            ],
-            paraiLow: [
-                ['South Indian','Parai Low','EM_THAPPU_PARAI_KICK_ONE SHOT_01.wav'], ['South Indian','Parai Low','EM_THAPPU_PARAI_KICK_ONE SHOT_02.wav'], ['South Indian','Parai Low','EM_THAPPU_PARAI_KICK_ONE SHOT_03.wav'], ['South Indian','Thappu  Folk Low','EM_THAPPU_PARAI_KICK_ONE SHOT_04.wav'], ['South Indian','Thappu  Folk Low','EM_THAPPU_PARAI_KICK_ONE SHOT_05.wav'], ['South Indian','Thappu  Folk Low','EM_THAPPU_PARAI_KICK_ONE SHOT_06.wav']
-            ],
-            paraiHigh: [
-                ['South Indian','Parai High','EM_THAPPU_PARAI_HITS_ONE SHOT_02.wav'], ['South Indian','Parai High','EM_THAPPU_PARAI_HITS_ONE SHOT_03.wav'], ['South Indian','Parai High','EM_THAPPU_PARAI_HITS_ONE SHOT_04.wav'], ['South Indian','Parai High','EM_THAPPU_PARAI_RIMSHOT_ONE SHOT_01.wav'], ['South Indian','Parai High','EM_THAPPU_PARAI_RIMSHOT_ONE SHOT_02.wav'], ['South Indian','Parai High','EM_THAPPU_PARAI_RIMSHOT_ONE SHOT_03.wav'], ['South Indian','Thappu  Folk High','thappu-hit-high-indian-drum_110bpm_D#_minor.wav'], ['South Indian','Thappu  Folk High','thappu-hit-hollow-indian-drum_110bpm_B_major.wav'], ['South Indian','Thappu  Folk High','thappu-hit-strong-indian-drum_110bpm_A#_minor.wav']
-            ],
-            orchSnare: [
-                ['Orchestral','Orchestral Snare','KSHMR_snare_big_roomy.wav'], ['Orchestral','Orchestral Snare','KSHMR_snare_character_snappy_C.wav'], ['Orchestral','Orchestral Snare','KSHMR_snare_big_noisy.wav']
-            ],
-            taikoLow: [
-                ['Orchestral','Taiko Low','Taiko Low_001.wav']
-            ],
-            taikoHigh: [
-                ['Orchestral','Taiko High','Taiko High_001.wav']
-            ],
-            cinematicLowTom: [
-                ['Orchestral','Cinematic Low Tom','KSHMR Acoustic High Tom 01 (A#).wav'], ['Orchestral','Cinematic Low Tom','KSHMR Acoustic High Tom 02 (A#).wav']
-            ],
-            timpaniLow: [
-                ['Orchestral','Timpani Low','KSHMR_Timpani_Hit_01_E.wav'], ['Orchestral','Timpani Low','KSHMR_Timpani_Hit_02_A.wav']
-            ],
-            timpaniMidHigh: [
-                ['Orchestral','Timpani Mid High','KSHMR_Timpani_Flam_01_E.wav'], ['Orchestral','Timpani Mid High','KSHMR_Timpani_Flam_02_A.wav']
-            ],
-            orchestralCrash: [
-                ['Orchestral','Crash','KSHMR_Orchestral_Crash_01.wav'], ['Orchestral','Crash','KSHMR_Orchestral_Crash_03.wav']
-            ]
-        };
-
-        const sampleUrlList = key => (SAMPLE_FILES[key] || []).map(parts => parts.join('/'));
-
-        const SAMPLE_NOTE_NAMES = ['C4','C#4','D4','D#4','E4','F4','F#4','G4','G#4','A4','A#4','B4'];
-        const sampleRoundRobin = new Map();
-
-        function createSampleSampler(urls, master, release = 0.8) {
-            if (!urls.length) return null;
-            const mapped = {};
-            urls.forEach((url, index) => {
-                mapped[SAMPLE_NOTE_NAMES[index % SAMPLE_NOTE_NAMES.length]] = url;
-            });
-            const sampler = new Tone.Sampler({
-                urls: mapped,
-                release,
-                curve: 'exponential'
-            }).connect(master);
-            return { sampler, notes: urls.map((_, i) => SAMPLE_NOTE_NAMES[i % SAMPLE_NOTE_NAMES.length]) };
-        }
-
-        function resetSampleRoundRobin() {
-            sampleRoundRobin.clear();
-        }
-
-        function triggerSample(poolName, samplePools, duration, time, velocity) {
-            const pool = samplePools[poolName];
-            if (!pool || !pool.sampler || !pool.notes.length) return false;
-            const index = sampleRoundRobin.get(poolName) || 0;
-            const sampleNote = pool.notes[index % pool.notes.length];
-            sampleRoundRobin.set(poolName, index + 1);
-            pool.sampler.triggerAttackRelease(sampleNote, duration, time, Math.min(1, velocity));
-            return true;
-        }
-
-        async function renderRhythmAudioPreview(notes, totalDuration, resolved, options = {}) {
-            
-            const previewNotes = notes
-                .map(note => ({ ...note }))
-                .filter(note => Number.isFinite(note.time) && note.time >= 0 && note.time < totalDuration)
-                .sort((a, b) => a.time - b.time || a.midi - b.midi);
-
-            const uniquePreviewNotes = [];
-            const seenPreviewEvents = new Set();
-            
-            previewNotes.forEach(note => {
-                const t = Math.max(0, Math.min(note.time, totalDuration - 0.001));
-                const key = `${note.track}|${note.midi}|${Math.round(t * 100)}`;
-                if (!seenPreviewEvents.has(key)) {
-                    seenPreviewEvents.add(key);
-                    uniquePreviewNotes.push({ ...note, time: t });
-                }
-            });
-
-            resetSampleRoundRobin();
-
-            const buffer = await Tone.Offline(async () => {
-                const isIndian = resolved.engine === 'indian';
-                const isSouth = resolved.engine === 'south_indian';
-                const isCinematic = resolved.engine === 'cinematic' || resolved.engine === 'hybrid';
-
-                const master = new Tone.Gain(0.82);
-                const compressor = new Tone.Compressor({ threshold: -18, ratio: 2.2, attack: 0.01, release: 0.18 });
-                const reverb = new Tone.Reverb({
-                    decay: isIndian || isSouth ? 2.8 : isCinematic ? 4.8 : 1.5,
-                    preDelay: 0.025,
-                    wet: isIndian || isSouth ? 0.18 : isCinematic ? 0.28 : 0.06
-                });
-                master.chain(compressor, reverb, Tone.getDestination());
-
-                const samplePools = {};
-                const addPool = (name, files, release = 0.8) => {
-                    samplePools[name] = createSampleSampler(sampleUrlList(files), master, release);
-                };
-
-                if (isIndian) {
-                    addPool('tablaLow', 'tablaLow', 0.8);
-                    addPool('tablaMid', 'tablaMid', 0.7);
-                    addPool('tablaHigh', 'tablaHigh', 0.65);
-                    addPool('modernKick', 'modernKick', 0.45);
-                    addPool('modernClosedHat', 'modernClosedHat', 0.18);
-                    addPool('modernOpenHat', 'modernOpenHat', 0.5);
-                } else if (isSouth) {
-                    addPool('mridangamLow', 'mridangamLow', 0.8);
-                    addPool('mridangamHigh', 'mridangamHigh', 0.65);
-                    addPool('paraiLow', 'paraiLow', 0.8);
-                    addPool('paraiHigh', 'paraiHigh', 0.65);
-                }
-
-                if (isCinematic) {
-                    addPool('taikoLow', 'taikoLow', 1.2);
-                    addPool('taikoHigh', 'taikoHigh', 1.0);
-                    addPool('cinematicLowTom', 'cinematicLowTom', 0.8);
-                    addPool('orchSnare', 'orchSnare', 0.45);
-                    addPool('timpaniLow', 'timpaniLow', 1.6);
-                    addPool('timpaniMidHigh', 'timpaniMidHigh', 1.4);
-                    addPool('orchestralCrash', 'orchestralCrash', 2.5);
-                }
-
-                if (!isIndian && !isSouth && !isCinematic || resolved.engine === 'hybrid') {
-                    addPool('modernKick', 'modernKick', 0.45);
-                    addPool('modernSnare', 'modernSnare', 0.5);
-                    addPool('modernClap', 'modernClap', 0.35);
-                    addPool('modernClosedHat', 'modernClosedHat', 0.18);
-                    addPool('modernOpenHat', 'modernOpenHat', 0.5);
-                    addPool('modernLowTom', 'modernLowTom', 0.55);
-                    addPool('modernHighTom', 'modernHighTom', 0.45);
-                    addPool('modernCrash', 'modernCrash', 2.0);
-                }
-
-                if (isCinematic) {
-                    addPool('modernKick', 'modernKick', 0.45);
-                    addPool('modernClosedHat', 'modernClosedHat', 0.18);
-                    addPool('modernOpenHat', 'modernOpenHat', 0.5);
-                }
-
-                // Protect sampler load with Try-Catch so missing Github files won't kill offline context
-                const banks = Object.values(samplePools).filter(b => b && b.sampler);
-                for (const bank of banks) {
-                    try {
-                        const urlsToFetch = Object.values(bank.sampler._buffers._buffers).map(b => b ? b.url : null).filter(x => x);
-                        await Promise.all(urlsToFetch.map(url => fetchSampleBuffer(url).then(audioBuf => {
-                            for(let [note, buf] of bank.sampler._buffers) {
-                                if (buf.url === url) bank.sampler._buffers.set(note, audioBuf);
-                            }
-                        })));
-                    } catch (e) {
-                        console.warn('ToneVault: Sampler load bypass', e);
-                    }
-                }
-
-                const lastVoiceTime = new Map();
-
-                uniquePreviewNotes.forEach(note => {
-                    const voiceKey = `${note.track}|${note.midi}`;
-                    let t = Math.max(0, Math.min(note.time, totalDuration - 0.001));
-                    const previous = lastVoiceTime.get(voiceKey);
-                    
-                    if (previous !== undefined && t <= previous + 0.002) {
-                        t = Math.min(totalDuration - 0.001, previous + 0.002);
-                    }
-                    lastVoiceTime.set(voiceKey, t);
-                    const v = note.velocity;
-                    let played = false;
-
-                    if (isIndian) {
-                        if (note.midi === MIDI_DRUMS.TABLA_LOW) played = triggerSample('tablaLow', samplePools, '8n', t, v * 1.08);
-                        else if (note.midi === MIDI_DRUMS.TA1) played = triggerSample('tablaMid', samplePools, '16n', t, v * 1.06);
-                        else if (note.midi === MIDI_DRUMS.TA2) played = triggerSample('tablaHigh', samplePools, '16n', t, v * 1.04);
-                    }
-
-                    if (!played && isSouth) {
-                        if (resolved.instrument === 'parai') {
-                            if (note.midi === MIDI_DRUMS.PARAI_LOW) played = triggerSample('paraiLow', samplePools, '8n', t, v * 1.06);
-                            else if (note.midi === MIDI_DRUMS.PARAI_HIGH || note.midi === MIDI_DRUMS.MRIDANGAM_HIGH || note.midi === MIDI_DRUMS.TA1 || note.midi === MIDI_DRUMS.TA2 || note.midi === MIDI_DRUMS.TABLA_LOW) played = triggerSample('paraiHigh', samplePools, '16n', t, v * 1.05);
-                        } else {
-                            if (note.midi === MIDI_DRUMS.PARAI_LOW) played = triggerSample('dholLow', samplePools, '8n', t, v * 1.06);
-                            else if (note.midi === MIDI_DRUMS.PARAI_HIGH) played = triggerSample('dholHigh', samplePools, '16n', t, v * 1.05);
-                            else if (note.midi === MIDI_DRUMS.MRIDANGAM_LOW) played = triggerSample('mridangamLow', samplePools, '8n', t, v * 1.05);
-                            else if (note.midi === MIDI_DRUMS.MRIDANGAM_HIGH || note.midi === MIDI_DRUMS.TA1 || note.midi === MIDI_DRUMS.TA2) played = triggerSample('mridangamHigh', samplePools, '16n', t, v * 1.04);
-                        }
-                    }
-
-                    if (!played && isCinematic) {
-                        if (note.midi === MIDI_DRUMS.TAIKO_LOW) played = triggerSample('taikoLow', samplePools, '8n', t, v);
-                        else if (note.midi === MIDI_DRUMS.LOW_TOM_CIN) played = triggerSample('cinematicLowTom', samplePools, '8n', t, v * 0.95);
-                        else if (note.midi === MIDI_DRUMS.HIGH_TOM_CIN) played = triggerSample('cinematicLowTom', samplePools, '16n', t, v * 0.9);
-                        else if (note.midi === MIDI_DRUMS.ORCH_SNARE) played = triggerSample('orchSnare', samplePools, '16n', t, v);
-                        else if (note.midi === MIDI_DRUMS.CRASH) played = triggerSample('orchestralCrash', samplePools, '8n', t, v);
-                        else if (note.midi === 'TIMPANI' || note.midi === 43) played = triggerSample(v >= 0.82 ? 'timpaniLow' : 'timpaniMidHigh', samplePools, '4n', t, v);
-                    }
-
-                    if (!played) {
-                        switch (note.midi) {
-                            case MIDI_DRUMS.KICK: played = triggerSample('modernKick', samplePools, '16n', t, v); break;
-                            case MIDI_DRUMS.SNARE: played = triggerSample('modernSnare', samplePools, '16n', t, v); break;
-                            case MIDI_DRUMS.CLAP: played = triggerSample('modernClap', samplePools, '16n', t, v); break;
-                            case MIDI_DRUMS.CH: played = triggerSample('modernClosedHat', samplePools, '32n', t, v * 0.8); break;
-                            case MIDI_DRUMS.OH: played = triggerSample('modernOpenHat', samplePools, '8n', t, v * 0.8); break;
-                            case MIDI_DRUMS.TOM_HI: played = triggerSample('modernHighTom', samplePools, '16n', t, v); break;
-                            case MIDI_DRUMS.TOM_LO: played = triggerSample('modernLowTom', samplePools, '16n', t, v); break;
-                            case MIDI_DRUMS.CRASH: played = triggerSample('modernCrash', samplePools, '8n', t, v); break;
-                        }
-                    }
-                });
-            }, Math.max(totalDuration, 1));
-
-            const wavBlob = bufferToWave(buffer.get(), buffer.length);
-
-            if (options.returnBlob) return wavBlob;
-
-            if (wavBlobUrl) URL.revokeObjectURL(wavBlobUrl);
-            wavBlobUrl = URL.createObjectURL(wavBlob);
-
-            if (wavesurfer) {
-                wavesurfer.destroy();
-                previewPlayIcon.className = 'fa-solid fa-play';
-                wavesurfer = null;
-            }
-
-            setTimeout(() => {
-                wavesurfer = WaveSurfer.create({
-                    container: '#waveform',
-                    waveColor: '#444',
-                    progressColor: '#00d4ff',
-                    cursorColor: '#ffffff',
-                    barWidth: 3,
-                    barRadius: 3,
-                    height: 60,
-                    normalize: true
-                });
-
-                wavesurfer.load(wavBlobUrl);
-                wavesurfer.on('ready', () => {
-                    audioDurationText.textContent = formatTime(wavesurfer.getDuration());
-                    wavesurfer.setVolume(parseFloat(previewVolume.value));
-                });
-                wavesurfer.on('play', () => previewPlayIcon.className = 'fa-solid fa-pause');
-                wavesurfer.on('pause', () => previewPlayIcon.className = 'fa-solid fa-play');
-                wavesurfer.on('finish', () => previewPlayIcon.className = 'fa-solid fa-play');
-            }, 50);
-        }
-
+        // WAV Exporter Utility
         function bufferToWave(abuffer, len) {
-            const numOfChan = abuffer.numberOfChannels;
-            const length = len * numOfChan * 2 + 44;
-            const buffer = new ArrayBuffer(length);
-            const view = new DataView(buffer);
-            const channels = [];
-            const sampleRate = abuffer.sampleRate;
-            let offset = 0;
-            let pos = 0;
+            let numOfChan = abuffer.numberOfChannels,
+                length = len * numOfChan * 2 + 44,
+                buffer = new ArrayBuffer(length),
+                view = new DataView(buffer),
+                channels = [], sampleRate = abuffer.sampleRate,
+                offset = 0, pos = 0;
 
             function setUint16(data) { view.setUint16(pos, data, true); pos += 2; }
             function setUint32(data) { view.setUint32(pos, data, true); pos += 4; }
 
-            setUint32(0x46464952); // RIFF
-            setUint32(length - 8);
-            setUint32(0x45564157); // WAVE
-            setUint32(0x20746d66); // fmt
-            setUint32(16);
-            setUint16(1);
+            setUint32(0x46464952); // "RIFF"
+            setUint32(length - 8); 
+            setUint32(0x45564157); // "WAVE"
+            setUint32(0x20746d66); // "fmt "
+            setUint32(16); 
+            setUint16(1); 
             setUint16(numOfChan);
             setUint32(sampleRate);
-            setUint32(sampleRate * 2 * numOfChan);
-            setUint16(numOfChan * 2);
-            setUint16(16);
-            setUint32(0x61746164); // data
+            setUint32(sampleRate * 2 * numOfChan); 
+            setUint16(numOfChan * 2); 
+            setUint16(16); 
+            setUint32(0x61746164); // "data"
             setUint32(length - pos - 4);
 
             for (let i = 0; i < abuffer.numberOfChannels; i++) channels.push(abuffer.getChannelData(i));
@@ -2223,21 +1362,14 @@
             while (pos < length) {
                 for (let i = 0; i < numOfChan; i++) {
                     let sample = Math.max(-1, Math.min(1, channels[i][offset] || 0));
-                    sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767) | 0;
+                    sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767)|0;
                     view.setInt16(pos, sample, true);
                     pos += 2;
                 }
                 offset++;
             }
-            return new Blob([buffer], { type: 'audio/wav' });
+            return new Blob([buffer], { type: "audio/wav" });
         }
-
-        window.addEventListener('beforeunload', () => {
-            clearInstrumentMidiUrls();
-            if (midiBlobUrl) URL.revokeObjectURL(midiBlobUrl);
-            if (wavBlobUrl) URL.revokeObjectURL(wavBlobUrl);
-        });
     </script>
-
 </body>
 </html>
