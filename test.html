@@ -1343,7 +1343,7 @@
             }, 100);
         });
 
-        previewPlayBtn.addEventListener('click', () => { if (wavesurfer) wavesurfer.playParse(); });
+        previewPlayBtn.addEventListener('click', () => { if (wavesurfer) wavesurfer.playPause(); });
         previewVolume.addEventListener('input', (e) => { if (wavesurfer) wavesurfer.setVolume(parseFloat(e.target.value)); });
 
         function bufferToWave(abuffer, len) {
