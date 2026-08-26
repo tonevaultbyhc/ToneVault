@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToneVault - AI Rhythm & Groove Generator (V8)</title>
+    <title>ToneVault - AI Rhythm & Groove Generator (V9)</title>
     
     <!-- FONTAWESOME ICONS CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -845,7 +845,7 @@
                         }
 
                         // ==========================================
-                        // BUILD / RISER ALGORITHM
+                        // BUILD / RISER ALGORITHM (NOW PROCEDURAL)
                         // ==========================================
                         if (rhythm === 'build') {
                             let buildVel = 0.5 + (0.5 * (bar / Math.max(1, totalBars - 1))); 
@@ -855,18 +855,56 @@
                             if (!isLastBar && !isSecondToLast) {
                                 if (downbeat) addNote(STANDARD_MIDI.KICK, stepTime, buildVel);
                                 if (isBackbeat) addNote(STANDARD_MIDI.SNARE, stepTime, buildVel * 0.9);
+                                
+                                // Procedural variation: Hats and ghost kicks
+                                if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime, buildVel * 0.7);
+                                if (grooveVariation % 2 === 0 && beat === 3 && step === 2 && stepRoll > 0.5) addNote(STANDARD_MIDI.KICK, stepTime, buildVel * 0.7);
+                                if (grooveVariation > 1 && beat === 2 && step === 3 && stepRoll > 0.7) addNote(STANDARD_MIDI.SNARE, stepTime, buildVel * 0.5);
                             } else if (isSecondToLast) {
+                                // Double time
                                 if (step === 0 || step === 2) {
                                     addNote(STANDARD_MIDI.KICK, stepTime, buildVel);
                                     addNote(STANDARD_MIDI.SNARE, stepTime, buildVel * 0.9);
                                 }
+                                // Procedural Hats
+                                addNote(STANDARD_MIDI.CH, stepTime, buildVel * 0.8);
+                                if (stepRoll > 0.6) addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.5), buildVel * 0.5, 0.05);
                             } else if (isLastBar) {
                                 if (beat < 2) {
+                                    // 16th note build
                                     addNote(STANDARD_MIDI.SNARE, stepTime, buildVel);
-                                    addNote(STANDARD_MIDI.KICK, stepTime, buildVel * 0.8);
+                                    if (step % 2 === 0 || stepRoll > 0.5) addNote(STANDARD_MIDI.KICK, stepTime, buildVel * 0.8);
                                 } else if (beat === 2) {
-                                    addNote(STANDARD_MIDI.SNARE, stepTime, buildVel);
-                                    addNote(STANDARD_MIDI.SNARE, stepTime + (sixteenth * 0.5), buildVel);
+                                    // Generative Climax on Beat 3
+                                    if (grooveVariation === 0) {
+                                        // Standard 32nd roll
+                                        addNote(STANDARD_MIDI.SNARE, stepTime, buildVel);
+                                        addNote(STANDARD_MIDI.SNARE, stepTime + (sixteenth * 0.5), buildVel);
+                                    } else if (grooveVariation === 1) {
+                                        // Snare + High Tom
+                                        addNote(STANDARD_MIDI.SNARE, stepTime, buildVel);
+                                        if(step % 2 === 0) addNote(STANDARD_MIDI.TOM_HI, stepTime, buildVel);
+                                        addNote(STANDARD_MIDI.SNARE, stepTime + (sixteenth * 0.5), buildVel);
+                                    } else if (grooveVariation === 2) {
+                                        // Heavy Kick/Snare alternating
+                                        addNote(step % 2 === 0 ? STANDARD_MIDI.SNARE : STANDARD_MIDI.KICK, stepTime, buildVel);
+                                        addNote(STANDARD_MIDI.SNARE, stepTime + (sixteenth * 0.5), buildVel);
+                                    } else {
+                                        // Fast hats + Snares
+                                        addNote(STANDARD_MIDI.SNARE, stepTime, buildVel);
+                                        addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.25), buildVel);
+                                        addNote(STANDARD_MIDI.SNARE, stepTime + (sixteenth * 0.5), buildVel);
+                                        addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.75), buildVel);
+                                    }
+                                } else if (beat === 3) {
+                                     // The Gap! (Beat 4)
+                                     // Usually silent, but let's add a rare pre-drop Tom or Snare fill on the very last 16th
+                                     if (step === 3 && stepRoll > 0.7) {
+                                         addNote(STANDARD_MIDI.SNARE, stepTime, buildVel);
+                                     }
+                                     if (step === 3 && grooveVariation === 3) {
+                                         addNote(STANDARD_MIDI.TOM_LO, stepTime, buildVel);
+                                     }
                                 }
                             }
                             continue; 
@@ -997,8 +1035,9 @@
                             if (density !== 'minimal' && (step === 0 || step === 1 || step === 3) && stepRoll > 0.2) {
                                 addNote(STANDARD_MIDI.CH, stepTime, 0.45);
                             }
-                            if (rhythm === 'tech' && step === 3 && stepRoll > 0.5) {
-                                addNote(grooveVariation % 2 === 0 ? STANDARD_MIDI.TOM_HI : STANDARD_MIDI.TOM_LO, stepTime, 0.6);
+                            if (rhythm === 'tech') {
+                                if (step === 3 && stepRoll > 0.5) addNote(grooveVariation % 2 === 0 ? STANDARD_MIDI.TOM_HI : STANDARD_MIDI.TOM_LO, stepTime, 0.6);
+                                if (beat === 1 && step === 2 && Math.random() > 0.4) addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.65);
                             }
                         }
 
