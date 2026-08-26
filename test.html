@@ -754,7 +754,7 @@
         }
 
         // -------------------------------------------------------------
-        // MASTER RHYTHMIC ENGINE ALGORITHM
+        // TRUE PROCEDURAL GENERATIVE RHYTHM ENGINE
         // -------------------------------------------------------------
         function generateRhythmNotes() {
             const genre = genreSelect.value;
@@ -768,7 +768,10 @@
             const text = thoughtsInput.value.toLowerCase();
             let rhythm = rhythmSelect.value;
 
-            // Keyword Routing Logic
+            // Generate a random structural groove style for this specific session
+            const grooveVariation = Math.floor(Math.random() * 4); // 0, 1, 2, or 3
+
+            // Keyword Routing
             if (rhythm === 'auto') {
                 if (genre !== 'lofi' && genre !== 'boombap' && (text.includes('build') || text.includes('drop') || text.includes('riser'))) {
                     rhythm = 'build';
@@ -831,8 +834,8 @@
                         const isBackbeat = downbeat && (beat === 1 || beat === 3);
                         const inFillZone = (isFillBar || isFinalBar) && (beat >= beatsPerBar - 1);
 
-                        // True Generative Seed for every single step
-                        const r1 = Math.random();
+                        // Random dice roll per step
+                        const stepRoll = Math.random();
 
                         if (inFillZone && rhythm !== 'build') {
                             if (step === 0 || step === 2) {
@@ -842,7 +845,7 @@
                         }
 
                         // ==========================================
-                        // SPECIAL: BUILD / RISER ALGORITHM
+                        // BUILD / RISER ALGORITHM
                         // ==========================================
                         if (rhythm === 'build') {
                             let buildVel = 0.5 + (0.5 * (bar / Math.max(1, totalBars - 1))); 
@@ -870,80 +873,113 @@
                         }
 
                         // ==========================================
-                        // 1. POP
+                        // 1. POP / MODERN POP (PRO PROCEDURAL)
                         // ==========================================
                         if (genre === 'pop') {
+                            // KICK GENERATION
                             if (rhythm === 'driving') {
                                 if (downbeat) addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
-                                if (isBackbeat) { addNote(STANDARD_MIDI.SNARE, stepTime, 0.9); addNote(STANDARD_MIDI.CLAP, stepTime, 0.7); }
-                                // Generative: 30% chance for an extra push kick in standard/busy
-                                if (density !== 'minimal' && beat === 3 && step === 2 && r1 > 0.7) addNote(STANDARD_MIDI.KICK, stepTime, 0.7);
+                                // Variation patterns across generations
+                                if (grooveVariation === 1 && beat === 2 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime, 0.8);
+                                if (grooveVariation === 2 && beat === 3 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime, 0.75);
+                                if (grooveVariation === 3 && (beat === 1 || beat === 3) && step === 2 && stepRoll > 0.4) addNote(STANDARD_MIDI.KICK, stepTime, 0.7);
                             } else if (rhythm === 'syncopated') {
                                 if (downbeat && (beat === 0 || beat === 2)) addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
-                                // Generative: Push kicks switch dynamically between 16th and 8th notes
-                                if (beat === 1 && step === (r1 > 0.5 ? 3 : 2)) addNote(STANDARD_MIDI.KICK, stepTime, 0.75);
-                                if (beat === 3 && step === 2 && density !== 'minimal' && r1 > 0.4) addNote(STANDARD_MIDI.KICK, stepTime, 0.65);
-                                if (isBackbeat) addNote(STANDARD_MIDI.SNARE, stepTime, 0.9);
+                                if (grooveVariation % 2 === 0 && beat === 1 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime, 0.85);
+                                if (grooveVariation % 2 !== 0 && beat === 1 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime, 0.85);
+                                if (beat === 3 && step === 2 && stepRoll > 0.3) addNote(STANDARD_MIDI.KICK, stepTime, 0.75);
                             } else if (rhythm === 'halftime') {
                                 if (downbeat && beat === 0) addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
-                                if (downbeat && beat === 2) addNote(STANDARD_MIDI.SNARE, stepTime, 0.95);
+                                if (grooveVariation > 1 && beat === 2 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime, 0.7);
+                                if (grooveVariation === 3 && beat === 3 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime, 0.75);
                             }
-                            // Generative Hi-hats
-                            if (density === 'minimal') { if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime, 0.5); }
-                            else if (density === 'standard') { addNote(STANDARD_MIDI.CH, stepTime, downbeat ? 0.7 : 0.45); }
-                            else if (density === 'busy') { 
-                                addNote(STANDARD_MIDI.CH, stepTime, downbeat ? 0.75 : 0.5); 
-                                if (step === 2 && r1 > 0.4) addNote(STANDARD_MIDI.OH, stepTime, 0.6); 
+
+                            // SNARE / CLAP GENERATION
+                            if (rhythm === 'halftime') {
+                                if (downbeat && beat === 2) addNote(STANDARD_MIDI.SNARE, stepTime, 0.95);
+                            } else {
+                                if (isBackbeat) {
+                                    addNote(STANDARD_MIDI.SNARE, stepTime, 0.92);
+                                    if (grooveVariation !== 1) addNote(STANDARD_MIDI.CLAP, stepTime, 0.75);
+                                }
+                                // Occasional ghost snare
+                                if (density === 'busy' && beat === 2 && step === 3 && stepRoll > 0.5) {
+                                    addNote(STANDARD_MIDI.SNARE, stepTime, 0.4);
+                                }
+                            }
+
+                            // HI-HAT GENERATION (Audibly distinct patterns)
+                            if (density === 'minimal') {
+                                if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime, 0.55);
+                            } else if (density === 'standard') {
+                                if (grooveVariation === 0) {
+                                    // Straight 8th notes
+                                    if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime, step === 0 ? 0.75 : 0.5);
+                                } else if (grooveVariation === 1) {
+                                    // 16th notes with dynamic accents
+                                    addNote(STANDARD_MIDI.CH, stepTime, downbeat ? 0.8 : (step === 2 ? 0.6 : 0.38));
+                                } else if (grooveVariation === 2) {
+                                    // Off-beat open hats
+                                    if (step === 2) addNote(STANDARD_MIDI.OH, stepTime, 0.7);
+                                    else if (step === 0) addNote(STANDARD_MIDI.CH, stepTime, 0.6);
+                                } else {
+                                    // Bouncy syncopated hats
+                                    if (step === 0 || step === 1 || step === 3) addNote(STANDARD_MIDI.CH, stepTime, 0.55);
+                                }
+                            } else if (density === 'busy') {
+                                addNote(STANDARD_MIDI.CH, stepTime, downbeat ? 0.8 : 0.45);
+                                if (step === 2 && stepRoll > 0.3) addNote(STANDARD_MIDI.OH, stepTime, 0.65);
                             }
                         }
 
                         // ==========================================
-                        // 2. BOOM BAP
+                        // 2. BOOM BAP / HIP-HOP
                         // ==========================================
                         if (genre === 'boombap') {
-                            // Generative: Drag amount fluctuates slightly
-                            let dragOffset = (rhythm === 'lazy') ? (sixteenth * (0.15 + (r1 * 0.15))) : 0;
+                            let dragOffset = (rhythm === 'lazy') ? (sixteenth * (0.15 + stepRoll * 0.15)) : 0;
                             
                             if (downbeat && (beat === 0 || beat === 2)) addNote(STANDARD_MIDI.KICK, stepTime + dragOffset, 0.9);
                             
-                            // Generative: 16th note placement moves around
-                            if (beat === 1 && step === (r1 > 0.5 ? 3 : 2)) addNote(STANDARD_MIDI.KICK, stepTime + dragOffset, 0.65);
+                            if (grooveVariation === 0 && beat === 1 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime + dragOffset, 0.75);
+                            if (grooveVariation === 1 && beat === 1 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime + dragOffset, 0.75);
+                            if (grooveVariation === 2 && beat === 3 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime + dragOffset, 0.7);
+                            if (grooveVariation === 3 && beat === 2 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime + dragOffset, 0.65);
+
                             if (isBackbeat) addNote(STANDARD_MIDI.SNARE, stepTime, 0.95);
 
-                            // Ghost note injections
-                            if (rhythm === 'ghost' && step === (r1 > 0.5 ? 3 : 2) && Math.random() > 0.3) {
-                                addNote(Math.random() > 0.5 ? STANDARD_MIDI.SNARE : STANDARD_MIDI.KICK, stepTime, 0.35);
+                            if (rhythm === 'ghost' && step === 3 && stepRoll > 0.4) {
+                                addNote(STANDARD_MIDI.SNARE, stepTime, 0.35);
                             }
-                            addNote(STANDARD_MIDI.CH, stepTime + dragOffset, downbeat ? 0.75 : 0.45);
+                            
+                            if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime + dragOffset, step === 0 ? 0.75 : 0.45);
+                            if (density === 'busy' && step === 3 && stepRoll > 0.5) addNote(STANDARD_MIDI.CH, stepTime + dragOffset, 0.35);
                         }
 
                         // ==========================================
-                        // 3. MODERN TRAP / DRILL
+                        // 3. TRAP / DRILL
                         // ==========================================
                         if (genre === 'trap') {
-                            if (downbeat && (beat === 0 || beat === 2)) addNote(STANDARD_MIDI.KICK, stepTime, 0.98);
-                            // Generative 808 bounce
-                            if (beat === 1 && step === (r1 > 0.5 ? 2 : 3)) addNote(STANDARD_MIDI.KICK, stepTime, 0.85); 
-                            if (beat === 3 && step === (Math.random() > 0.5 ? 3 : 2)) addNote(STANDARD_MIDI.KICK, stepTime, 0.8);
+                            if (downbeat && beat === 0) addNote(STANDARD_MIDI.KICK, stepTime, 0.98);
+                            if (grooveVariation === 0 && beat === 1 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime, 0.88);
+                            if (grooveVariation === 1 && beat === 2 && step === 0) addNote(STANDARD_MIDI.KICK, stepTime, 0.92);
+                            if (grooveVariation === 2 && beat === 3 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime, 0.85);
+                            if (grooveVariation === 3 && beat === 1 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime, 0.82);
 
                             if (downbeat && beat === 2) {
                                 addNote(STANDARD_MIDI.SNARE, stepTime, 0.95);
                                 addNote(STANDARD_MIDI.CLAP, stepTime, 0.8);
                             }
 
-                            if (rhythm === 'drill' && (step === 1 || step === 3)) {
-                                if (beat === 3 && r1 > 0.3) addNote(STANDARD_MIDI.SNARE, stepTime, 0.6); 
+                            if (rhythm === 'drill' && (step === 1 || step === 3) && beat === 3 && stepRoll > 0.3) {
+                                addNote(STANDARD_MIDI.SNARE, stepTime, 0.6); 
                             }
 
-                            // Generative Hat Rolls
-                            if (density !== 'minimal') {
-                                addNote(STANDARD_MIDI.CH, stepTime, 0.6);
-                                if (rhythm === 'rolls' || density === 'busy') {
-                                    if (r1 > 0.6) addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.5), 0.45, 0.05);
-                                    if (step === (Math.random() > 0.5 ? 3 : 2) && Math.random() > 0.4) {
-                                        addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.25), 0.35, 0.03);
-                                        addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.75), 0.35, 0.03);
-                                    }
+                            addNote(STANDARD_MIDI.CH, stepTime, 0.6);
+                            if (rhythm === 'rolls' || density === 'busy') {
+                                if (stepRoll > 0.6) addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.5), 0.45, 0.05);
+                                if (step === 3 && stepRoll > 0.4) {
+                                    addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.25), 0.35, 0.03);
+                                    addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.75), 0.35, 0.03);
                                 }
                             }
                         }
@@ -952,21 +988,17 @@
                         // 4. HOUSE / EDM
                         // ==========================================
                         if (genre === 'house') {
-                            if (rhythm === 'classic' || rhythm === 'tech' || rhythm === 'minimal') {
-                                if (downbeat && (density !== 'minimal' || r1 > 0.2)) {
-                                    addNote(STANDARD_MIDI.KICK, stepTime, 0.92);
-                                }
+                            if (downbeat) addNote(STANDARD_MIDI.KICK, stepTime, 0.94);
+                            if (isBackbeat) addNote(STANDARD_MIDI.CLAP, stepTime, 0.9);
+
+                            if (rhythm === 'tech' && beat === 2 && step === 3) addNote(STANDARD_MIDI.CLAP, stepTime, 0.65);
+                            if (step === 2) addNote(STANDARD_MIDI.OH, stepTime, 0.72);
+
+                            if (density !== 'minimal' && (step === 0 || step === 1 || step === 3) && stepRoll > 0.2) {
+                                addNote(STANDARD_MIDI.CH, stepTime, 0.45);
                             }
-                            if (isBackbeat) addNote(STANDARD_MIDI.CLAP, stepTime, rhythm === 'minimal' ? 0.7 : 0.9);
-                            if (rhythm === 'tech' && beat === 2 && step === 3 && r1 > 0.2) addNote(STANDARD_MIDI.CLAP, stepTime, 0.65); 
-                            if (step === 2) addNote(STANDARD_MIDI.OH, stepTime, 0.7); 
-                            
-                            if (density !== 'minimal') {
-                                if ((step === 0 || step === 1 || step === 3) && r1 > 0.1) addNote(STANDARD_MIDI.CH, stepTime, 0.45);
-                            }
-                            if (rhythm === 'tech') {
-                                if (step === 3 && r1 > 0.5) addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.55);
-                                if (beat === 1 && step === 2 && Math.random() > 0.4) addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.65);
+                            if (rhythm === 'tech' && step === 3 && stepRoll > 0.5) {
+                                addNote(grooveVariation % 2 === 0 ? STANDARD_MIDI.TOM_HI : STANDARD_MIDI.TOM_LO, stepTime, 0.6);
                             }
                         }
 
@@ -974,26 +1006,18 @@
                         // 5. LO-FI / CHILLHOP
                         // ==========================================
                         if (genre === 'lofi') {
-                            let drag = sixteenth * (0.15 + r1 * 0.15); // Generative lazy drag
+                            let drag = sixteenth * (0.15 + stepRoll * 0.15);
 
-                            if (rhythm === 'sleepy') {
-                                if (downbeat && (beat === 0 || (beat === 2 && Math.random() > 0.3))) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.85);
-                                if (isBackbeat) addNote(STANDARD_MIDI.SNARE, stepTime, 0.9);
-                                if (density !== 'minimal' && beat === 1 && step === 3 && r1 > 0.4) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.6);
-                                if (step === 0 && Math.random() > 0.1) addNote(STANDARD_MIDI.CH, stepTime + drag, 0.5);
-                            } else if (rhythm === 'jazzy') {
-                                if (downbeat && (beat === 0 || beat === 2)) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.9);
-                                if (beat === 1 && step === 3 && r1 > 0.3) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.7);
-                                if (beat === 3 && step === 2 && Math.random() > 0.4) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.6);
-                                if (isBackbeat) addNote(STANDARD_MIDI.SNARE, stepTime, 0.9);
-                                if (beat === 2 && step === 3 && Math.random() > 0.5) addNote(STANDARD_MIDI.SNARE, stepTime + drag, 0.4); 
-                                if ((step === 0 || step === 2) && r1 > 0.1) addNote(STANDARD_MIDI.CH, stepTime + drag, 0.6);
-                                if (step === 2 && beat % 2 !== 0 && Math.random() > 0.2) addNote(STANDARD_MIDI.OH, stepTime + drag, 0.5);
-                            } else {
-                                if (downbeat && (beat === 0 || beat === 2)) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.9);
-                                if (beat === 1 && step === 3 && r1 > 0.4) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.7);
-                                if (isBackbeat) addNote(STANDARD_MIDI.SNARE, stepTime, 0.9);
-                                if (r1 > 0.1) addNote(STANDARD_MIDI.CH, stepTime + drag, downbeat ? 0.7 : 0.4);
+                            if (downbeat && beat === 0) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.88);
+                            if (grooveVariation === 0 && beat === 1 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.68);
+                            if (grooveVariation === 1 && beat === 2 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.72);
+                            if (grooveVariation >= 2 && beat === 3 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.65);
+
+                            if (isBackbeat) addNote(STANDARD_MIDI.SNARE, stepTime, 0.9);
+
+                            if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime + drag, step === 0 ? 0.65 : 0.4);
+                            if (rhythm === 'jazzy' && step === 2 && beat % 2 !== 0 && stepRoll > 0.3) {
+                                addNote(STANDARD_MIDI.OH, stepTime + drag, 0.5);
                             }
                         }
 
