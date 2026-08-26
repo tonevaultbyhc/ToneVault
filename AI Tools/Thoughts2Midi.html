@@ -235,6 +235,20 @@
             font-weight: bold;
         }
 
+        /* HYBRID COMBOBOX FOR TIME SIGNATURE */
+        .custom-combobox-wrapper { position: relative; width: 100%; z-index: 2; }
+        .custom-combobox-wrapper.open { z-index: 100; }
+        .custom-combobox-input { width: 100%; background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(255, 255, 255, 0.15); color: #ffffff; padding: 12px 35px 12px 15px; border-radius: 10px; font-size: 1rem; outline: none; transition: border-color 0.2s ease; }
+        .custom-combobox-input:focus { border-color: #00d4ff; }
+        .combobox-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #00d4ff; cursor: pointer; pointer-events: none; transition: transform 0.3s ease; font-size: 0.9rem; }
+        .custom-combobox-wrapper.open .combobox-icon { transform: translateY(-50%) rotate(180deg); }
+        .custom-combobox-wrapper.open .custom-combobox-input { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-color: #00d4ff; background: rgba(15, 15, 15, 0.95); }
+        .custom-combobox-options { position: absolute; top: 100%; left: 0; right: 0; background: rgba(15, 15, 15, 0.95); backdrop-filter: blur(10px); border: 1px solid #00d4ff; border-top: none; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; box-shadow: 0 15px 30px rgba(0,0,0,0.6); opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 50; overflow-y: auto; max-height: 250px; }
+        .custom-combobox-wrapper.open .custom-combobox-options { opacity: 1; visibility: visible; }
+        .custom-combobox-options::-webkit-scrollbar { width: 6px; }
+        .custom-combobox-options::-webkit-scrollbar-thumb { background: #00d4ff; border-radius: 3px; }
+        .custom-combobox-options::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+
         /* WAVEFORM CONTAINER PREVIEW */
         .waveform-preview-container {
             background: rgba(10, 10, 10, 0.8);
@@ -693,29 +707,24 @@
                         </select>
                     </div>
 
-                    <!-- Time Signature Dropdown -->
+                    <!-- Time Signature Combobox -->
                     <div class="setting-group">
                         <label><i class="fa-solid fa-clock"></i> Time Signature</label>
-                        <div class="custom-select-wrapper" id="timeSigSelectWrapper">
-                            <div class="custom-select-trigger" id="timeSigSelectTrigger">
-                                <span>4/4 (Common Time)</span>
-                                <i class="fa-solid fa-chevron-down"></i>
-                            </div>
-                            <div class="custom-select-options" id="timeSigSelectOptions">
-                                <div class="custom-option selected" data-value="4/4">4/4 (Common Time)</div>
-                                <div class="custom-option" data-value="3/4">3/4 (Waltz)</div>
-                                <div class="custom-option" data-value="6/8">6/8 (Compound)</div>
+                        <div class="custom-combobox-wrapper" id="timeSigWrapper">
+                            <input type="text" id="timeSigInput" class="custom-combobox-input" value="4/4" placeholder="e.g. 4/4 or 7/8">
+                            <i class="fa-solid fa-chevron-down combobox-icon" id="timeSigIcon"></i>
+                            <div class="custom-combobox-options" id="timeSigOptions">
+                                <div class="custom-option" data-value="2/2">2/2 (Cut Time)</div>
                                 <div class="custom-option" data-value="2/4">2/4 (March)</div>
-                                <div class="custom-option" data-value="5/4">5/4 (Asymmetric)</div>
+                                <div class="custom-option" data-value="3/4">3/4 (Waltz)</div>
+                                <div class="custom-option selected" data-value="4/4">4/4 (Standard)</div>
+                                <div class="custom-option" data-value="3/2">3/2</div>
+                                <div class="custom-option" data-value="4/2">4/2</div>
+                                <div class="custom-option" data-value="6/8">6/8 (Compound)</div>
+                                <div class="custom-option" data-value="9/8">9/8</div>
+                                <div class="custom-option" data-value="12/8">12/8</div>
                             </div>
                         </div>
-                        <select id="timeSigSelect" style="display: none;">
-                            <option value="4/4" selected>4/4 (Common Time)</option>
-                            <option value="3/4">3/4 (Waltz)</option>
-                            <option value="6/8">6/8 (Compound)</option>
-                            <option value="2/4">2/4 (March)</option>
-                            <option value="5/4">5/4 (Asymmetric)</option>
-                        </select>
                     </div>
 
                     <!-- Exact Length Input -->
@@ -814,7 +823,7 @@
                             
                             <div class="volume-control-wrapper">
                                 <i class="fa-solid fa-volume-high"></i>
-                                <input type="range" class="volume-slider" id="previewVolume" min="0" max="1" step="0.05" value="1">
+                                <input type="range" class="volume-slider" id="previewVolume" min="0" max="1" step="0.05" value="0.85">
                             </div>
                         </div>
                         
@@ -927,7 +936,7 @@
                 e.stopPropagation();
                 
                 // Close other open wrappers
-                document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+                document.querySelectorAll('.custom-select-wrapper, .custom-combobox-wrapper').forEach(w => {
                     if (w !== wrapper) w.classList.remove('open');
                 });
                 
@@ -960,9 +969,42 @@
             });
         }
 
+        // ==========================================
+        // HYBRID COMBOBOX (TIME SIGNATURE) INIT
+        // ==========================================
+        const timeSigWrapper = document.getElementById('timeSigWrapper');
+        const timeSigInput = document.getElementById('timeSigInput');
+        const timeSigOptions = document.getElementById('timeSigOptions');
+        const timeSigIcon = document.getElementById('timeSigIcon');
+
+        [timeSigInput, timeSigIcon].forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.querySelectorAll('.custom-select-wrapper, .custom-combobox-wrapper').forEach(w => {
+                    if (w !== timeSigWrapper) w.classList.remove('open');
+                });
+                timeSigWrapper.classList.toggle('open');
+            });
+        });
+
+        timeSigOptions.addEventListener('click', (e) => {
+            const opt = e.target.closest('.custom-option');
+            if (!opt) return;
+            e.stopPropagation();
+            
+            // Set input value to the fraction selected
+            timeSigInput.value = opt.dataset.value;
+            
+            // Manage selected class
+            timeSigOptions.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+            
+            timeSigWrapper.classList.remove('open');
+        });
+
         // Close dropdowns if clicking anywhere outside
         window.addEventListener('click', () => {
-            document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+            document.querySelectorAll('.custom-select-wrapper, .custom-combobox-wrapper').forEach(w => {
                 w.classList.remove('open');
             });
         });
@@ -970,7 +1012,6 @@
         // Initialize all Custom Dropdowns
         setupCustomDropdown('genreSelect');
         setupCustomDropdown('keySelect');
-        setupCustomDropdown('timeSigSelect');
         setupCustomDropdown('scaleSelect');
         setupCustomDropdown('postInstrumentSelect');
 
@@ -981,7 +1022,6 @@
         const barsInput = document.getElementById("barsInput");
         const keySelect = document.getElementById("keySelect"); // Pulls from hidden sync'd input
         const scaleSelect = document.getElementById("scaleSelect");
-        const timeSigSelect = document.getElementById("timeSigSelect");
         const postInstrumentSelect = document.getElementById("postInstrumentSelect");
         const thoughtsInput = document.getElementById("thoughtsInput");
         
@@ -1013,6 +1053,16 @@
 
         const noteToVal = { 'C':0, 'C#':1, 'D':2, 'D#':3, 'E':4, 'F':5, 'F#':6, 'G':7, 'G#':8, 'A':9, 'A#':10, 'B':11 };
 
+        // Bank of procedural chord progressions based on scale degrees
+        const progressionBank = [
+            [0, 5, 3, 4], // I - vi - IV - V
+            [0, 4, 5, 3], // I - V - vi - IV
+            [5, 3, 0, 4], // vi - IV - I - V
+            [3, 4, 0, 5], // IV - V - I - vi
+            [0, 3, 0, 4], // I - IV - I - V
+            [5, 4, 3, 4]  // vi - V - IV - V
+        ];
+
         function formatTime(seconds) {
             const mins = Math.floor(seconds / 60);
             const secs = Math.floor(seconds % 60);
@@ -1024,6 +1074,7 @@
             if (wavesurfer) wavesurfer.playPause();
         });
 
+        // Dynamic volume update applied instantly to the wavesurfer object
         previewVolume.addEventListener("input", (e) => {
             const vol = parseFloat(e.target.value);
             if (wavesurfer) wavesurfer.setVolume(vol);
@@ -1056,8 +1107,11 @@
                     const totalBars = parseInt(barsInput.value) || 8;
                     const rootKey = keySelect.value;
                     const scaleType = scaleSelect.value;
-                    const timeSig = timeSigSelect.value; 
-                    const [beatsPerBar, beatUnit] = timeSig.split('/').map(Number);
+                    
+                    // Parse the hybrid combobox for custom fractions
+                    const rawTimeSig = timeSigInput.value.match(/^\d+\/\d+$/) ? timeSigInput.value : '4/4';
+                    const [beatsPerBar, beatUnit] = rawTimeSig.split('/').map(Number);
+                    
                     const rootNoteVal = 48 + noteToVal[rootKey]; 
 
                     const secondsPerBeat = 60 / currentTempo;
@@ -1083,8 +1137,12 @@
                     let currentTime = 0;
                     generatedNotes = [];
 
-                    const chordProgression = [0, 5, 3, 4]; 
+                    // PROCEDURAL GENERATION: Select a random progression from the bank
+                    const chordProgression = progressionBank[Math.floor(Math.random() * progressionBank.length)];
                     let currentChordIdx = 0;
+
+                    // Procedural arpeggio density (guarantees a new pattern style on every click)
+                    const arpDensitySeed = Math.random();
 
                     while (currentTime + stepDuration <= exactMaxTime) {
                         if (Math.floor(currentTime / (barDuration * 2)) !== currentChordIdx) {
@@ -1115,7 +1173,8 @@
                                 velocity: 0.85
                             });
                         } else {
-                            if (Math.random() > 0.3) {
+                            // The arpeggio randomizer uses the new procedural seed
+                            if (Math.random() > (arpDensitySeed > 0.5 ? 0.2 : 0.45)) {
                                 let duration = Math.min(stepDuration * 0.9, exactMaxTime - currentTime);
                                 const randomInterval = intervals[(baseDegree + Math.floor(Math.random() * 3) * 2) % intervals.length];
                                 const midiNote = rootNoteVal + 12 + randomInterval;
@@ -1167,6 +1226,8 @@
                 } catch (error) {
                     console.error("FULL GENERATION ERROR:", error);
                     alert(error.message);
+                    processBtn.removeAttribute("disabled");
+                    statusMessage.style.display = "none";
                 }
             }, 500);
         });
@@ -1303,6 +1364,7 @@
 
                 wavesurfer.on('ready', () => {
                     audioDurationText.textContent = formatTime(wavesurfer.getDuration());
+                    // FIX: Re-apply the volume state from the slider
                     wavesurfer.setVolume(parseFloat(previewVolume.value));
                     statusText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#00d4ff;"></i> Preview Ready`;
                 });
