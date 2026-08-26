@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToneVault - AI Rhythm & Groove Generator (V10)</title>
+    <title>ToneVault - AI Rhythm & Groove Generator (V11)</title>
     
     <!-- FONTAWESOME ICONS CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -49,6 +49,20 @@
         .custom-select-options::-webkit-scrollbar { width: 6px; }
         .custom-select-options::-webkit-scrollbar-thumb { background: #00d4ff; border-radius: 3px; }
         .custom-select-options::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+
+        /* HYBRID COMBOBOX FOR TIME SIGNATURE */
+        .custom-combobox-wrapper { position: relative; width: 100%; z-index: 2; }
+        .custom-combobox-wrapper.open { z-index: 100; }
+        .custom-combobox-input { width: 100%; background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(255, 255, 255, 0.15); color: #ffffff; padding: 12px 35px 12px 15px; border-radius: 10px; font-size: 1rem; outline: none; transition: border-color 0.2s ease; }
+        .custom-combobox-input:focus { border-color: #00d4ff; }
+        .combobox-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #00d4ff; cursor: pointer; pointer-events: none; transition: transform 0.3s ease; font-size: 0.9rem; }
+        .custom-combobox-wrapper.open .combobox-icon { transform: translateY(-50%) rotate(180deg); }
+        .custom-combobox-wrapper.open .custom-combobox-input { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-color: #00d4ff; background: rgba(15, 15, 15, 0.95); }
+        .custom-combobox-options { position: absolute; top: 100%; left: 0; right: 0; background: rgba(15, 15, 15, 0.95); backdrop-filter: blur(10px); border: 1px solid #00d4ff; border-top: none; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; box-shadow: 0 15px 30px rgba(0,0,0,0.6); opacity: 0; visibility: hidden; transition: all 0.2s ease; overflow-y: auto; max-height: 250px; }
+        .custom-combobox-wrapper.open .custom-combobox-options { opacity: 1; visibility: visible; }
+        .custom-combobox-options::-webkit-scrollbar { width: 6px; }
+        .custom-combobox-options::-webkit-scrollbar-thumb { background: #00d4ff; border-radius: 3px; }
+        .custom-combobox-options::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
 
         /* WAVEFORM PREVIEW */
         .waveform-preview-container { background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 15px; margin-bottom: 25px; display: none; }
@@ -194,25 +208,24 @@
                         <input type="number" id="tempoInput" value="120" min="40" max="240" placeholder="e.g. 120">
                     </div>
                     
-                    <!-- 5. Time Signature -->
+                    <!-- 5. Time Signature (HYBRID COMBOBOX) -->
                     <div class="setting-group">
                         <label><i class="fa-solid fa-clock"></i> Time Signature</label>
-                        <div class="custom-select-wrapper" id="timeSigSelectWrapper">
-                            <div class="custom-select-trigger" id="timeSigSelectTrigger">
-                                <span>4/4 (Standard)</span>
-                                <i class="fa-solid fa-chevron-down"></i>
-                            </div>
-                            <div class="custom-select-options" id="timeSigSelectOptions">
-                                <div class="custom-option selected" data-value="4/4">4/4 (Standard)</div>
+                        <div class="custom-combobox-wrapper" id="timeSigWrapper">
+                            <input type="text" id="timeSigInput" class="custom-combobox-input" value="4/4" placeholder="e.g. 4/4 or 7/8">
+                            <i class="fa-solid fa-chevron-down combobox-icon" id="timeSigIcon"></i>
+                            <div class="custom-combobox-options" id="timeSigOptions">
+                                <div class="custom-option" data-value="2/2">2/2 (Cut Time)</div>
+                                <div class="custom-option" data-value="2/4">2/4 (March)</div>
                                 <div class="custom-option" data-value="3/4">3/4 (Waltz)</div>
+                                <div class="custom-option selected" data-value="4/4">4/4 (Standard)</div>
+                                <div class="custom-option" data-value="3/2">3/2</div>
+                                <div class="custom-option" data-value="4/2">4/2</div>
                                 <div class="custom-option" data-value="6/8">6/8 (Compound)</div>
+                                <div class="custom-option" data-value="9/8">9/8</div>
+                                <div class="custom-option" data-value="12/8">12/8</div>
                             </div>
                         </div>
-                        <select id="timeSigSelect" style="display: none;">
-                            <option value="4/4" selected>4/4 (Standard)</option>
-                            <option value="3/4">3/4 (Waltz)</option>
-                            <option value="6/8">6/8 (Compound)</option>
-                        </select>
                     </div>
 
                     <!-- 6. Length -->
@@ -586,15 +599,17 @@
             const optionsContainer = document.getElementById(selectId + 'Options');
             const triggerSpan = document.querySelector('#' + selectId + 'Trigger span');
             
-            select.innerHTML = '';
+            if (select) select.innerHTML = '';
             optionsContainer.innerHTML = '';
             
             optionsData.forEach((opt, index) => {
-                const optionEl = document.createElement('option');
-                optionEl.value = opt.val;
-                optionEl.textContent = opt.text;
-                if (index === 0) optionEl.selected = true;
-                select.appendChild(optionEl);
+                if (select) {
+                    const optionEl = document.createElement('option');
+                    optionEl.value = opt.val;
+                    optionEl.textContent = opt.text;
+                    if (index === 0) optionEl.selected = true;
+                    select.appendChild(optionEl);
+                }
 
                 const div = document.createElement('div');
                 div.className = 'custom-option' + (index === 0 ? ' selected' : '');
@@ -635,7 +650,7 @@
 
             trigger.addEventListener('click', (e) => {
                 e.stopPropagation();
-                document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+                document.querySelectorAll('.custom-select-wrapper, .custom-combobox-wrapper').forEach(w => {
                     if (w !== wrapper) w.classList.remove('open');
                 });
                 wrapper.classList.toggle('open');
@@ -651,18 +666,47 @@
                 optionsContainer.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
                 opt.classList.add('selected');
                 
-                hiddenSelect.value = opt.dataset.value;
+                if (hiddenSelect) {
+                    hiddenSelect.value = opt.dataset.value;
+                    hiddenSelect.dispatchEvent(new Event('change'));
+                }
                 wrapper.classList.remove('open');
-                
-                hiddenSelect.dispatchEvent(new Event('change'));
             });
         }
 
-        window.addEventListener('click', () => {
-            document.querySelectorAll('.custom-select-wrapper').forEach(w => w.classList.remove('open'));
+        // Setup the Hybrid Combobox for Time Signature
+        const timeSigWrapper = document.getElementById('timeSigWrapper');
+        const timeSigInput = document.getElementById('timeSigInput');
+        const timeSigOptions = document.getElementById('timeSigOptions');
+        const timeSigIcon = document.getElementById('timeSigIcon');
+
+        [timeSigInput, timeSigIcon].forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.querySelectorAll('.custom-select-wrapper, .custom-combobox-wrapper').forEach(w => {
+                    if (w !== timeSigWrapper) w.classList.remove('open');
+                });
+                timeSigWrapper.classList.toggle('open');
+            });
         });
 
-        ['genreSelect','rhythmSelect','instrumentSelect','timeSigSelect','densitySelect','swingSelect','humanizeSelect','fillSelect']
+        timeSigOptions.addEventListener('click', (e) => {
+            const opt = e.target.closest('.custom-option');
+            if (!opt) return;
+            e.stopPropagation();
+            
+            timeSigInput.value = opt.dataset.value;
+            timeSigOptions.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+            
+            timeSigWrapper.classList.remove('open');
+        });
+
+        window.addEventListener('click', () => {
+            document.querySelectorAll('.custom-select-wrapper, .custom-combobox-wrapper').forEach(w => w.classList.remove('open'));
+        });
+
+        ['genreSelect','rhythmSelect','instrumentSelect','densitySelect','swingSelect','humanizeSelect','fillSelect']
             .forEach(setupCustomDropdown);
             
         // Initial setup on load
@@ -674,7 +718,6 @@
         // -------------------------------------------------------------
         const tempoInput = document.getElementById('tempoInput');
         const barsInput = document.getElementById('barsInput');
-        const timeSigSelect = document.getElementById('timeSigSelect');
         const densitySelect = document.getElementById('densitySelect');
         const swingSelect = document.getElementById('swingSelect');
         const humanizeSelect = document.getElementById('humanizeSelect');
@@ -805,13 +848,17 @@
         }
 
         // -------------------------------------------------------------
-        // TRUE PROCEDURAL GENERATIVE RHYTHM ENGINE (INCLUDING CINEMATIC)
+        // TRUE PROCEDURAL GENERATIVE RHYTHM ENGINE
         // -------------------------------------------------------------
         function generateRhythmNotes() {
             const genre = genreSelect.value;
             const currentTempo = Math.max(40, Math.min(240, parseInt(tempoInput.value) || 120));
             const totalBars = Math.max(1, Math.min(64, parseInt(barsInput.value) || 8));
-            const [beatsPerBar, beatUnit] = timeSigSelect.value.split('/').map(Number);
+            
+            // HYBRID COMBOBOX FALLBACK: If user types nonsense, fallback to 4/4
+            const rawTimeSig = timeSigInput.value.match(/^\d+\/\d+$/) ? timeSigInput.value : '4/4';
+            const [beatsPerBar, beatUnit] = rawTimeSig.split('/').map(Number);
+            
             const density = densitySelect.value;
             const swingAmount = parseFloat(swingSelect.value) || 0;
             const humanizeAmount = parseFloat(humanizeSelect.value) || 0;
@@ -1084,25 +1131,22 @@
                         // ==========================================
                         if (genre === 'cinematic') {
                             if (rhythm === 'epic') {
-                                // Epic trailer hits on downbeats, heavy rolling snare/taiko swells
                                 if (downbeat && (beat === 0 || beat === 2)) {
-                                    addNote(STANDARD_MIDI.KICK, stepTime, 0.98); // Taiko Low
+                                    addNote(STANDARD_MIDI.KICK, stepTime, 0.98); 
                                     addNote(STANDARD_MIDI.CRASH, stepTime, 0.8);
                                 }
                                 if (isBackbeat || (beat === 3 && step === 2)) {
-                                    addNote(STANDARD_MIDI.SNARE, stepTime, 0.95); // Orchestral Snare
+                                    addNote(STANDARD_MIDI.SNARE, stepTime, 0.95); 
                                 }
                                 if (grooveVariation > 1 && step === 3) {
                                     addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7);
                                 }
                             } else if (rhythm === 'tension') {
-                                // Dark, sparse low pulses
                                 if (downbeat && beat === 0) addNote(STANDARD_MIDI.KICK, stepTime, 0.9);
                                 if (grooveVariation % 2 === 0 && beat === 2 && step === 0) addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.8);
                                 if (grooveVariation >= 2 && beat === 3 && step === 2) addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7);
                                 if (beat === 3 && step === 3 && stepRoll > 0.6) addNote(STANDARD_MIDI.SNARE, stepTime, 0.4);
                             } else if (rhythm === 'action') {
-                                // Fast driving chase rhythms
                                 if (downbeat) addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
                                 if (step === 2) addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.8);
                                 if (isBackbeat || step === 3) addNote(STANDARD_MIDI.SNARE, stepTime, 0.9);
