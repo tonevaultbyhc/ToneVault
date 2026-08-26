@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToneVault - AI Rhythm & Groove Generator (V9)</title>
+    <title>ToneVault - AI Rhythm & Groove Generator (V10)</title>
     
     <!-- FONTAWESOME ICONS CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -149,6 +149,7 @@
                                 <div class="custom-option" data-value="trap">Modern Trap / Drill</div>
                                 <div class="custom-option" data-value="house">House / EDM</div>
                                 <div class="custom-option" data-value="lofi">Lo-Fi / Chillhop</div>
+                                <div class="custom-option" data-value="cinematic">Cinematic Orchestral</div>
                             </div>
                         </div>
                         <select id="genreSelect" style="display: none;">
@@ -157,6 +158,7 @@
                             <option value="trap">Modern Trap / Drill</option>
                             <option value="house">House / EDM</option>
                             <option value="lofi">Lo-Fi / Chillhop</option>
+                            <option value="cinematic">Cinematic Orchestral</option>
                         </select>
                     </div>
 
@@ -442,6 +444,19 @@
                     </div>
                 </div>
 
+                <!-- CINEMATIC GUIDE -->
+                <div id="guide-cinematic" class="genre-guide">
+                    <div class="keyword-category">
+                        <h4>CINEMATIC ORCHESTRAL</h4>
+                        <div class="keyword-row"><span class="keyword">epic</span><span>Massive Hollywood trailer hits and swells</span></div>
+                        <div class="keyword-row"><span class="keyword">tension</span><span>Brooding, slow, sparse low toms</span></div>
+                        <div class="keyword-row"><span class="keyword">action</span><span>Fast, aggressive chase rhythms</span></div>
+                        <div class="keyword-row"><span class="keyword">chase</span><span>High-speed percussion pulses</span></div>
+                        <div class="keyword-row"><span class="keyword">trailer</span><span>Big cinematic impact builds</span></div>
+                        <div class="keyword-row"><span class="keyword">dark</span><span>Atmospheric low-end beds</span></div>
+                    </div>
+                </div>
+
                 <div class="custom-keyword-note">
                     <i class="fa-solid fa-lightbulb" style="color: #00d4ff; margin-right: 5px;"></i>
                     Select your Genre on the left to swap options dynamically.
@@ -547,6 +562,22 @@
                 defaultKit: 'lofi',
                 defaultTempo: 78,
                 placeholder: 'e.g. sleepy, minimal, jazzy, swung, chill...'
+            },
+            cinematic: {
+                rhythms: [
+                    {val: 'auto', text: 'Auto (from Keywords)'},
+                    {val: 'epic', text: 'Epic Trailer Build'},
+                    {val: 'tension', text: 'Dark Tension Pulse'},
+                    {val: 'action', text: 'Action / Chase'}
+                ],
+                kits: [
+                    {val: 'auto', text: 'Auto (Orchestra & Taikos)'},
+                    {val: 'hybrid', text: 'Hybrid Cinematic'},
+                    {val: 'indian', text: 'Indian Percussion'}
+                ],
+                defaultKit: 'cinematic',
+                defaultTempo: 110,
+                placeholder: 'e.g. epic, trailer, dark, tension, action, chase...'
             }
         };
 
@@ -676,7 +707,7 @@
         let stemBlobUrls = [];
 
         // -------------------------------------------------------------
-        // MIDI MAPPING AND KIT CONFIGURATIONS
+        // MIDI MAPPING AND KIT CONFIGURATIONS (INCLUDING CINEMATIC)
         // -------------------------------------------------------------
         const STANDARD_MIDI = {
             KICK: 36, SNARE: 38, CLAP: 39, CH: 42, OH: 46, TOM_LO: 41, TOM_HI: 45, CRASH: 49
@@ -702,6 +733,26 @@
                 41: { name: 'Cinematic Low Tom', icon: 'fa-drum', sample: 'Cinematic/Low Tom/tom_low_01.wav' },
                 45: { name: 'Cinematic High Tom', icon: 'fa-drum', sample: 'Cinematic/High Tom/tom_high_01.wav' },
                 49: { name: 'Piatti Crash', icon: 'fa-compact-disc', sample: 'Cinematic/Crash/crash_01.wav' }
+            },
+            hybrid: {
+                36: { name: 'Hybrid Kick', icon: 'fa-drum', sample: 'Cinematic/Taiko Low/taiko_low_01.wav' },
+                38: { name: 'Hybrid Snare', icon: 'fa-drum-steelpan', sample: 'Modern/Snare/Snare_001.wav' },
+                39: { name: 'Hybrid Clap', icon: 'fa-hands-clapping', sample: 'Modern/Clap/Clap_001.wav' },
+                42: { name: 'Hybrid Hat', icon: 'fa-circle', sample: 'Modern/Closed Hi-Hat/Closed Hi-Hat_001.wav' },
+                46: { name: 'Hybrid Open Hat', icon: 'fa-circle-dot', sample: 'Cinematic/Crash/crash_01.wav' },
+                41: { name: 'Hybrid Low Tom', icon: 'fa-drum', sample: 'Cinematic/Low Tom/tom_low_01.wav' },
+                45: { name: 'Hybrid High Tom', icon: 'fa-drum', sample: 'Cinematic/High Tom/tom_high_01.wav' },
+                49: { name: 'Hybrid Crash', icon: 'fa-compact-disc', sample: 'Cinematic/Crash/crash_01.wav' }
+            },
+            indian: {
+                36: { name: 'Tabla Low', icon: 'fa-drum', sample: 'Cinematic/Taiko Low/taiko_low_01.wav' },
+                38: { name: 'Tabla Snare', icon: 'fa-drum-steelpan', sample: 'Cinematic/Orchestral Snare/orchestral_snare_01.wav' },
+                39: { name: 'Tabla Clap', icon: 'fa-hands-clapping', sample: 'Cinematic/Taiko High/taiko_high_01.wav' },
+                42: { name: 'Tabla CH', icon: 'fa-circle', sample: 'Cinematic/Timpani/timpani_01.wav' },
+                46: { name: 'Tabla OH', icon: 'fa-circle-dot', sample: 'Cinematic/Crash/crash_01.wav' },
+                41: { name: 'Tabla Low Tom', icon: 'fa-drum', sample: 'Cinematic/Low Tom/tom_low_01.wav' },
+                45: { name: 'Tabla High Tom', icon: 'fa-drum', sample: 'Cinematic/High Tom/tom_high_01.wav' },
+                49: { name: 'Tabla Crash', icon: 'fa-compact-disc', sample: 'Cinematic/Crash/crash_01.wav' }
             },
             acoustic: {
                 36: { name: 'Acoustic Kick', icon: 'fa-drum', sample: 'Acoustic/Kick/kick_01.wav' },
@@ -754,7 +805,7 @@
         }
 
         // -------------------------------------------------------------
-        // TRUE PROCEDURAL GENERATIVE RHYTHM ENGINE
+        // TRUE PROCEDURAL GENERATIVE RHYTHM ENGINE (INCLUDING CINEMATIC)
         // -------------------------------------------------------------
         function generateRhythmNotes() {
             const genre = genreSelect.value;
@@ -768,7 +819,6 @@
             const text = thoughtsInput.value.toLowerCase();
             let rhythm = rhythmSelect.value;
 
-            // Generate a random structural groove style for this specific session
             const grooveVariation = Math.floor(Math.random() * 4); // 0, 1, 2, or 3
 
             // Keyword Routing
@@ -795,6 +845,10 @@
                     if (text.includes('sleepy') || text.includes('minimal')) rhythm = 'sleepy';
                     else if (text.includes('jazzy') || text.includes('swung')) rhythm = 'jazzy';
                     else rhythm = 'default';
+                } else if (genre === 'cinematic') {
+                    if (text.includes('tension') || text.includes('dark')) rhythm = 'tension';
+                    else if (text.includes('action') || text.includes('chase')) rhythm = 'action';
+                    else rhythm = 'epic';
                 }
             }
 
@@ -833,8 +887,6 @@
                         const downbeat = (step === 0);
                         const isBackbeat = downbeat && (beat === 1 || beat === 3);
                         const inFillZone = (isFillBar || isFinalBar) && (beat >= beatsPerBar - 1);
-
-                        // Random dice roll per step
                         const stepRoll = Math.random();
 
                         if (inFillZone && rhythm !== 'build') {
@@ -845,7 +897,7 @@
                         }
 
                         // ==========================================
-                        // BUILD / RISER ALGORITHM (NOW PROCEDURAL)
+                        // BUILD / RISER ALGORITHM
                         // ==========================================
                         if (rhythm === 'build') {
                             let buildVel = 0.5 + (0.5 * (bar / Math.max(1, totalBars - 1))); 
@@ -855,69 +907,50 @@
                             if (!isLastBar && !isSecondToLast) {
                                 if (downbeat) addNote(STANDARD_MIDI.KICK, stepTime, buildVel);
                                 if (isBackbeat) addNote(STANDARD_MIDI.SNARE, stepTime, buildVel * 0.9);
-                                
-                                // Procedural variation: Hats and ghost kicks
                                 if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime, buildVel * 0.7);
                                 if (grooveVariation % 2 === 0 && beat === 3 && step === 2 && stepRoll > 0.5) addNote(STANDARD_MIDI.KICK, stepTime, buildVel * 0.7);
-                                if (grooveVariation > 1 && beat === 2 && step === 3 && stepRoll > 0.7) addNote(STANDARD_MIDI.SNARE, stepTime, buildVel * 0.5);
                             } else if (isSecondToLast) {
-                                // Double time
                                 if (step === 0 || step === 2) {
                                     addNote(STANDARD_MIDI.KICK, stepTime, buildVel);
                                     addNote(STANDARD_MIDI.SNARE, stepTime, buildVel * 0.9);
                                 }
-                                // Procedural Hats
                                 addNote(STANDARD_MIDI.CH, stepTime, buildVel * 0.8);
                                 if (stepRoll > 0.6) addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.5), buildVel * 0.5, 0.05);
                             } else if (isLastBar) {
                                 if (beat < 2) {
-                                    // 16th note build
                                     addNote(STANDARD_MIDI.SNARE, stepTime, buildVel);
                                     if (step % 2 === 0 || stepRoll > 0.5) addNote(STANDARD_MIDI.KICK, stepTime, buildVel * 0.8);
                                 } else if (beat === 2) {
-                                    // Generative Climax on Beat 3
                                     if (grooveVariation === 0) {
-                                        // Standard 32nd roll
                                         addNote(STANDARD_MIDI.SNARE, stepTime, buildVel);
                                         addNote(STANDARD_MIDI.SNARE, stepTime + (sixteenth * 0.5), buildVel);
                                     } else if (grooveVariation === 1) {
-                                        // Snare + High Tom
                                         addNote(STANDARD_MIDI.SNARE, stepTime, buildVel);
                                         if(step % 2 === 0) addNote(STANDARD_MIDI.TOM_HI, stepTime, buildVel);
                                         addNote(STANDARD_MIDI.SNARE, stepTime + (sixteenth * 0.5), buildVel);
                                     } else if (grooveVariation === 2) {
-                                        // Heavy Kick/Snare alternating
                                         addNote(step % 2 === 0 ? STANDARD_MIDI.SNARE : STANDARD_MIDI.KICK, stepTime, buildVel);
                                         addNote(STANDARD_MIDI.SNARE, stepTime + (sixteenth * 0.5), buildVel);
                                     } else {
-                                        // Fast hats + Snares
                                         addNote(STANDARD_MIDI.SNARE, stepTime, buildVel);
                                         addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.25), buildVel);
                                         addNote(STANDARD_MIDI.SNARE, stepTime + (sixteenth * 0.5), buildVel);
                                         addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.75), buildVel);
                                     }
                                 } else if (beat === 3) {
-                                     // The Gap! (Beat 4)
-                                     // Usually silent, but let's add a rare pre-drop Tom or Snare fill on the very last 16th
-                                     if (step === 3 && stepRoll > 0.7) {
-                                         addNote(STANDARD_MIDI.SNARE, stepTime, buildVel);
-                                     }
-                                     if (step === 3 && grooveVariation === 3) {
-                                         addNote(STANDARD_MIDI.TOM_LO, stepTime, buildVel);
-                                     }
+                                     if (step === 3 && stepRoll > 0.7) addNote(STANDARD_MIDI.SNARE, stepTime, buildVel);
+                                     if (step === 3 && grooveVariation === 3) addNote(STANDARD_MIDI.TOM_LO, stepTime, buildVel);
                                 }
                             }
                             continue; 
                         }
 
                         // ==========================================
-                        // 1. POP / MODERN POP (PRO PROCEDURAL)
+                        // 1. POP
                         // ==========================================
                         if (genre === 'pop') {
-                            // KICK GENERATION
                             if (rhythm === 'driving') {
                                 if (downbeat) addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
-                                // Variation patterns across generations
                                 if (grooveVariation === 1 && beat === 2 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime, 0.8);
                                 if (grooveVariation === 2 && beat === 3 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime, 0.75);
                                 if (grooveVariation === 3 && (beat === 1 || beat === 3) && step === 2 && stepRoll > 0.4) addNote(STANDARD_MIDI.KICK, stepTime, 0.7);
@@ -932,7 +965,6 @@
                                 if (grooveVariation === 3 && beat === 3 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime, 0.75);
                             }
 
-                            // SNARE / CLAP GENERATION
                             if (rhythm === 'halftime') {
                                 if (downbeat && beat === 2) addNote(STANDARD_MIDI.SNARE, stepTime, 0.95);
                             } else {
@@ -940,28 +972,22 @@
                                     addNote(STANDARD_MIDI.SNARE, stepTime, 0.92);
                                     if (grooveVariation !== 1) addNote(STANDARD_MIDI.CLAP, stepTime, 0.75);
                                 }
-                                // Occasional ghost snare
                                 if (density === 'busy' && beat === 2 && step === 3 && stepRoll > 0.5) {
                                     addNote(STANDARD_MIDI.SNARE, stepTime, 0.4);
                                 }
                             }
 
-                            // HI-HAT GENERATION (Audibly distinct patterns)
                             if (density === 'minimal') {
                                 if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime, 0.55);
                             } else if (density === 'standard') {
                                 if (grooveVariation === 0) {
-                                    // Straight 8th notes
                                     if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime, step === 0 ? 0.75 : 0.5);
                                 } else if (grooveVariation === 1) {
-                                    // 16th notes with dynamic accents
                                     addNote(STANDARD_MIDI.CH, stepTime, downbeat ? 0.8 : (step === 2 ? 0.6 : 0.38));
                                 } else if (grooveVariation === 2) {
-                                    // Off-beat open hats
                                     if (step === 2) addNote(STANDARD_MIDI.OH, stepTime, 0.7);
                                     else if (step === 0) addNote(STANDARD_MIDI.CH, stepTime, 0.6);
                                 } else {
-                                    // Bouncy syncopated hats
                                     if (step === 0 || step === 1 || step === 3) addNote(STANDARD_MIDI.CH, stepTime, 0.55);
                                 }
                             } else if (density === 'busy') {
@@ -971,26 +997,19 @@
                         }
 
                         // ==========================================
-                        // 2. BOOM BAP / HIP-HOP
+                        // 2. BOOM BAP
                         // ==========================================
                         if (genre === 'boombap') {
                             let dragOffset = (rhythm === 'lazy') ? (sixteenth * (0.15 + stepRoll * 0.15)) : 0;
-                            
                             if (downbeat && (beat === 0 || beat === 2)) addNote(STANDARD_MIDI.KICK, stepTime + dragOffset, 0.9);
-                            
                             if (grooveVariation === 0 && beat === 1 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime + dragOffset, 0.75);
                             if (grooveVariation === 1 && beat === 1 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime + dragOffset, 0.75);
                             if (grooveVariation === 2 && beat === 3 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime + dragOffset, 0.7);
                             if (grooveVariation === 3 && beat === 2 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime + dragOffset, 0.65);
 
                             if (isBackbeat) addNote(STANDARD_MIDI.SNARE, stepTime, 0.95);
-
-                            if (rhythm === 'ghost' && step === 3 && stepRoll > 0.4) {
-                                addNote(STANDARD_MIDI.SNARE, stepTime, 0.35);
-                            }
-                            
+                            if (rhythm === 'ghost' && step === 3 && stepRoll > 0.4) addNote(STANDARD_MIDI.SNARE, stepTime, 0.35);
                             if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime + dragOffset, step === 0 ? 0.75 : 0.45);
-                            if (density === 'busy' && step === 3 && stepRoll > 0.5) addNote(STANDARD_MIDI.CH, stepTime + dragOffset, 0.35);
                         }
 
                         // ==========================================
@@ -1057,6 +1076,37 @@
                             if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime + drag, step === 0 ? 0.65 : 0.4);
                             if (rhythm === 'jazzy' && step === 2 && beat % 2 !== 0 && stepRoll > 0.3) {
                                 addNote(STANDARD_MIDI.OH, stepTime + drag, 0.5);
+                            }
+                        }
+
+                        // ==========================================
+                        // 6. CINEMATIC ORCHESTRAL
+                        // ==========================================
+                        if (genre === 'cinematic') {
+                            if (rhythm === 'epic') {
+                                // Epic trailer hits on downbeats, heavy rolling snare/taiko swells
+                                if (downbeat && (beat === 0 || beat === 2)) {
+                                    addNote(STANDARD_MIDI.KICK, stepTime, 0.98); // Taiko Low
+                                    addNote(STANDARD_MIDI.CRASH, stepTime, 0.8);
+                                }
+                                if (isBackbeat || (beat === 3 && step === 2)) {
+                                    addNote(STANDARD_MIDI.SNARE, stepTime, 0.95); // Orchestral Snare
+                                }
+                                if (grooveVariation > 1 && step === 3) {
+                                    addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7);
+                                }
+                            } else if (rhythm === 'tension') {
+                                // Dark, sparse low pulses
+                                if (downbeat && beat === 0) addNote(STANDARD_MIDI.KICK, stepTime, 0.9);
+                                if (grooveVariation % 2 === 0 && beat === 2 && step === 0) addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.8);
+                                if (grooveVariation >= 2 && beat === 3 && step === 2) addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7);
+                                if (beat === 3 && step === 3 && stepRoll > 0.6) addNote(STANDARD_MIDI.SNARE, stepTime, 0.4);
+                            } else if (rhythm === 'action') {
+                                // Fast driving chase rhythms
+                                if (downbeat) addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
+                                if (step === 2) addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.8);
+                                if (isBackbeat || step === 3) addNote(STANDARD_MIDI.SNARE, stepTime, 0.9);
+                                if (stepRoll > 0.5) addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.5), 0.5, 0.05);
                             }
                         }
 
@@ -1293,7 +1343,7 @@
             }, 100);
         });
 
-        previewPlayBtn.addEventListener('click', () => { if (wavesurfer) wavesurfer.playPause(); });
+        previewPlayBtn.addEventListener('click', () => { if (wavesurfer) wavesurfer.playParse(); });
         previewVolume.addEventListener('input', (e) => { if (wavesurfer) wavesurfer.setVolume(parseFloat(e.target.value)); });
 
         function bufferToWave(abuffer, len) {
