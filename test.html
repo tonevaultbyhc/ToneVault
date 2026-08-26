@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToneVault - AI Rhythm & Groove Generator (V6)</title>
+    <title>ToneVault - AI Rhythm & Groove Generator (V7)</title>
     
     <!-- FONTAWESOME ICONS CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -307,7 +307,7 @@
                 <!-- Keywords Textarea -->
                 <div class="setting-group" style="margin-bottom: 25px;">
                     <label for="thoughtsInput"><i class="fa-solid fa-brain"></i> Thoughts / Keywords / Inspiration</label>
-                    <textarea id="thoughtsInput" rows="2" placeholder="e.g. driving, syncopated, disco, ballad..."></textarea>
+                    <textarea id="thoughtsInput" rows="2" placeholder="e.g. driving, syncopated, disco, ballad, build..."></textarea>
                 </div>
 
                 <button id="processBtn" class="action-btn">
@@ -380,13 +380,10 @@
                         <div class="keyword-row"><span class="keyword">driving</span><span>4-on-the-floor dance pop</span></div>
                         <div class="keyword-row"><span class="keyword">syncopated</span><span>Off-beat push kicks & disco bounce</span></div>
                         <div class="keyword-row"><span class="keyword">ballad</span><span>Half-time emotional pop feel</span></div>
+                        <div class="keyword-row"><span class="keyword">build</span><span>Rising snare roll pre-drop</span></div>
                         <div class="keyword-row"><span class="keyword">upbeat</span><span>Fast and energetic rhythm</span></div>
                         <div class="keyword-row"><span class="keyword">disco</span><span>Classic 70s/80s pop bounce</span></div>
-                        <div class="keyword-row"><span class="keyword">funk</span><span>Tight grooves with ghost notes</span></div>
-                        <div class="keyword-row"><span class="keyword">stadium</span><span>Massive arena-rock pop feel</span></div>
                         <div class="keyword-row"><span class="keyword">acoustic</span><span>Singer-songwriter style drums</span></div>
-                        <div class="keyword-row"><span class="keyword">groovy</span><span>Pocket-heavy rhythmic pop</span></div>
-                        <div class="keyword-row"><span class="keyword">minimal</span><span>Stripped back and sparse beats</span></div>
                     </div>
                 </div>
 
@@ -398,10 +395,8 @@
                         <div class="keyword-row"><span class="keyword">lazy</span><span>J-Dilla style delayed kicks/hats</span></div>
                         <div class="keyword-row"><span class="keyword">ghost</span><span>Busy snare/kick ghost note textures</span></div>
                         <div class="keyword-row"><span class="keyword">dusty</span><span>Vintage texture and timing</span></div>
-                        <div class="keyword-row"><span class="keyword">off-grid</span><span>Unquantized, loose feel</span></div>
                         <div class="keyword-row"><span class="keyword">heavy swing</span><span>Extreme MPC-style swing</span></div>
                         <div class="keyword-row"><span class="keyword">chill</span><span>Relaxed and slow paced</span></div>
-                        <div class="keyword-row"><span class="keyword">east coast</span><span>Gritty, hard-hitting snares</span></div>
                         <div class="keyword-row"><span class="keyword">sparse</span><span>Very few hits, lots of gaps</span></div>
                     </div>
                 </div>
@@ -413,11 +408,9 @@
                         <div class="keyword-row"><span class="keyword">trap</span><span>Half-time 808 bounce</span></div>
                         <div class="keyword-row"><span class="keyword">drill</span><span>UK Drill triplet & syncopated feel</span></div>
                         <div class="keyword-row"><span class="keyword">rolls</span><span>Rapid 32nd-note hat subdivisions</span></div>
+                        <div class="keyword-row"><span class="keyword">build</span><span>Rising pre-drop stutter</span></div>
                         <div class="keyword-row"><span class="keyword">bouncy</span><span>Highly syncopated Atlanta style</span></div>
                         <div class="keyword-row"><span class="keyword">halftime</span><span>Snare strictly on beat 3</span></div>
-                        <div class="keyword-row"><span class="keyword">triplet</span><span>Triplets embedded in the hi-hats</span></div>
-                        <div class="keyword-row"><span class="keyword">fast hats</span><span>Continuous 16th/32nd note runs</span></div>
-                        <div class="keyword-row"><span class="keyword">dark drill</span><span>Brooding, sparse drill spacing</span></div>
                         <div class="keyword-row"><span class="keyword">intense</span><span>Aggressive velocity and rolls</span></div>
                     </div>
                 </div>
@@ -429,11 +422,9 @@
                         <div class="keyword-row"><span class="keyword">classic</span><span>Standard 4/4 beat with off-beat hats</span></div>
                         <div class="keyword-row"><span class="keyword">tech house</span><span>Bouncy syncopated claps & toms</span></div>
                         <div class="keyword-row"><span class="keyword">minimal</span><span>Deep, stripped back, sparse grooves</span></div>
+                        <div class="keyword-row"><span class="keyword">build</span><span>EDM festival snare riser</span></div>
                         <div class="keyword-row"><span class="keyword">deep</span><span>Low velocity, subtle electronic feel</span></div>
-                        <div class="keyword-row"><span class="keyword">progressive</span><span>Building, driving 4/4 energy</span></div>
-                        <div class="keyword-row"><span class="keyword">tropical</span><span>Upbeat, slightly swung dance</span></div>
                         <div class="keyword-row"><span class="keyword">driving</span><span>Relentless kick and bass rhythm</span></div>
-                        <div class="keyword-row"><span class="keyword">tribal</span><span>Tom-heavy rhythm beds</span></div>
                         <div class="keyword-row"><span class="keyword">shuffle</span><span>Swung 16th note house groove</span></div>
                     </div>
                 </div>
@@ -447,10 +438,7 @@
                         <div class="keyword-row"><span class="keyword">swung</span><span>Behind-the-beat human timing</span></div>
                         <div class="keyword-row"><span class="keyword">drag</span><span>Noticeably late kick drums</span></div>
                         <div class="keyword-row"><span class="keyword">chillhop</span><span>Standard instrumental hiphop beat</span></div>
-                        <div class="keyword-row"><span class="keyword">relaxed</span><span>Low density and velocity</span></div>
                         <div class="keyword-row"><span class="keyword">unquantized</span><span>Dilla-style organic grid</span></div>
-                        <div class="keyword-row"><span class="keyword">pocket</span><span>Deep in the groove placement</span></div>
-                        <div class="keyword-row"><span class="keyword">late night</span><span>Muffled, minimal energy</span></div>
                     </div>
                 </div>
 
@@ -474,7 +462,7 @@
     <script type="module">
 
         // -------------------------------------------------------------
-        // DYNAMIC DROPDOWN CONFIGURATION MATRIX
+        // DYNAMIC DROPDOWN CONFIGURATION MATRIX 
         // -------------------------------------------------------------
         const STYLE_CONFIGS = {
             pop: {
@@ -482,7 +470,8 @@
                     {val: 'auto', text: 'Auto (from Keywords)'},
                     {val: 'driving', text: 'Driving (4-on-the-Floor)'},
                     {val: 'syncopated', text: 'Syncopated Groove'},
-                    {val: 'halftime', text: 'Half-Time Ballad'}
+                    {val: 'halftime', text: 'Half-Time Ballad'},
+                    {val: 'build', text: 'Pre-Drop Build / Riser'}
                 ],
                 kits: [
                     {val: 'auto', text: 'Auto (Modern Electro-Pop)'},
@@ -492,7 +481,7 @@
                 ],
                 defaultKit: 'modern',
                 defaultTempo: 120,
-                placeholder: 'e.g. driving, syncopated, disco, ballad, groovy...'
+                placeholder: 'e.g. driving, syncopated, disco, ballad, build...'
             },
             boombap: {
                 rhythms: [
@@ -508,14 +497,15 @@
                 ],
                 defaultKit: 'lofi',
                 defaultTempo: 88,
-                placeholder: 'e.g. lazy, ghost notes, classic 90s, dusty, chill...'
+                placeholder: 'e.g. lazy, ghost notes, classic 90s, dusty...'
             },
             trap: {
                 rhythms: [
                     {val: 'auto', text: 'Auto (from Keywords)'},
                     {val: 'standard', text: 'Standard Trap (808 Bounce)'},
                     {val: 'drill', text: 'UK Drill Pulse'},
-                    {val: 'rolls', text: 'Rapid Hat Rolls'}
+                    {val: 'rolls', text: 'Rapid Hat Rolls'},
+                    {val: 'build', text: 'Drop Build-up'}
                 ],
                 kits: [
                     {val: 'auto', text: 'Auto (Modern 808s)'},
@@ -524,14 +514,15 @@
                 ],
                 defaultKit: 'modern',
                 defaultTempo: 142,
-                placeholder: 'e.g. trap, drill, fast rolls, bouncy, halftime...'
+                placeholder: 'e.g. trap, drill, fast rolls, bouncy, build...'
             },
             house: {
                 rhythms: [
                     {val: 'auto', text: 'Auto (from Keywords)'},
                     {val: 'classic', text: 'Classic 4/4'},
                     {val: 'tech', text: 'Tech House (Bouncy)'},
-                    {val: 'minimal', text: 'Minimal / Deep'}
+                    {val: 'minimal', text: 'Minimal / Deep'},
+                    {val: 'build', text: 'Festival Snare Build'}
                 ],
                 kits: [
                     {val: 'auto', text: 'Auto (Modern Electronic)'},
@@ -540,7 +531,7 @@
                 ],
                 defaultKit: 'modern',
                 defaultTempo: 126,
-                placeholder: 'e.g. tech house, minimal, deep, 4/4, driving...'
+                placeholder: 'e.g. tech house, minimal, deep, build...'
             },
             lofi: {
                 rhythms: [
@@ -555,7 +546,7 @@
                 ],
                 defaultKit: 'lofi',
                 defaultTempo: 78,
-                placeholder: 'e.g. sleepy, minimal, jazzy, swung, chill, dusty...'
+                placeholder: 'e.g. sleepy, minimal, jazzy, swung, chill...'
             }
         };
 
@@ -779,7 +770,8 @@
 
             // Keyword Routing Logic
             if (rhythm === 'auto') {
-                if (genre === 'pop') {
+                if (text.includes('build') || text.includes('drop') || text.includes('riser')) rhythm = 'build';
+                else if (genre === 'pop') {
                     if (text.includes('syncopated') || text.includes('disco')) rhythm = 'syncopated';
                     else if (text.includes('ballad') || text.includes('halftime')) rhythm = 'halftime';
                     else rhythm = 'driving';
@@ -824,7 +816,8 @@
                 const barStart = bar * barDuration;
 
                 if (bar === 0 || (fillFreq > 0 && bar % fillFreq === 0)) {
-                    addNote(STANDARD_MIDI.CRASH, barStart, 0.85, 1.5);
+                    // Do not add crash on bar 1 if it's a build
+                    if (rhythm !== 'build') addNote(STANDARD_MIDI.CRASH, barStart, 0.85, 1.5);
                 }
 
                 for (let beat = 0; beat < beatsPerBar; beat++) {
@@ -838,11 +831,46 @@
                         const isBackbeat = downbeat && (beat === 1 || beat === 3);
                         const inFillZone = (isFillBar || isFinalBar) && (beat >= beatsPerBar - 1);
 
-                        if (inFillZone) {
+                        if (inFillZone && rhythm !== 'build') {
                             if (step === 0 || step === 2) {
                                 addNote(step === 0 ? STANDARD_MIDI.TOM_HI : STANDARD_MIDI.TOM_LO, stepTime, 0.85);
                             }
                             continue;
+                        }
+
+                        // ==========================================
+                        // SPECIAL: BUILD / RISER ALGORITHM
+                        // ==========================================
+                        if (rhythm === 'build') {
+                            // Dynamic volume swell based on progression
+                            let buildVel = 0.5 + (0.5 * (bar / Math.max(1, totalBars - 1))); 
+                            const isLastBar = (bar === totalBars - 1);
+                            const isSecondToLast = (bar === totalBars - 2);
+
+                            if (!isLastBar && !isSecondToLast) {
+                                // Foundation: 4-on-the-floor
+                                if (downbeat) addNote(STANDARD_MIDI.KICK, stepTime, buildVel);
+                                if (isBackbeat) addNote(STANDARD_MIDI.SNARE, stepTime, buildVel * 0.9);
+                            } else if (isSecondToLast) {
+                                // Double time (8th notes)
+                                if (step === 0 || step === 2) {
+                                    addNote(STANDARD_MIDI.KICK, stepTime, buildVel);
+                                    addNote(STANDARD_MIDI.SNARE, stepTime, buildVel * 0.9);
+                                }
+                            } else if (isLastBar) {
+                                // Snare roll climax
+                                if (beat < 2) {
+                                    // 16th notes
+                                    addNote(STANDARD_MIDI.SNARE, stepTime, buildVel);
+                                    addNote(STANDARD_MIDI.KICK, stepTime, buildVel * 0.8);
+                                } else if (beat === 2) {
+                                    // 32nd notes (machine gun)
+                                    addNote(STANDARD_MIDI.SNARE, stepTime, buildVel);
+                                    addNote(STANDARD_MIDI.SNARE, stepTime + (sixteenth * 0.5), buildVel);
+                                }
+                                // Beat 3 (the 4th beat) is left completely empty for the "drop gap"!
+                            }
+                            continue; // Skip the rest of the generation for this step
                         }
 
                         // ==========================================
@@ -1072,7 +1100,6 @@
                         wavesurfer.load(wavBlobUrl);
                         wavesurfer.on('ready', () => { 
                             audioDurationText.textContent = formatTime(wavesurfer.getDuration()); 
-                            // BUG FIX: Set Master Volume to match slider immediately upon loading
                             wavesurfer.setVolume(parseFloat(previewVolume.value));
                         });
                     } else {
@@ -1114,8 +1141,6 @@
 
                         const row = document.createElement('div');
                         row.className = 'instrument-midi-row';
-                        
-                        // NEW FEATURE: Stem Volume Slider injected into the row
                         row.innerHTML = `
                             <div class="instrument-midi-info">
                                 <i class="fa-solid ${stemInfo.icon}"></i>
@@ -1148,7 +1173,6 @@
                             stemWs.load(stemWavUrl);
                             stemWaveSurfers.set(midi, stemWs);
                             
-                            // Initialize stem volume and bind slider
                             stemWs.on('ready', () => {
                                 stemWs.setVolume(parseFloat(stemVolSlider.value));
                             });
