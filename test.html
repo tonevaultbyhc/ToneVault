@@ -1305,30 +1305,83 @@
                                     if (stepRoll > 0.2) addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7);
                                 }
                             } 
-                            else if (rhythm === 'carnatic') {
-                                // Adi Tala Mathematical cycle (8 beats: 4 + 2 + 2 Laghu and Dhrutam)
-                                const adiBeat = (bar * beatsPerBar + beat) % 8;
-                                if (step === 0) {
-                                    if (adiBeat === 0 || adiBeat === 4 || adiBeat === 6) {
-                                        addNote(STANDARD_MIDI.KICK, stepTime, 0.9); // Clap (Laghu / Dhrutam start)
-                                        addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.85); // Udukkai Bass
-                                    } else {
-                                        addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7); // Finger counts
-                                    }
-                                }
-                                if (density !== 'minimal' && (step === 1 || step === 2 || step === 3)) {
-                                     if (stepRoll > 0.6) addNote(STANDARD_MIDI.SNARE, stepTime, 0.35); // Rapid ghost hits
-                                }
-                            }
-                        }
+else if (rhythm === 'carnatic') {
+    // 8-Akshara Adi Tala Cycle (Laghu 4 + Dhrutam 2 + Dhrutam 2)
+    const adiBeat = (bar * beatsPerBar + beat) % 8;
+    const isSamam = (adiBeat === 0 && step === 0);
+    const isDhrutamStart = (adiBeat === 4 || adiBeat === 6) && step === 0;
 
-                    }
-                }
-            }
+    // 1. SAMAM & DHRUTAM ANCHORS (The Master Claps / Thud)
+    if (isSamam) {
+        addNote(STANDARD_MIDI.KICK, stepTime, 1.0);     // Strong Parai Bass
+        addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.9);   // Udukkai Deep Stroke
+        if (bar === 0 || bar % 4 === 0) addNote(STANDARD_MIDI.CRASH, stepTime, 0.7);
+    } else if (isDhrutamStart) {
+        addNote(STANDARD_MIDI.KICK, stepTime, 0.85);
+        addNote(STANDARD_MIDI.CLAP, stepTime, 0.75);
+    }
 
-            generatedNotes.sort((a, b) => a.time - b.time);
-            return { currentTempo, beatsPerBar, beatUnit };
+    // 2. PROCEDURAL VARIATIONS BASED ON GROOVE ROLL
+    if (grooveVariation === 0) {
+        // STYLE A: Traditional Sarvalaghu (Tha-Ka-Dhi-Mi Flow)
+        if (step === 0 && (adiBeat === 1 || adiBeat === 2 || adiBeat === 3 || adiBeat === 5 || adiBeat === 7)) {
+            addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7); // Finger taps
         }
+        if (step === 2) {
+            addNote(STANDARD_MIDI.SNARE, stepTime, 0.65); // Crisp off-beat Ta
+        }
+        if (density === 'busy' && (step === 1 || step === 3) && stepRoll > 0.3) {
+            addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.45); // Rolling subdivisions
+        }
+    } 
+    else if (grooveVariation === 1) {
+        // STYLE B: 3+3+2 Gathi / Cross-Accent Pulse
+        if ((step === 0 && (adiBeat === 0 || adiBeat === 3 || adiBeat === 6)) || (step === 2 && adiBeat === 1)) {
+            addNote(STANDARD_MIDI.KICK, stepTime, 0.88);
+            addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.75);
+        }
+        if (step === 0 && (adiBeat === 2 || adiBeat === 5 || adiBeat === 7)) {
+            addNote(STANDARD_MIDI.SNARE, stepTime, 0.8);
+        }
+        if (density !== 'minimal' && step === 2) {
+            addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.55);
+        }
+    } 
+    else if (grooveVariation === 2) {
+        // STYLE C: Solkattu Syncopated Bounce (Off-beat Udukkai & Slaps)
+        if (step === 0 && (adiBeat % 2 === 0)) {
+            addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.75);
+        }
+        if (step === 2 || (step === 3 && stepRoll > 0.4)) {
+            addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.7); // Udukkai Pitch modulations
+            addNote(STANDARD_MIDI.SNARE, stepTime, 0.6);
+        }
+        if (step === 1 && stepRoll > 0.5) {
+            addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.45);
+        }
+    } 
+    else {
+        // STYLE D: Korvai / Mukthayee Phrasing (Dense Rhythmic Build-up)
+        const isCadenceBar = (bar % 2 === 1);
+        if (!isCadenceBar) {
+            if (step === 0 || step === 2) addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7);
+            if (step === 0 && (adiBeat === 1 || adiBeat === 5)) addNote(STANDARD_MIDI.SNARE, stepTime, 0.85);
+        } else {
+            // Rapid ending cadences (Tha-Dhi-Gi-Na-Thom)
+            if (step % 2 === 0 || stepRoll > 0.3) {
+                addNote(adiBeat >= 4 ? STANDARD_MIDI.SNARE : STANDARD_MIDI.TOM_HI, stepTime, 0.8 + (stepRoll * 0.15));
+            }
+            if (adiBeat === 7 && step === 3) {
+                addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
+            }
+        }
+    }
+
+    // 3. TALAM METALLIC TIMEKEEPING (Accenting Aksharas)
+    if (step === 0) {
+        addNote(STANDARD_MIDI.CH, stepTime, isSamam ? 0.9 : 0.6);
+    }
+}
 
         // -------------------------------------------------------------
         // OFFLINE AUDIO MIXER (CREATES MASTER & STEM WAVS)
