@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToneVault - AI Rhythm & Groove Generator (V11)</title>
+    <title>ToneVault - AI Rhythm & Groove Generator (V12)</title>
     
     <!-- FONTAWESOME ICONS CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -58,7 +58,7 @@
         .combobox-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #00d4ff; cursor: pointer; pointer-events: none; transition: transform 0.3s ease; font-size: 0.9rem; }
         .custom-combobox-wrapper.open .combobox-icon { transform: translateY(-50%) rotate(180deg); }
         .custom-combobox-wrapper.open .custom-combobox-input { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-color: #00d4ff; background: rgba(15, 15, 15, 0.95); }
-        .custom-combobox-options { position: absolute; top: 100%; left: 0; right: 0; background: rgba(15, 15, 15, 0.95); backdrop-filter: blur(10px); border: 1px solid #00d4ff; border-top: none; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; box-shadow: 0 15px 30px rgba(0,0,0,0.6); opacity: 0; visibility: hidden; transition: all 0.2s ease; overflow-y: auto; max-height: 250px; }
+        .custom-combobox-options { position: absolute; top: 100%; left: 0; right: 0; background: rgba(15, 15, 15, 0.95); backdrop-filter: blur(10px); border: 1px solid #00d4ff; border-top: none; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; box-shadow: 0 15px 30px rgba(0,0,0,0.6); opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 50; overflow-y: auto; max-height: 250px; }
         .custom-combobox-wrapper.open .custom-combobox-options { opacity: 1; visibility: visible; }
         .custom-combobox-options::-webkit-scrollbar { width: 6px; }
         .custom-combobox-options::-webkit-scrollbar-thumb { background: #00d4ff; border-radius: 3px; }
@@ -149,7 +149,7 @@
                 
                 <div class="settings-grid">
                     
-                    <!-- 1. Style Selection -->
+                    <!-- 1. Style Selection (ADDED INDIAN STYLES) -->
                     <div class="setting-group">
                         <label><i class="fa-solid fa-compact-disc"></i> Groove Style</label>
                         <div class="custom-select-wrapper" id="genreSelectWrapper">
@@ -164,6 +164,8 @@
                                 <div class="custom-option" data-value="house">House / EDM</div>
                                 <div class="custom-option" data-value="lofi">Lo-Fi / Chillhop</div>
                                 <div class="custom-option" data-value="cinematic">Cinematic Orchestral</div>
+                                <div class="custom-option" data-value="indian">Indian / Bollywood</div>
+                                <div class="custom-option" data-value="southindian">South Indian / Koothu</div>
                             </div>
                         </div>
                         <select id="genreSelect" style="display: none;">
@@ -173,6 +175,8 @@
                             <option value="house">House / EDM</option>
                             <option value="lofi">Lo-Fi / Chillhop</option>
                             <option value="cinematic">Cinematic Orchestral</option>
+                            <option value="indian">Indian / Bollywood</option>
+                            <option value="southindian">South Indian / Koothu</option>
                         </select>
                     </div>
 
@@ -470,6 +474,32 @@
                     </div>
                 </div>
 
+                <!-- INDIAN GUIDE -->
+                <div id="guide-indian" class="genre-guide">
+                    <div class="keyword-category">
+                        <h4>INDIAN / BOLLYWOOD</h4>
+                        <div class="keyword-row"><span class="keyword">teentaal</span><span>16-beat Classical cycle (Dha Dhin Dhin Dha)</span></div>
+                        <div class="keyword-row"><span class="keyword">bhangra</span><span>Swung Punjabi dhol rhythm</span></div>
+                        <div class="keyword-row"><span class="keyword">bollywood</span><span>Upbeat 4/4 syncopated dance</span></div>
+                        <div class="keyword-row"><span class="keyword">garba</span><span>6/8 or swung folk groove</span></div>
+                        <div class="keyword-row"><span class="keyword">classical</span><span>Authentic tabla phrasing</span></div>
+                        <div class="keyword-row"><span class="keyword">punjabi</span><span>Heavy kicks on 1 and 3 with swung off-beats</span></div>
+                    </div>
+                </div>
+
+                <!-- SOUTH INDIAN GUIDE -->
+                <div id="guide-southindian" class="genre-guide">
+                    <div class="keyword-category">
+                        <h4>SOUTH INDIAN / KOOTHU</h4>
+                        <div class="keyword-row"><span class="keyword">dappankoothu</span><span>Fast, syncopated street festival beat</span></div>
+                        <div class="keyword-row"><span class="keyword">kuthu fast</span><span>Double-time aggressive thavil rhythm</span></div>
+                        <div class="keyword-row"><span class="keyword">carnatic</span><span>Traditional 8-beat Adi Tala cycle</span></div>
+                        <div class="keyword-row"><span class="keyword">thavil</span><span>Heavy rolling drum fills</span></div>
+                        <div class="keyword-row"><span class="keyword">street</span><span>Raw, unquantized local feel</span></div>
+                        <div class="keyword-row"><span class="keyword">adi</span><span>Mathematical 4+2+2 subdivision</span></div>
+                    </div>
+                </div>
+
                 <div class="custom-keyword-note">
                     <i class="fa-solid fa-lightbulb" style="color: #00d4ff; margin-right: 5px;"></i>
                     Select your Genre on the left to swap options dynamically.
@@ -591,6 +621,40 @@
                 defaultKit: 'cinematic',
                 defaultTempo: 110,
                 placeholder: 'e.g. epic, trailer, dark, tension, action, chase...'
+            },
+            indian: {
+                rhythms: [
+                    {val: 'auto', text: 'Auto (from Keywords)'},
+                    {val: 'teentaal', text: 'Teen Taal (16-beat cycle)'},
+                    {val: 'bhangra', text: 'Bhangra (Swung)'},
+                    {val: 'bollywood', text: 'Bollywood Pop'}
+                ],
+                kits: [
+                    {val: 'auto', text: 'Auto (Indian Percussion)'},
+                    {val: 'indian', text: 'Indian Percussion'},
+                    {val: 'acoustic', text: 'Acoustic Studio Kit'},
+                    {val: 'modern', text: 'Modern Electronic'}
+                ],
+                defaultKit: 'indian',
+                defaultTempo: 100,
+                placeholder: 'e.g. teentaal, classical, bhangra, bollywood, dance...'
+            },
+            southindian: {
+                rhythms: [
+                    {val: 'auto', text: 'Auto (from Keywords)'},
+                    {val: 'dappankoothu', text: 'Dappan Koothu (Street)'},
+                    {val: 'kuthu_fast', text: 'Kuthu Fast'},
+                    {val: 'carnatic', text: 'Carnatic (Adi Tala)'}
+                ],
+                kits: [
+                    {val: 'auto', text: 'Auto (Indian Percussion)'},
+                    {val: 'indian', text: 'Indian Percussion'},
+                    {val: 'cinematic', text: 'Hybrid Cinematic'},
+                    {val: 'acoustic', text: 'Acoustic Studio Kit'}
+                ],
+                defaultKit: 'indian',
+                defaultTempo: 130,
+                placeholder: 'e.g. koothu, dappan, fast, carnatic, adi...'
             }
         };
 
@@ -750,7 +814,7 @@
         let stemBlobUrls = [];
 
         // -------------------------------------------------------------
-        // MIDI MAPPING AND KIT CONFIGURATIONS (INCLUDING CINEMATIC)
+        // MIDI MAPPING AND KIT CONFIGURATIONS
         // -------------------------------------------------------------
         const STANDARD_MIDI = {
             KICK: 36, SNARE: 38, CLAP: 39, CH: 42, OH: 46, TOM_LO: 41, TOM_HI: 45, CRASH: 49
@@ -788,14 +852,14 @@
                 49: { name: 'Hybrid Crash', icon: 'fa-compact-disc', sample: 'Cinematic/Crash/crash_01.wav' }
             },
             indian: {
-                36: { name: 'Tabla Low', icon: 'fa-drum', sample: 'Cinematic/Taiko Low/taiko_low_01.wav' },
-                38: { name: 'Tabla Snare', icon: 'fa-drum-steelpan', sample: 'Cinematic/Orchestral Snare/orchestral_snare_01.wav' },
-                39: { name: 'Tabla Clap', icon: 'fa-hands-clapping', sample: 'Cinematic/Taiko High/taiko_high_01.wav' },
-                42: { name: 'Tabla CH', icon: 'fa-circle', sample: 'Cinematic/Timpani/timpani_01.wav' },
-                46: { name: 'Tabla OH', icon: 'fa-circle-dot', sample: 'Cinematic/Crash/crash_01.wav' },
-                41: { name: 'Tabla Low Tom', icon: 'fa-drum', sample: 'Cinematic/Low Tom/tom_low_01.wav' },
-                45: { name: 'Tabla High Tom', icon: 'fa-drum', sample: 'Cinematic/High Tom/tom_high_01.wav' },
-                49: { name: 'Tabla Crash', icon: 'fa-compact-disc', sample: 'Cinematic/Crash/crash_01.wav' }
+                36: { name: 'Bayan / Thavil Bass', icon: 'fa-drum', sample: 'Indian/Bayan_Low/bayan_low_01.wav' },
+                38: { name: 'Dayan / Snappy Ta', icon: 'fa-drum-steelpan', sample: 'Indian/Dayan_High/dayan_high_01.wav' },
+                39: { name: 'Chati / Hand Clap', icon: 'fa-hands-clapping', sample: 'Indian/Chati_Snap/chati_snap_01.wav' },
+                42: { name: 'Finger Tap / Talam', icon: 'fa-circle', sample: 'Indian/Finger_Taps/finger_tap_01.wav' },
+                46: { name: 'Manjira / Open Bell', icon: 'fa-circle-dot', sample: 'Indian/Manjira_Open/manjira_open_01.wav' },
+                41: { name: 'Mridangam Low', icon: 'fa-drum', sample: 'Indian/Mridangam_Low/mridangam_low_01.wav' },
+                45: { name: 'Thavil High Stick', icon: 'fa-drum', sample: 'Indian/Thavil_Roll/thavil_roll_01.wav' },
+                49: { name: 'Temple Gong Crash', icon: 'fa-compact-disc', sample: 'Indian/Gong_Crash/gong_crash_01.wav' }
             },
             acoustic: {
                 36: { name: 'Acoustic Kick', icon: 'fa-drum', sample: 'Acoustic/Kick/kick_01.wav' },
@@ -870,7 +934,7 @@
 
             // Keyword Routing
             if (rhythm === 'auto') {
-                if (genre !== 'lofi' && genre !== 'boombap' && (text.includes('build') || text.includes('drop') || text.includes('riser'))) {
+                if (genre !== 'lofi' && genre !== 'boombap' && genre !== 'indian' && genre !== 'southindian' && (text.includes('build') || text.includes('drop') || text.includes('riser'))) {
                     rhythm = 'build';
                 } else if (genre === 'pop') {
                     if (text.includes('syncopated') || text.includes('disco')) rhythm = 'syncopated';
@@ -896,6 +960,14 @@
                     if (text.includes('tension') || text.includes('dark')) rhythm = 'tension';
                     else if (text.includes('action') || text.includes('chase')) rhythm = 'action';
                     else rhythm = 'epic';
+                } else if (genre === 'indian') {
+                    if (text.includes('teen') || text.includes('classical') || text.includes('16')) rhythm = 'teentaal';
+                    else if (text.includes('bhangra') || text.includes('punjabi')) rhythm = 'bhangra';
+                    else rhythm = 'bollywood';
+                } else if (genre === 'southindian') {
+                    if (text.includes('fast') || text.includes('kuthu')) rhythm = 'kuthu_fast';
+                    else if (text.includes('carnatic') || text.includes('adi')) rhythm = 'carnatic';
+                    else rhythm = 'dappankoothu';
                 }
             }
 
@@ -921,7 +993,7 @@
                 const barStart = bar * barDuration;
 
                 if (bar === 0 || (fillFreq > 0 && bar % fillFreq === 0)) {
-                    if (rhythm !== 'build') addNote(STANDARD_MIDI.CRASH, barStart, 0.85, 1.5);
+                    if (rhythm !== 'build' && genre !== 'indian' && genre !== 'southindian') addNote(STANDARD_MIDI.CRASH, barStart, 0.85, 1.5);
                 }
 
                 for (let beat = 0; beat < beatsPerBar; beat++) {
@@ -936,7 +1008,7 @@
                         const inFillZone = (isFillBar || isFinalBar) && (beat >= beatsPerBar - 1);
                         const stepRoll = Math.random();
 
-                        if (inFillZone && rhythm !== 'build') {
+                        if (inFillZone && rhythm !== 'build' && genre !== 'indian' && genre !== 'southindian') {
                             if (step === 0 || step === 2) {
                                 addNote(step === 0 ? STANDARD_MIDI.TOM_HI : STANDARD_MIDI.TOM_LO, stepTime, 0.85);
                             }
@@ -1151,6 +1223,90 @@
                                 if (step === 2) addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.8);
                                 if (isBackbeat || step === 3) addNote(STANDARD_MIDI.SNARE, stepTime, 0.9);
                                 if (stepRoll > 0.5) addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.5), 0.5, 0.05);
+                            }
+                        }
+
+                        // ==========================================
+                        // 7. INDIAN / BOLLYWOOD
+                        // ==========================================
+                        if (genre === 'indian') {
+                            const cycleBeat = (bar * beatsPerBar + beat) % 16;
+                            
+                            if (rhythm === 'teentaal') {
+                                // 16-beat cycle math (Dha Dhin Dhin Dha) mapped over 4 bars (if 4/4)
+                                if (step === 0) {
+                                    if ([0, 3, 4, 7, 8, 15].includes(cycleBeat)) {
+                                        addNote(STANDARD_MIDI.KICK, stepTime, 0.9); // Deep Bayan
+                                        addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.8);
+                                    } else if ([1, 2, 5, 6, 13, 14].includes(cycleBeat)) {
+                                        addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.75); // Resonant Dhin
+                                    } else if ([9, 10, 11, 12].includes(cycleBeat)) {
+                                        addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7); // Khali (empty/light)
+                                        addNote(STANDARD_MIDI.SNARE, stepTime, 0.6); 
+                                    }
+                                }
+                                if (density !== 'minimal' && step === 2 && stepRoll > 0.4) {
+                                     addNote(STANDARD_MIDI.CH, stepTime, 0.4); // Subtle finger taps
+                                }
+                            } 
+                            else if (rhythm === 'bhangra') {
+                                let bhangraDrag = sixteenth * (swingAmount > 0 ? swingAmount : 0.35); // Heavy Dhol swing
+                                if (downbeat && (beat === 0 || beat === 2)) addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
+                                if (beat === 1 || beat === 3) {
+                                    if (step === 2) addNote(STANDARD_MIDI.TOM_HI, stepTime + bhangraDrag, 0.85); // High Dholak side
+                                }
+                                if (step === 0) addNote(STANDARD_MIDI.CH, stepTime, 0.6);
+                                if (step === 2) addNote(STANDARD_MIDI.CH, stepTime + bhangraDrag, 0.5);
+                            } 
+                            else {
+                                // Bollywood 4/4 Dance Syncopation
+                                if (downbeat) addNote(STANDARD_MIDI.KICK, stepTime, 0.9);
+                                if (step === 3 && stepRoll > 0.3) addNote(STANDARD_MIDI.KICK, stepTime, 0.7); // Syncopated push
+                                if (isBackbeat) addNote(STANDARD_MIDI.CLAP, stepTime, 0.9);
+                                if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime, 0.6);
+                            }
+                        }
+
+                        // ==========================================
+                        // 8. SOUTH INDIAN / KOOTHU
+                        // ==========================================
+                        if (genre === 'southindian') {
+                            if (rhythm === 'dappankoothu') {
+                                // Chaotic street festival syncopation (Thavil/Parai)
+                                if (step === 0 && beat % 2 === 0) addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
+                                if (step === 3 && stepRoll > 0.2) addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.8);
+                                if (beat % 2 !== 0 && step === 1) addNote(STANDARD_MIDI.SNARE, stepTime, 0.85);
+                                if (beat % 2 !== 0 && step === 3) addNote(STANDARD_MIDI.SNARE, stepTime, 0.9);
+                                
+                                // Continuous fast high percussion (thavil rolls)
+                                if (density !== 'minimal') {
+                                    if (step === 0 || step === 2 || step === 3) {
+                                        if (stepRoll > 0.3) addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.5 + stepRoll*0.2);
+                                    }
+                                }
+                            } 
+                            else if (rhythm === 'kuthu_fast') {
+                                // Double time, aggressive street beat
+                                if (step === 0 || step === 2) addNote(STANDARD_MIDI.KICK, stepTime, 0.9);
+                                if (isBackbeat && step === 0) addNote(STANDARD_MIDI.SNARE, stepTime, 0.95);
+                                if (step === 1 || step === 3) {
+                                    if (stepRoll > 0.2) addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7);
+                                }
+                            } 
+                            else if (rhythm === 'carnatic') {
+                                // Adi Tala Mathematical cycle (8 beats: 4 + 2 + 2 Laghu and Dhrutam)
+                                const adiBeat = (bar * beatsPerBar + beat) % 8;
+                                if (step === 0) {
+                                    if (adiBeat === 0 || adiBeat === 4 || adiBeat === 6) {
+                                        addNote(STANDARD_MIDI.KICK, stepTime, 0.9); // Clap (Laghu / Dhrutam start)
+                                        addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.85); // Mridangam Bass
+                                    } else {
+                                        addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7); // Finger counts
+                                    }
+                                }
+                                if (density !== 'minimal' && (step === 1 || step === 2 || step === 3)) {
+                                     if (stepRoll > 0.6) addNote(STANDARD_MIDI.SNARE, stepTime, 0.35); // Rapid Mridangam ghost hits
+                                }
                             }
                         }
 
