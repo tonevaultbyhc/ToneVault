@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToneVault - AI Rhythm & Groove Generator (V13)</title>
+    <title>ToneVault - AI Rhythm & Groove Generator (V15)</title>
     
     <!-- FONTAWESOME ICONS CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -209,7 +209,7 @@
                     <!-- 4. Tempo Input -->
                     <div class="setting-group">
                         <label for="tempoInput"><i class="fa-solid fa-metronome"></i> Tempo (BPM)</label>
-                        <input type="number" id="tempoInput" value="120" min="40" max="240" placeholder="e.g. 120">
+                        <input type="number" id="tempoInput" value="135" min="40" max="240" placeholder="e.g. 135">
                     </div>
                     
                     <!-- 5. Time Signature (HYBRID COMBOBOX) -->
@@ -264,18 +264,18 @@
                         <label><i class="fa-solid fa-water"></i> Swing / Shuffle</label>
                         <div class="custom-select-wrapper" id="swingSelectWrapper">
                             <div class="custom-select-trigger" id="swingSelectTrigger">
-                                <span>Straight (0%)</span>
+                                <span>Light Swing (20%)</span>
                                 <i class="fa-solid fa-chevron-down"></i>
                             </div>
                             <div class="custom-select-options" id="swingSelectOptions">
-                                <div class="custom-option selected" data-value="0">Straight (0%)</div>
-                                <div class="custom-option" data-value="0.2">Light Swing (20%)</div>
+                                <div class="custom-option" data-value="0">Straight (0%)</div>
+                                <div class="custom-option selected" data-value="0.2">Light Swing (20%)</div>
                                 <div class="custom-option" data-value="0.4">Heavy Shuffle (40%)</div>
                             </div>
                         </div>
                         <select id="swingSelect" style="display: none;">
-                            <option value="0" selected>Straight (0%)</option>
-                            <option value="0.2">Light Swing (20%)</option>
+                            <option value="0">Straight (0%)</option>
+                            <option value="0.2" selected>Light Swing (20%)</option>
                             <option value="0.4">Heavy Shuffle (40%)</option>
                         </select>
                     </div>
@@ -653,7 +653,7 @@
                     {val: 'cinematic', text: 'Hybrid Cinematic'}
                 ],
                 defaultKit: 'southindian_pure',
-                defaultTempo: 130,
+                defaultTempo: 135,
                 placeholder: 'e.g. koothu, dappan, fast, carnatic, adi...'
             }
         };
@@ -852,14 +852,14 @@
                 49: { name: 'Temple Gong Crash', icon: 'fa-compact-disc', sample: 'Indian/Gong_Crash/gong_crash_01.wav' }
             },
             southindian_pure: {
-                36: { name: 'Thavil Bass', icon: 'fa-drum', sample: 'SouthIndian/Thavil/thavil_bass_01.wav' },
-                38: { name: 'Thavil Slap', icon: 'fa-hand', sample: 'SouthIndian/Thavil/thavil_slap_01.wav' },
-                39: { name: 'Parai Slap (Tamte)', icon: 'fa-hands-clapping', sample: 'SouthIndian/Parai/parai_slap_01.wav' },
+                36: { name: 'Parai Bass', icon: 'fa-drum', sample: 'SouthIndian/Parai/parai_bass_01.wav' },
+                38: { name: 'Parai Slap', icon: 'fa-hand', sample: 'SouthIndian/Parai/parai_slap_01.wav' },
+                39: { name: 'Thavil Slap', icon: 'fa-hands-clapping', sample: 'SouthIndian/Thavil/thavil_slap_01.wav' },
                 42: { name: 'Talam Muted', icon: 'fa-circle', sample: 'SouthIndian/Talam/talam_muted_01.wav' },
                 46: { name: 'Talam Open', icon: 'fa-circle-dot', sample: 'SouthIndian/Talam/talam_open_01.wav' },
-                41: { name: 'Mridangam Low', icon: 'fa-drum', sample: 'Indian/Mridangam_Low/mridangam_low_01.wav' },
+                41: { name: 'Udukkai Bend', icon: 'fa-wave-square', sample: 'SouthIndian/Udukkai/udukkai_bend_01.wav' },
                 45: { name: 'Thavil Stick Roll', icon: 'fa-drum', sample: 'Indian/Thavil_Roll/thavil_roll_01.wav' },
-                49: { name: 'Temple Gong', icon: 'fa-compact-disc', sample: 'Indian/Gong_Crash/gong_crash_01.wav' }
+                49: { name: 'Thavil Bass', icon: 'fa-drum', sample: 'SouthIndian/Thavil/thavil_bass_01.wav' } // Mapped Thavil Bass here so it is available to the engine!
             },
             acoustic: {
                 36: { name: 'Acoustic Kick', icon: 'fa-drum', sample: 'Acoustic/Kick/kick_01.wav' },
@@ -1272,18 +1272,30 @@
                         // ==========================================
                         if (genre === 'southindian') {
                             if (rhythm === 'dappankoothu') {
-                                // Chaotic street festival syncopation (Thavil/Parai)
-                                if (step === 0 && beat % 2 === 0) addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
-                                if (step === 3 && stepRoll > 0.2) addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.8);
-                                if (beat % 2 !== 0 && step === 1) addNote(STANDARD_MIDI.SNARE, stepTime, 0.85);
-                                if (beat % 2 !== 0 && step === 3) addNote(STANDARD_MIDI.SNARE, stepTime, 0.9);
+                                // PARAI BASS (Kick) & PARAI SLAP (Snare): The classic Koothu Gallop
+                                if (step === 0) addNote(STANDARD_MIDI.KICK, stepTime, 1.0); // Downbeat
+                                if (step === 2) addNote(STANDARD_MIDI.KICK, stepTime, 0.9); // The 'and'
                                 
-                                // Continuous fast high percussion (thavil rolls)
+                                // Hard Parai Slaps on the backbeats (beats 2 and 4)
+                                if (step === 0 && (beat === 1 || beat === 3)) addNote(STANDARD_MIDI.SNARE, stepTime, 1.0);
+                                
+                                // Syncopated push on the 'a' (16th note before the next beat)
+                                if (step === 3 && stepRoll > 0.3) addNote(STANDARD_MIDI.KICK, stepTime, 0.85);
+
+                                // UDUKKAI / URUMI BEND (Low Tom): The wailing street pitch-bend
+                                if (step === 1 || step === 3) {
+                                    if (stepRoll > 0.4) addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.8);
+                                }
+
+                                // THAVIL STICK ROLL (High Tom): Relentless 16th notes
                                 if (density !== 'minimal') {
-                                    if (step === 0 || step === 2 || step === 3) {
-                                        if (stepRoll > 0.3) addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.5 + stepRoll*0.2);
+                                    if (step !== 0) { // Keep away from the absolute downbeat for bounce
+                                        if (stepRoll > 0.1) addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.5 + (stepRoll * 0.3));
                                     }
                                 }
+                                
+                                // THAVIL SLAP (Clap): Emphasizing the driving force
+                                if (step === 0 && beat % 2 !== 0) addNote(STANDARD_MIDI.CLAP, stepTime, 0.8);
                             } 
                             else if (rhythm === 'kuthu_fast') {
                                 // Double time, aggressive street beat
@@ -1299,13 +1311,13 @@
                                 if (step === 0) {
                                     if (adiBeat === 0 || adiBeat === 4 || adiBeat === 6) {
                                         addNote(STANDARD_MIDI.KICK, stepTime, 0.9); // Clap (Laghu / Dhrutam start)
-                                        addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.85); // Mridangam Bass
+                                        addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.85); // Udukkai Bass
                                     } else {
                                         addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7); // Finger counts
                                     }
                                 }
                                 if (density !== 'minimal' && (step === 1 || step === 2 || step === 3)) {
-                                     if (stepRoll > 0.6) addNote(STANDARD_MIDI.SNARE, stepTime, 0.35); // Rapid Mridangam ghost hits
+                                     if (stepRoll > 0.6) addNote(STANDARD_MIDI.SNARE, stepTime, 0.35); // Rapid ghost hits
                                 }
                             }
                         }
