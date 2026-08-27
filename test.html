@@ -149,7 +149,7 @@
                 
                 <div class="settings-grid">
                     
-                    <!-- 1. Style Selection (ADDED INDIAN STYLES) -->
+                    <!-- 1. Style Selection -->
                     <div class="setting-group">
                         <label><i class="fa-solid fa-compact-disc"></i> Groove Style</label>
                         <div class="custom-select-wrapper" id="genreSelectWrapper">
@@ -212,7 +212,7 @@
                         <input type="number" id="tempoInput" value="135" min="40" max="240" placeholder="e.g. 135">
                     </div>
                     
-                    <!-- 5. Time Signature (HYBRID COMBOBOX) -->
+                    <!-- 5. Time Signature -->
                     <div class="setting-group">
                         <label><i class="fa-solid fa-clock"></i> Time Signature</label>
                         <div class="custom-combobox-wrapper" id="timeSigWrapper">
@@ -519,9 +519,6 @@
     <!-- RHYTHM GENERATION ENGINE -->
     <script type="module">
 
-        // -------------------------------------------------------------
-        // DYNAMIC DROPDOWN CONFIGURATION MATRIX 
-        // -------------------------------------------------------------
         const STYLE_CONFIGS = {
             pop: {
                 rhythms: [
@@ -685,7 +682,6 @@
             });
         }
 
-        // Initialize Dynamic Load on Genre Change (Including Sidebar & Placeholders)
         document.getElementById('genreSelect').addEventListener('change', (e) => {
             const genre = e.target.value;
             const config = STYLE_CONFIGS[genre];
@@ -695,16 +691,12 @@
                 document.getElementById('tempoInput').value = config.defaultTempo;
                 document.getElementById('thoughtsInput').placeholder = config.placeholder;
 
-                // Update Sidebar Guide visibility dynamically
                 document.querySelectorAll('.genre-guide').forEach(el => el.classList.remove('active'));
                 const activeGuide = document.getElementById('guide-' + genre);
                 if (activeGuide) activeGuide.classList.add('active');
             }
         });
 
-        // -------------------------------------------------------------
-        // BULLETPROOF CUSTOM DROPDOWN EVENT DELEGATION
-        // -------------------------------------------------------------
         function setupCustomDropdown(selectId) {
             const hiddenSelect = document.getElementById(selectId);
             const wrapper = document.getElementById(selectId + 'Wrapper');
@@ -738,7 +730,6 @@
             });
         }
 
-        // Setup the Hybrid Combobox for Time Signature
         const timeSigWrapper = document.getElementById('timeSigWrapper');
         const timeSigInput = document.getElementById('timeSigInput');
         const timeSigOptions = document.getElementById('timeSigOptions');
@@ -773,13 +764,9 @@
         ['genreSelect','rhythmSelect','instrumentSelect','densitySelect','swingSelect','humanizeSelect','fillSelect']
             .forEach(setupCustomDropdown);
             
-        // Initial setup on load
         updateSelectOptions('rhythmSelect', STYLE_CONFIGS.pop.rhythms);
         updateSelectOptions('instrumentSelect', STYLE_CONFIGS.pop.kits);
 
-        // -------------------------------------------------------------
-        // DOM REFS
-        // -------------------------------------------------------------
         const tempoInput = document.getElementById('tempoInput');
         const barsInput = document.getElementById('barsInput');
         const densitySelect = document.getElementById('densitySelect');
@@ -813,9 +800,6 @@
         let stemWaveSurfers = new Map();
         let stemBlobUrls = [];
 
-        // -------------------------------------------------------------
-        // MIDI MAPPING AND KIT CONFIGURATIONS
-        // -------------------------------------------------------------
         const STANDARD_MIDI = {
             KICK: 36, SNARE: 38, CLAP: 39, CH: 42, OH: 46, TOM_LO: 41, TOM_HI: 45, CRASH: 49
         };
@@ -859,7 +843,7 @@
                 46: { name: 'Talam Open', icon: 'fa-circle-dot', sample: 'SouthIndian/Talam/talam_open_01.wav' },
                 41: { name: 'Udukkai Bend', icon: 'fa-wave-square', sample: 'SouthIndian/Udukkai/udukkai_bend_01.wav' },
                 45: { name: 'Thavil Stick Roll', icon: 'fa-drum', sample: 'Indian/Thavil_Roll/thavil_roll_01.wav' },
-                49: { name: 'Thavil Bass', icon: 'fa-drum', sample: 'SouthIndian/Thavil/thavil_bass_01.wav' } // Mapped Thavil Bass here so it is available to the engine!
+                49: { name: 'Thavil Bass', icon: 'fa-drum', sample: 'SouthIndian/Thavil/thavil_bass_01.wav' }
             },
             acoustic: {
                 36: { name: 'Acoustic Kick', icon: 'fa-drum', sample: 'Acoustic/Kick/kick_01.wav' },
@@ -911,15 +895,11 @@
             return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
         }
 
-        // -------------------------------------------------------------
-        // TRUE PROCEDURAL GENERATIVE RHYTHM ENGINE
-        // -------------------------------------------------------------
         function generateRhythmNotes() {
             const genre = genreSelect.value;
             const currentTempo = Math.max(40, Math.min(240, parseInt(tempoInput.value) || 120));
             const totalBars = Math.max(1, Math.min(64, parseInt(barsInput.value) || 8));
             
-            // HYBRID COMBOBOX FALLBACK: If user types nonsense, fallback to 4/4
             const rawTimeSig = timeSigInput.value.match(/^\d+\/\d+$/) ? timeSigInput.value : '4/4';
             const [beatsPerBar, beatUnit] = rawTimeSig.split('/').map(Number);
             
@@ -930,9 +910,8 @@
             const text = thoughtsInput.value.toLowerCase();
             let rhythm = rhythmSelect.value;
 
-            const grooveVariation = Math.floor(Math.random() * 4); // 0, 1, 2, or 3
+            const grooveVariation = Math.floor(Math.random() * 4);
 
-            // Keyword Routing
             if (rhythm === 'auto') {
                 if (genre !== 'lofi' && genre !== 'boombap' && genre !== 'indian' && genre !== 'southindian' && (text.includes('build') || text.includes('drop') || text.includes('riser'))) {
                     rhythm = 'build';
@@ -1015,9 +994,6 @@
                             continue;
                         }
 
-                        // ==========================================
-                        // BUILD / RISER ALGORITHM
-                        // ==========================================
                         if (rhythm === 'build') {
                             let buildVel = 0.5 + (0.5 * (bar / Math.max(1, totalBars - 1))); 
                             const isLastBar = (bar === totalBars - 1);
@@ -1064,9 +1040,6 @@
                             continue; 
                         }
 
-                        // ==========================================
-                        // 1. POP
-                        // ==========================================
                         if (genre === 'pop') {
                             if (rhythm === 'driving') {
                                 if (downbeat) addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
@@ -1115,9 +1088,6 @@
                             }
                         }
 
-                        // ==========================================
-                        // 2. BOOM BAP
-                        // ==========================================
                         if (genre === 'boombap') {
                             let dragOffset = (rhythm === 'lazy') ? (sixteenth * (0.15 + stepRoll * 0.15)) : 0;
                             if (downbeat && (beat === 0 || beat === 2)) addNote(STANDARD_MIDI.KICK, stepTime + dragOffset, 0.9);
@@ -1131,9 +1101,6 @@
                             if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime + dragOffset, step === 0 ? 0.75 : 0.45);
                         }
 
-                        // ==========================================
-                        // 3. TRAP / DRILL
-                        // ==========================================
                         if (genre === 'trap') {
                             if (downbeat && beat === 0) addNote(STANDARD_MIDI.KICK, stepTime, 0.98);
                             if (grooveVariation === 0 && beat === 1 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime, 0.88);
@@ -1160,9 +1127,6 @@
                             }
                         }
 
-                        // ==========================================
-                        // 4. HOUSE / EDM
-                        // ==========================================
                         if (genre === 'house') {
                             if (downbeat) addNote(STANDARD_MIDI.KICK, stepTime, 0.94);
                             if (isBackbeat) addNote(STANDARD_MIDI.CLAP, stepTime, 0.9);
@@ -1179,9 +1143,6 @@
                             }
                         }
 
-                        // ==========================================
-                        // 5. LO-FI / CHILLHOP
-                        // ==========================================
                         if (genre === 'lofi') {
                             let drag = sixteenth * (0.15 + stepRoll * 0.15);
 
@@ -1198,9 +1159,6 @@
                             }
                         }
 
-                        // ==========================================
-                        // 6. CINEMATIC ORCHESTRAL
-                        // ==========================================
                         if (genre === 'cinematic') {
                             if (rhythm === 'epic') {
                                 if (downbeat && (beat === 0 || beat === 2)) {
@@ -1226,166 +1184,138 @@
                             }
                         }
 
-                        // ==========================================
-                        // 7. INDIAN / BOLLYWOOD
-                        // ==========================================
                         if (genre === 'indian') {
                             const cycleBeat = (bar * beatsPerBar + beat) % 16;
                             
                             if (rhythm === 'teentaal') {
-                                // 16-beat cycle math (Dha Dhin Dhin Dha) mapped over 4 bars (if 4/4)
                                 if (step === 0) {
                                     if ([0, 3, 4, 7, 8, 15].includes(cycleBeat)) {
-                                        addNote(STANDARD_MIDI.KICK, stepTime, 0.9); // Deep Bayan
+                                        addNote(STANDARD_MIDI.KICK, stepTime, 0.9);
                                         addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.8);
                                     } else if ([1, 2, 5, 6, 13, 14].includes(cycleBeat)) {
-                                        addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.75); // Resonant Dhin
+                                        addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.75);
                                     } else if ([9, 10, 11, 12].includes(cycleBeat)) {
-                                        addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7); // Khali (empty/light)
+                                        addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7);
                                         addNote(STANDARD_MIDI.SNARE, stepTime, 0.6); 
                                     }
                                 }
                                 if (density !== 'minimal' && step === 2 && stepRoll > 0.4) {
-                                     addNote(STANDARD_MIDI.CH, stepTime, 0.4); // Subtle finger taps
+                                     addNote(STANDARD_MIDI.CH, stepTime, 0.4);
                                 }
-                            } 
-                            else if (rhythm === 'bhangra') {
-                                let bhangraDrag = sixteenth * (swingAmount > 0 ? swingAmount : 0.35); // Heavy Dhol swing
+                            } else if (rhythm === 'bhangra') {
+                                let bhangraDrag = sixteenth * (swingAmount > 0 ? swingAmount : 0.35);
                                 if (downbeat && (beat === 0 || beat === 2)) addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
                                 if (beat === 1 || beat === 3) {
-                                    if (step === 2) addNote(STANDARD_MIDI.TOM_HI, stepTime + bhangraDrag, 0.85); // High Dholak side
+                                    if (step === 2) addNote(STANDARD_MIDI.TOM_HI, stepTime + bhangraDrag, 0.85);
                                 }
                                 if (step === 0) addNote(STANDARD_MIDI.CH, stepTime, 0.6);
                                 if (step === 2) addNote(STANDARD_MIDI.CH, stepTime + bhangraDrag, 0.5);
-                            } 
-                            else {
-                                // Bollywood 4/4 Dance Syncopation
+                            } else {
                                 if (downbeat) addNote(STANDARD_MIDI.KICK, stepTime, 0.9);
-                                if (step === 3 && stepRoll > 0.3) addNote(STANDARD_MIDI.KICK, stepTime, 0.7); // Syncopated push
+                                if (step === 3 && stepRoll > 0.3) addNote(STANDARD_MIDI.KICK, stepTime, 0.7);
                                 if (isBackbeat) addNote(STANDARD_MIDI.CLAP, stepTime, 0.9);
                                 if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime, 0.6);
                             }
                         }
 
-                        // ==========================================
-                        // 8. SOUTH INDIAN / KOOTHU
-                        // ==========================================
                         if (genre === 'southindian') {
                             if (rhythm === 'dappankoothu') {
-                                // PARAI BASS (Kick) & PARAI SLAP (Snare): The classic Koothu Gallop
-                                if (step === 0) addNote(STANDARD_MIDI.KICK, stepTime, 1.0); // Downbeat
-                                if (step === 2) addNote(STANDARD_MIDI.KICK, stepTime, 0.9); // The 'and'
-                                
-                                // Hard Parai Slaps on the backbeats (beats 2 and 4)
+                                if (step === 0) addNote(STANDARD_MIDI.KICK, stepTime, 1.0);
+                                if (step === 2) addNote(STANDARD_MIDI.KICK, stepTime, 0.9);
                                 if (step === 0 && (beat === 1 || beat === 3)) addNote(STANDARD_MIDI.SNARE, stepTime, 1.0);
-                                
-                                // Syncopated push on the 'a' (16th note before the next beat)
                                 if (step === 3 && stepRoll > 0.3) addNote(STANDARD_MIDI.KICK, stepTime, 0.85);
 
-                                // UDUKKAI / URUMI BEND (Low Tom): The wailing street pitch-bend
                                 if (step === 1 || step === 3) {
                                     if (stepRoll > 0.4) addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.8);
                                 }
 
-                                // THAVIL STICK ROLL (High Tom): Relentless 16th notes
                                 if (density !== 'minimal') {
-                                    if (step !== 0) { // Keep away from the absolute downbeat for bounce
+                                    if (step !== 0) {
                                         if (stepRoll > 0.1) addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.5 + (stepRoll * 0.3));
                                     }
                                 }
-                                
-                                // THAVIL SLAP (Clap): Emphasizing the driving force
                                 if (step === 0 && beat % 2 !== 0) addNote(STANDARD_MIDI.CLAP, stepTime, 0.8);
-                            } 
-                            else if (rhythm === 'kuthu_fast') {
-                                // Double time, aggressive street beat
+                            } else if (rhythm === 'kuthu_fast') {
                                 if (step === 0 || step === 2) addNote(STANDARD_MIDI.KICK, stepTime, 0.9);
                                 if (isBackbeat && step === 0) addNote(STANDARD_MIDI.SNARE, stepTime, 0.95);
                                 if (step === 1 || step === 3) {
                                     if (stepRoll > 0.2) addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7);
                                 }
-                            } 
-else if (rhythm === 'carnatic') {
-    // 8-Akshara Adi Tala Cycle (Laghu 4 + Dhrutam 2 + Dhrutam 2)
-    const adiBeat = (bar * beatsPerBar + beat) % 8;
-    const isSamam = (adiBeat === 0 && step === 0);
-    const isDhrutamStart = (adiBeat === 4 || adiBeat === 6) && step === 0;
+                            } else if (rhythm === 'carnatic') {
+                                const adiBeat = (bar * beatsPerBar + beat) % 8;
+                                const isSamam = (adiBeat === 0 && step === 0);
+                                const isDhrutamStart = (adiBeat === 4 || adiBeat === 6) && step === 0;
 
-    // 1. SAMAM & DHRUTAM ANCHORS (The Master Claps / Thud)
-    if (isSamam) {
-        addNote(STANDARD_MIDI.KICK, stepTime, 1.0);     // Strong Parai Bass
-        addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.9);   // Udukkai Deep Stroke
-        if (bar === 0 || bar % 4 === 0) addNote(STANDARD_MIDI.CRASH, stepTime, 0.7);
-    } else if (isDhrutamStart) {
-        addNote(STANDARD_MIDI.KICK, stepTime, 0.85);
-        addNote(STANDARD_MIDI.CLAP, stepTime, 0.75);
-    }
+                                if (isSamam) {
+                                    addNote(STANDARD_MIDI.KICK, stepTime, 1.0);
+                                    addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.9);
+                                    if (bar === 0 || bar % 4 === 0) addNote(STANDARD_MIDI.CRASH, stepTime, 0.7);
+                                } else if (isDhrutamStart) {
+                                    addNote(STANDARD_MIDI.KICK, stepTime, 0.85);
+                                    addNote(STANDARD_MIDI.CLAP, stepTime, 0.75);
+                                }
 
-    // 2. PROCEDURAL VARIATIONS BASED ON GROOVE ROLL
-    if (grooveVariation === 0) {
-        // STYLE A: Traditional Sarvalaghu (Tha-Ka-Dhi-Mi Flow)
-        if (step === 0 && (adiBeat === 1 || adiBeat === 2 || adiBeat === 3 || adiBeat === 5 || adiBeat === 7)) {
-            addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7); // Finger taps
-        }
-        if (step === 2) {
-            addNote(STANDARD_MIDI.SNARE, stepTime, 0.65); // Crisp off-beat Ta
-        }
-        if (density === 'busy' && (step === 1 || step === 3) && stepRoll > 0.3) {
-            addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.45); // Rolling subdivisions
-        }
-    } 
-    else if (grooveVariation === 1) {
-        // STYLE B: 3+3+2 Gathi / Cross-Accent Pulse
-        if ((step === 0 && (adiBeat === 0 || adiBeat === 3 || adiBeat === 6)) || (step === 2 && adiBeat === 1)) {
-            addNote(STANDARD_MIDI.KICK, stepTime, 0.88);
-            addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.75);
-        }
-        if (step === 0 && (adiBeat === 2 || adiBeat === 5 || adiBeat === 7)) {
-            addNote(STANDARD_MIDI.SNARE, stepTime, 0.8);
-        }
-        if (density !== 'minimal' && step === 2) {
-            addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.55);
-        }
-    } 
-    else if (grooveVariation === 2) {
-        // STYLE C: Solkattu Syncopated Bounce (Off-beat Udukkai & Slaps)
-        if (step === 0 && (adiBeat % 2 === 0)) {
-            addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.75);
-        }
-        if (step === 2 || (step === 3 && stepRoll > 0.4)) {
-            addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.7); // Udukkai Pitch modulations
-            addNote(STANDARD_MIDI.SNARE, stepTime, 0.6);
-        }
-        if (step === 1 && stepRoll > 0.5) {
-            addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.45);
-        }
-    } 
-    else {
-        // STYLE D: Korvai / Mukthayee Phrasing (Dense Rhythmic Build-up)
-        const isCadenceBar = (bar % 2 === 1);
-        if (!isCadenceBar) {
-            if (step === 0 || step === 2) addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7);
-            if (step === 0 && (adiBeat === 1 || adiBeat === 5)) addNote(STANDARD_MIDI.SNARE, stepTime, 0.85);
-        } else {
-            // Rapid ending cadences (Tha-Dhi-Gi-Na-Thom)
-            if (step % 2 === 0 || stepRoll > 0.3) {
-                addNote(adiBeat >= 4 ? STANDARD_MIDI.SNARE : STANDARD_MIDI.TOM_HI, stepTime, 0.8 + (stepRoll * 0.15));
+                                if (grooveVariation === 0) {
+                                    if (step === 0 && (adiBeat === 1 || adiBeat === 2 || adiBeat === 3 || adiBeat === 5 || adiBeat === 7)) {
+                                        addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7);
+                                    }
+                                    if (step === 2) {
+                                        addNote(STANDARD_MIDI.SNARE, stepTime, 0.65);
+                                    }
+                                    if (density === 'busy' && (step === 1 || step === 3) && stepRoll > 0.3) {
+                                        addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.45);
+                                    }
+                                } else if (grooveVariation === 1) {
+                                    if ((step === 0 && (adiBeat === 0 || adiBeat === 3 || adiBeat === 6)) || (step === 2 && adiBeat === 1)) {
+                                        addNote(STANDARD_MIDI.KICK, stepTime, 0.88);
+                                        addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.75);
+                                    }
+                                    if (step === 0 && (adiBeat === 2 || adiBeat === 5 || adiBeat === 7)) {
+                                        addNote(STANDARD_MIDI.SNARE, stepTime, 0.8);
+                                    }
+                                    if (density !== 'minimal' && step === 2) {
+                                        addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.55);
+                                    }
+                                } else if (grooveVariation === 2) {
+                                    if (step === 0 && (adiBeat % 2 === 0)) {
+                                        addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.75);
+                                    }
+                                    if (step === 2 || (step === 3 && stepRoll > 0.4)) {
+                                        addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.7);
+                                        addNote(STANDARD_MIDI.SNARE, stepTime, 0.6);
+                                    }
+                                    if (step === 1 && stepRoll > 0.5) {
+                                        addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.45);
+                                    }
+                                } else {
+                                    const isCadenceBar = (bar % 2 === 1);
+                                    if (!isCadenceBar) {
+                                        if (step === 0 || step === 2) addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7);
+                                        if (step === 0 && (adiBeat === 1 || adiBeat === 5)) addNote(STANDARD_MIDI.SNARE, stepTime, 0.85);
+                                    } else {
+                                        if (step % 2 === 0 || stepRoll > 0.3) {
+                                            addNote(adiBeat >= 4 ? STANDARD_MIDI.SNARE : STANDARD_MIDI.TOM_HI, stepTime, 0.8 + (stepRoll * 0.15));
+                                        }
+                                        if (adiBeat === 7 && step === 3) {
+                                            addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
+                                        }
+                                    }
+                                }
+
+                                if (step === 0) {
+                                    addNote(STANDARD_MIDI.CH, stepTime, isSamam ? 0.9 : 0.6);
+                                }
+                            }
+                        }
+
+                    }
+                }
             }
-            if (adiBeat === 7 && step === 3) {
-                addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
-            }
+
+            generatedNotes.sort((a, b) => a.time - b.time);
+            return { currentTempo, beatsPerBar, beatUnit };
         }
-    }
 
-    // 3. TALAM METALLIC TIMEKEEPING (Accenting Aksharas)
-    if (step === 0) {
-        addNote(STANDARD_MIDI.CH, stepTime, isSamam ? 0.9 : 0.6);
-    }
-}
-
-        // -------------------------------------------------------------
-        // OFFLINE AUDIO MIXER (CREATES MASTER & STEM WAVS)
-        // -------------------------------------------------------------
         let lastBufferMapSize = 0;
 
         async function renderAudioMix(noteList, selectedKit, filterMidi = null) {
