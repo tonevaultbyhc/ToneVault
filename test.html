@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ToneVault - AI Rhythm & Groove Generator (V12)</title>
+    <title>ToneVault - AI Rhythm & Groove Generator (V13)</title>
     
     <!-- FONTAWESOME ICONS CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -632,8 +632,8 @@
                 kits: [
                     {val: 'auto', text: 'Auto (Indian Percussion)'},
                     {val: 'indian', text: 'Indian Percussion'},
-                    {val: 'acoustic', text: 'Acoustic Studio Kit'},
-                    {val: 'modern', text: 'Modern Electronic'}
+                    {val: 'southindian_pure', text: 'Pure South Indian'},
+                    {val: 'acoustic', text: 'Acoustic Studio Kit'}
                 ],
                 defaultKit: 'indian',
                 defaultTempo: 100,
@@ -647,12 +647,12 @@
                     {val: 'carnatic', text: 'Carnatic (Adi Tala)'}
                 ],
                 kits: [
-                    {val: 'auto', text: 'Auto (Indian Percussion)'},
-                    {val: 'indian', text: 'Indian Percussion'},
-                    {val: 'cinematic', text: 'Hybrid Cinematic'},
-                    {val: 'acoustic', text: 'Acoustic Studio Kit'}
+                    {val: 'auto', text: 'Auto (Pure South Indian)'},
+                    {val: 'southindian_pure', text: 'Pure South Indian'},
+                    {val: 'indian', text: 'Hybrid Indian Percussion'},
+                    {val: 'cinematic', text: 'Hybrid Cinematic'}
                 ],
-                defaultKit: 'indian',
+                defaultKit: 'southindian_pure',
                 defaultTempo: 130,
                 placeholder: 'e.g. koothu, dappan, fast, carnatic, adi...'
             }
@@ -841,16 +841,6 @@
                 45: { name: 'Cinematic High Tom', icon: 'fa-drum', sample: 'Cinematic/High Tom/tom_high_01.wav' },
                 49: { name: 'Piatti Crash', icon: 'fa-compact-disc', sample: 'Cinematic/Crash/crash_01.wav' }
             },
-            hybrid: {
-                36: { name: 'Hybrid Kick', icon: 'fa-drum', sample: 'Cinematic/Taiko Low/taiko_low_01.wav' },
-                38: { name: 'Hybrid Snare', icon: 'fa-drum-steelpan', sample: 'Modern/Snare/Snare_001.wav' },
-                39: { name: 'Hybrid Clap', icon: 'fa-hands-clapping', sample: 'Modern/Clap/Clap_001.wav' },
-                42: { name: 'Hybrid Hat', icon: 'fa-circle', sample: 'Modern/Closed Hi-Hat/Closed Hi-Hat_001.wav' },
-                46: { name: 'Hybrid Open Hat', icon: 'fa-circle-dot', sample: 'Cinematic/Crash/crash_01.wav' },
-                41: { name: 'Hybrid Low Tom', icon: 'fa-drum', sample: 'Cinematic/Low Tom/tom_low_01.wav' },
-                45: { name: 'Hybrid High Tom', icon: 'fa-drum', sample: 'Cinematic/High Tom/tom_high_01.wav' },
-                49: { name: 'Hybrid Crash', icon: 'fa-compact-disc', sample: 'Cinematic/Crash/crash_01.wav' }
-            },
             indian: {
                 36: { name: 'Bayan / Thavil Bass', icon: 'fa-drum', sample: 'Indian/Bayan_Low/bayan_low_01.wav' },
                 38: { name: 'Dayan / Snappy Ta', icon: 'fa-drum-steelpan', sample: 'Indian/Dayan_High/dayan_high_01.wav' },
@@ -860,6 +850,16 @@
                 41: { name: 'Mridangam Low', icon: 'fa-drum', sample: 'Indian/Mridangam_Low/mridangam_low_01.wav' },
                 45: { name: 'Thavil High Stick', icon: 'fa-drum', sample: 'Indian/Thavil_Roll/thavil_roll_01.wav' },
                 49: { name: 'Temple Gong Crash', icon: 'fa-compact-disc', sample: 'Indian/Gong_Crash/gong_crash_01.wav' }
+            },
+            southindian_pure: {
+                36: { name: 'Thavil Bass', icon: 'fa-drum', sample: 'SouthIndian/Thavil/thavil_bass_01.wav' },
+                38: { name: 'Thavil Slap', icon: 'fa-hand', sample: 'SouthIndian/Thavil/thavil_slap_01.wav' },
+                39: { name: 'Parai Slap (Tamte)', icon: 'fa-hands-clapping', sample: 'SouthIndian/Parai/parai_slap_01.wav' },
+                42: { name: 'Talam Muted', icon: 'fa-circle', sample: 'SouthIndian/Talam/talam_muted_01.wav' },
+                46: { name: 'Talam Open', icon: 'fa-circle-dot', sample: 'SouthIndian/Talam/talam_open_01.wav' },
+                41: { name: 'Mridangam Low', icon: 'fa-drum', sample: 'Indian/Mridangam_Low/mridangam_low_01.wav' },
+                45: { name: 'Thavil Stick Roll', icon: 'fa-drum', sample: 'Indian/Thavil_Roll/thavil_roll_01.wav' },
+                49: { name: 'Temple Gong', icon: 'fa-compact-disc', sample: 'Indian/Gong_Crash/gong_crash_01.wav' }
             },
             acoustic: {
                 36: { name: 'Acoustic Kick', icon: 'fa-drum', sample: 'Acoustic/Kick/kick_01.wav' },
