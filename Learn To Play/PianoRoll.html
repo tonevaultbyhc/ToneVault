@@ -97,6 +97,7 @@
             flex-wrap: wrap;
             margin-bottom: 15px;
             backdrop-filter: blur(10px);
+            z-index: 5;
         }
 
         .control-group-left {
@@ -113,7 +114,7 @@
             gap: 8px;
         }
 
-        .control-element select, .control-element input[type="number"] {
+        .control-element input[type="number"] {
             background: rgba(10, 10, 15, 0.9);
             border: 1px solid rgba(255, 255, 255, 0.15);
             color: #fff;
@@ -141,9 +142,26 @@
             background: #00d4ff;
         }
 
-        .control-element select:focus, .control-element input[type="number"]:focus {
+        .control-element input[type="number"]:focus {
             border-color: #00d4ff;
         }
+
+        /* CUSTOM DROPDOWN STYLES */
+        .custom-select-wrapper { position: relative; user-select: none; z-index: 1; }
+        .custom-select-wrapper.open { z-index: 100; }
+        .custom-select-trigger { background: rgba(10, 10, 15, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #ffffff; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: border-color 0.2s ease, box-shadow 0.2s ease; white-space: nowrap; }
+        .custom-select-wrapper.open .custom-select-trigger { border-color: #00d4ff; border-bottom-left-radius: 0; border-bottom-right-radius: 0; background: rgba(15, 15, 20, 0.95); }
+        .custom-select-trigger i.fa-chevron-down { color: #00d4ff; transition: transform 0.3s ease; font-size: 0.75rem; margin-left: 10px; }
+        .custom-select-wrapper.open .custom-select-trigger i.fa-chevron-down { transform: rotate(180deg); }
+        .custom-select-options { position: absolute; top: 100%; left: 0; right: 0; background: rgba(15, 15, 20, 0.98); backdrop-filter: blur(10px); border: 1px solid #00d4ff; border-top: none; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; box-shadow: 0 15px 30px rgba(0,0,0,0.6); opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 50; overflow-y: auto; max-height: 250px; min-width: 100%; }
+        .custom-select-wrapper.open .custom-select-options { opacity: 1; visibility: visible; }
+        .custom-option { padding: 10px 12px; color: #bbb; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease; border-bottom: 1px solid rgba(255, 255, 255, 0.05); display: flex; justify-content: space-between; align-items: center; }
+        .custom-option:last-child { border-bottom: none; }
+        .custom-option:hover { background: rgba(0, 212, 255, 0.1); color: #00d4ff; padding-left: 16px; }
+        .custom-option.selected { color: #ffffff; background: rgba(0, 212, 255, 0.05); font-weight: bold; }
+        .custom-select-options::-webkit-scrollbar { width: 6px; }
+        .custom-select-options::-webkit-scrollbar-thumb { background: #00d4ff; border-radius: 3px; }
+        .custom-select-options::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
 
         .primary-btn {
             background: linear-gradient(135deg, #00d4ff, #0077ff);
@@ -223,6 +241,7 @@
             align-items: center;
             flex-wrap: wrap;
             backdrop-filter: blur(10px);
+            z-index: 10;
         }
 
         /* Stage Area (Canvas + Piano) */
@@ -354,7 +373,6 @@
             box-shadow: 0 0 15px #0077ff;
         }
 
-        /* NEW: Stacked Note Label Formatting */
         .pitch {
             font-weight: bold;
             line-height: 1.1;
@@ -426,7 +444,7 @@
         <div class="dashboard-header">
             <div class="title-group">
                 <h1>Learn to <span>Play</span></h1>
-                <span style="font-size: 0.9rem; color: #888;">Interactive Piano & MIDI Studio</span>
+                <span style="font-size: 0.9rem; color: #888;">Interactive Piano Curriculum</span>
             </div>
 
             <div class="stats-bar">
@@ -445,61 +463,130 @@
             </div>
         </div>
 
-        <!-- Audio Settings Sub-Ribbon -->
+        <!-- Audio Settings Sub-Ribbon (Custom Dropdowns) -->
         <div class="audio-ribbon">
             <div class="control-element">
-                <label for="instrumentSelect" style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-sliders"></i> Instrument:</label>
-                <select id="instrumentSelect">
-                    <option value="grandpiano" selected>Grand Piano — Concert (Default)</option>
+                <label style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-sliders"></i> Inst:</label>
+                <div class="custom-select-wrapper" id="instrumentSelectWrapper" style="width: 150px;">
+                    <div class="custom-select-trigger" id="instrumentSelectTrigger">
+                        <span>Concert Piano</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="custom-select-options" id="instrumentSelectOptions">
+                        <div class="custom-option selected" data-value="grandpiano">Concert Piano</div>
+                        <div class="custom-option" data-value="electricpiano">Electric Piano</div>
+                        <div class="custom-option" data-value="softpiano">Soft Piano</div>
+                        <div class="custom-option" data-value="bell">Soft Bell</div>
+                    </div>
+                </div>
+                <select id="instrumentSelect" style="display: none;">
+                    <option value="grandpiano" selected>Concert Piano</option>
                     <option value="electricpiano">Electric Piano</option>
-                    <option value="softpiano">Soft Grand Piano</option>
-                    <option value="strings">Warm Strings</option>
-                    <option value="pad">Cinematic Pad</option>
+                    <option value="softpiano">Soft Piano</option>
                     <option value="bell">Soft Bell</option>
                 </select>
             </div>
+            
             <div class="control-element">
                 <label for="instVolSlider" style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-volume-high"></i> Vol:</label>
-                <input type="range" id="instVolSlider" min="0" max="1.5" step="0.05" value="0.9" style="width: 70px;" title="Instrument Volume">
+                <input type="range" id="instVolSlider" min="0" max="1.5" step="0.05" value="0.9" style="width: 70px;">
             </div>
 
             <div class="control-element" style="margin-left: 15px; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px;">
-                <label for="metronomeSoundSelect" style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-wave-square"></i> Metronome:</label>
-                <select id="metronomeSoundSelect">
-                    <option value="digital" selected>Digital Click (Default)</option>
-                    <option value="woodblock">Classic Woodblock</option>
+                <label style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-wave-square"></i> Metro:</label>
+                <div class="custom-select-wrapper" id="metronomeSoundSelectWrapper" style="width: 130px;">
+                    <div class="custom-select-trigger" id="metronomeSoundSelectTrigger">
+                        <span>Digital Click</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </div>
+                    <div class="custom-select-options" id="metronomeSoundSelectOptions">
+                        <div class="custom-option selected" data-value="digital">Digital Click</div>
+                        <div class="custom-option" data-value="woodblock">Woodblock</div>
+                        <div class="custom-option" data-value="drum">Kick Drum</div>
+                    </div>
+                </div>
+                <select id="metronomeSoundSelect" style="display: none;">
+                    <option value="digital" selected>Digital Click</option>
+                    <option value="woodblock">Woodblock</option>
                     <option value="drum">Kick Drum</option>
                 </select>
             </div>
+            
             <div class="control-element">
-                <label for="metroVolSlider" style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-volume-high"></i> Vol:</label>
-                <input type="range" id="metroVolSlider" min="0" max="1.5" step="0.05" value="0.8" style="width: 70px;" title="Metronome Volume">
+                <input type="range" id="metroVolSlider" min="0" max="1.5" step="0.05" value="0.8" style="width: 70px;">
             </div>
         </div>
 
-        <!-- Controls Ribbon -->
+        <!-- Two-Tier Curriculum Controls Ribbon -->
         <div class="controls-ribbon">
             <div class="control-group-left">
+                
                 <div class="control-element">
-                    <label for="songSelect" style="font-size: 0.85rem; color: #aaa;">Piece:</label>
-                    <select id="songSelect">
-                        <option value="odeToJoy">Beethoven — Ode to Joy (Beginner)</option>
-                        <option value="cMajorScale">C Major Scale (Ascending & Descending)</option>
-                        <option value="messedUpHook">ToneVault — "Messed Up" Hook (EDM Riff)</option>
+                    <label style="font-size: 0.85rem; color: #aaa;">Grade:</label>
+                    <div class="custom-select-wrapper" id="gradeSelectWrapper" style="width: 200px;">
+                        <div class="custom-select-trigger" id="gradeSelectTrigger">
+                            <span>Grade 1: Fundamentals</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div class="custom-select-options" id="gradeSelectOptions">
+                            <div class="custom-option selected" data-value="grade1">Grade 1: Fundamentals</div>
+                        </div>
+                    </div>
+                    <select id="gradeSelect" style="display: none;">
+                        <option value="grade1" selected>Grade 1: Fundamentals</option>
                     </select>
                 </div>
 
                 <div class="control-element">
-                    <label for="playModeSelect" style="font-size: 0.85rem; color: #aaa;">Mode:</label>
-                    <select id="playModeSelect">
-                        <option value="wait" selected>Wait for Right Key</option>
-                        <option value="continuous">Continuous Flow</option>
+                    <label style="font-size: 0.85rem; color: #aaa;">Exercise:</label>
+                    <div class="custom-select-wrapper" id="songSelectWrapper" style="width: 260px;">
+                        <div class="custom-select-trigger" id="songSelectTrigger">
+                            <span>1. Finding Middle C</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div class="custom-select-options" id="songSelectOptions">
+                            <!-- Injected via JS -->
+                        </div>
+                    </div>
+                    <select id="songSelect" style="display: none;"></select>
+                </div>
+
+                <div class="control-element">
+                    <label style="font-size: 0.85rem; color: #aaa;">Hands:</label>
+                    <div class="custom-select-wrapper" id="handSelectWrapper" style="width: 140px;">
+                        <div class="custom-select-trigger" id="handSelectTrigger">
+                            <span>Both Hands</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div class="custom-select-options" id="handSelectOptions">
+                            <div class="custom-option selected" data-value="both">Both Hands</div>
+                            <div class="custom-option" data-value="R">Right Hand Only</div>
+                            <div class="custom-option" data-value="L">Left Hand Only</div>
+                        </div>
+                    </div>
+                    <select id="handSelect" style="display: none;">
+                        <option value="both" selected>Both Hands</option>
+                        <option value="R">Right Hand Only</option>
+                        <option value="L">Left Hand Only</option>
                     </select>
                 </div>
 
                 <div class="control-element">
-                    <label for="keyboardSizeSelect" style="font-size: 0.85rem; color: #aaa;">Range:</label>
-                    <select id="keyboardSizeSelect">
+                    <label style="font-size: 0.85rem; color: #aaa;">Range:</label>
+                    <div class="custom-select-wrapper" id="keyboardSizeSelectWrapper" style="width: 100px;">
+                        <div class="custom-select-trigger" id="keyboardSizeSelectTrigger">
+                            <span>Auto</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div class="custom-select-options" id="keyboardSizeSelectOptions">
+                            <div class="custom-option selected" data-value="auto">Auto</div>
+                            <div class="custom-option" data-value="25">25-Key</div>
+                            <div class="custom-option" data-value="49">49-Key</div>
+                            <div class="custom-option" data-value="61">61-Key</div>
+                            <div class="custom-option" data-value="88">88-Key</div>
+                        </div>
+                    </div>
+                    <select id="keyboardSizeSelect" style="display: none;">
                         <option value="auto" selected>Auto</option>
                         <option value="25">25-Key</option>
                         <option value="49">49-Key</option>
@@ -509,17 +596,31 @@
                 </div>
 
                 <div class="control-element">
-                    <label for="tempoInput" style="font-size: 0.85rem; color: #aaa;">Tempo:</label>
-                    <input type="number" id="tempoInput" min="30" max="300" style="width: 70px;">
-                    <button id="btnResetTempo" class="btn-icon" title="Reset to Song Default">
-                        <i class="fa-solid fa-rotate-left"></i>
-                    </button>
+                    <label style="font-size: 0.85rem; color: #aaa;">Mode:</label>
+                    <div class="custom-select-wrapper" id="playModeSelectWrapper" style="width: 160px;">
+                        <div class="custom-select-trigger" id="playModeSelectTrigger">
+                            <span>Wait for Right Key</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div class="custom-select-options" id="playModeSelectOptions">
+                            <div class="custom-option selected" data-value="wait">Wait for Right Key</div>
+                            <div class="custom-option" data-value="continuous">Continuous Flow</div>
+                        </div>
+                    </div>
+                    <select id="playModeSelect" style="display: none;">
+                        <option value="wait" selected>Wait for Right Key</option>
+                        <option value="continuous">Continuous Flow</option>
+                    </select>
                 </div>
 
                 <div class="control-element">
-                    <button id="btnMetronome" class="btn-icon" title="Toggle Metronome">
-                        <i class="fa-solid fa-stopwatch"></i> Metronome
-                    </button>
+                    <label for="tempoInput" style="font-size: 0.85rem; color: #aaa;">BPM:</label>
+                    <input type="number" id="tempoInput" min="30" max="300" style="width: 60px;">
+                    <button id="btnResetTempo" class="btn-icon" title="Reset to Song Default"><i class="fa-solid fa-rotate-left"></i></button>
+                </div>
+
+                <div class="control-element">
+                    <button id="btnMetronome" class="btn-icon" title="Toggle Metronome"><i class="fa-solid fa-stopwatch"></i> Metronome</button>
                 </div>
 
                 <div class="control-element">
@@ -529,9 +630,9 @@
                 </div>
             </div>
 
-            <div style="display: flex; gap: 10px;">
+            <div style="display: flex; gap: 10px; padding-top: 5px;">
                 <button id="btnDemo" class="btn-secondary">
-                    <i class="fa-solid fa-eye"></i> Watch Demo
+                    <i class="fa-solid fa-eye"></i> Demo
                 </button>
                 <button id="btnPlay" class="primary-btn">
                     <i class="fa-solid fa-play"></i> Start Practice
@@ -574,10 +675,124 @@
     <!-- Core Interactive Engine -->
     <script>
         // ==========================================
-        // 1. KEYBOARD & SONG DATA
+        // CUSTOM DROPDOWN INIT
         // ==========================================
+        function setupCustomDropdown(selectId) {
+            const hiddenSelect = document.getElementById(selectId);
+            const wrapper = document.getElementById(selectId + 'Wrapper');
+            const trigger = document.getElementById(selectId + 'Trigger');
+            const optionsContainer = document.getElementById(selectId + 'Options');
+            
+            if(!wrapper || !trigger || !optionsContainer) return;
+            const triggerText = trigger.querySelector('span');
+
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+                    if (w !== wrapper) w.classList.remove('open');
+                });
+                if (!wrapper.classList.contains('disabled')) wrapper.classList.toggle('open');
+            });
+
+            optionsContainer.addEventListener('click', (e) => {
+                const opt = e.target.closest('.custom-option');
+                if (!opt) return;
+
+                e.stopPropagation();
+                
+                // Set the visual text (strip out any checkmarks for the main trigger span)
+                const clonedContent = opt.cloneNode(true);
+                const icon = clonedContent.querySelector('i');
+                if (icon) icon.remove();
+                triggerText.textContent = clonedContent.textContent.trim();
+                
+                optionsContainer.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                
+                if (hiddenSelect) {
+                    hiddenSelect.value = opt.dataset.value;
+                    hiddenSelect.dispatchEvent(new Event('change'));
+                }
+                wrapper.classList.remove('open');
+            });
+        }
+
+        window.addEventListener('click', () => {
+            document.querySelectorAll('.custom-select-wrapper').forEach(w => w.classList.remove('open'));
+        });
+
+        // Initialize Native-to-Custom UI Dropdowns
+        ['instrumentSelect', 'metronomeSoundSelect', 'gradeSelect', 'handSelect', 'playModeSelect', 'keyboardSizeSelect'].forEach(setupCustomDropdown);
+        
+        // songSelect requires special init since it dynamically populates
+        setupCustomDropdown('songSelect');
+
+        // ==========================================
+        // 1. CURRICULUM DATABASE
+        // ==========================================
+        const CURRICULUM = {
+            grade1: {
+                title: "Grade 1: Fundamentals",
+                songs: {
+                    findingMiddleC: {
+                        title: "1. Finding Middle C (Orientation)", tempo: 80,
+                        notes: [
+                            { note: "C3", time: 1.0, dur: 0.8, hand: "L" }, { note: "C4", time: 2.0, dur: 0.8, hand: "R" },
+                            { note: "C3", time: 3.0, dur: 0.8, hand: "L" }, { note: "C4", time: 4.0, dur: 0.8, hand: "R" },
+                            { note: "C3", time: 5.0, dur: 0.4, hand: "L" }, { note: "C4", time: 5.5, dur: 0.4, hand: "R" },
+                            { note: "C3", time: 6.0, dur: 0.4, hand: "L" }, { note: "C4", time: 6.5, dur: 0.4, hand: "R" },
+                            { note: "C3", time: 7.0, dur: 1.5, hand: "L" }, { note: "C4", time: 7.0, dur: 1.5, hand: "R" } 
+                        ]
+                    },
+                    whiteKeyWalk: {
+                        title: "2. The White Key Walk (5-Finger)", tempo: 90,
+                        notes: [
+                            { note: "C3", time: 1.0, dur: 0.4, hand: "L" }, { note: "C4", time: 1.0, dur: 0.4, hand: "R" },
+                            { note: "D3", time: 1.5, dur: 0.4, hand: "L" }, { note: "D4", time: 1.5, dur: 0.4, hand: "R" },
+                            { note: "E3", time: 2.0, dur: 0.4, hand: "L" }, { note: "E4", time: 2.0, dur: 0.4, hand: "R" },
+                            { note: "F3", time: 2.5, dur: 0.4, hand: "L" }, { note: "F4", time: 2.5, dur: 0.4, hand: "R" },
+                            { note: "G3", time: 3.0, dur: 0.8, hand: "L" }, { note: "G4", time: 3.0, dur: 0.8, hand: "R" },
+                            { note: "F3", time: 4.0, dur: 0.4, hand: "L" }, { note: "F4", time: 4.0, dur: 0.4, hand: "R" },
+                            { note: "E3", time: 4.5, dur: 0.4, hand: "L" }, { note: "E4", time: 4.5, dur: 0.4, hand: "R" },
+                            { note: "D3", time: 5.0, dur: 0.4, hand: "L" }, { note: "D4", time: 5.0, dur: 0.4, hand: "R" },
+                            { note: "C3", time: 5.5, dur: 1.5, hand: "L" }, { note: "C4", time: 5.5, dur: 1.5, hand: "R" }
+                        ]
+                    },
+                    blackKeyGroups: {
+                        title: "3. Black Key Groups (2s and 3s)", tempo: 75,
+                        notes: [
+                            { note: "C#3", time: 1.0, dur: 0.4, hand: "L" }, { note: "D#3", time: 1.5, dur: 0.8, hand: "L" },
+                            { note: "C#4", time: 2.5, dur: 0.4, hand: "R" }, { note: "D#4", time: 3.0, dur: 0.8, hand: "R" },
+                            { note: "F#3", time: 4.5, dur: 0.4, hand: "L" }, { note: "G#3", time: 5.0, dur: 0.4, hand: "L" }, { note: "A#3", time: 5.5, dur: 0.8, hand: "L" },
+                            { note: "F#4", time: 7.0, dur: 0.4, hand: "R" }, { note: "G#4", time: 7.5, dur: 0.4, hand: "R" }, { note: "A#4", time: 8.0, dur: 0.8, hand: "R" }
+                        ]
+                    },
+                    octaveStretch: {
+                        title: "4. The Octave Stretch", tempo: 85,
+                        notes: [
+                            { note: "C3", time: 1.0, dur: 0.4, hand: "L" }, { note: "C4", time: 1.5, dur: 0.4, hand: "R" },
+                            { note: "D3", time: 2.5, dur: 0.4, hand: "L" }, { note: "D4", time: 3.0, dur: 0.4, hand: "R" },
+                            { note: "E3", time: 4.0, dur: 0.4, hand: "L" }, { note: "E4", time: 4.5, dur: 0.4, hand: "R" },
+                            { note: "F3", time: 5.5, dur: 0.4, hand: "L" }, { note: "F4", time: 6.0, dur: 0.4, hand: "R" },
+                            { note: "G3", time: 7.0, dur: 0.8, hand: "L" }, { note: "G4", time: 7.0, dur: 0.8, hand: "R" }
+                        ]
+                    },
+                    simpleSimon: {
+                        title: "5. Simple Simon (Reaction)", tempo: 100,
+                        notes: [
+                            { note: "C4", time: 1.0, dur: 0.4, hand: "R" }, { note: "E4", time: 2.0, dur: 0.4, hand: "R" },
+                            { note: "D4", time: 3.0, dur: 0.4, hand: "R" }, { note: "C3", time: 4.0, dur: 0.4, hand: "L" },
+                            { note: "D3", time: 5.0, dur: 0.4, hand: "L" }, { note: "E3", time: 6.0, dur: 0.4, hand: "L" },
+                            { note: "E4", time: 7.0, dur: 0.4, hand: "R" }, { note: "C3", time: 7.5, dur: 0.4, hand: "L" },
+                            { note: "D4", time: 8.0, dur: 0.4, hand: "R" }, { note: "D3", time: 8.5, dur: 0.4, hand: "L" }
+                        ]
+                    }
+                }
+            }
+        };
+
         const KEYBOARD_RANGES = {
-            "25": { startMidi: 60, endMidi: 84, whiteKeyWidth: 50 },  // C4 to C6
+            "25": { startMidi: 48, endMidi: 72, whiteKeyWidth: 40 },  // C3 to C5
             "49": { startMidi: 36, endMidi: 84, whiteKeyWidth: 32 },  // C2 to C6
             "61": { startMidi: 36, endMidi: 96, whiteKeyWidth: 26 },  // C2 to C7
             "88": { startMidi: 21, endMidi: 108, whiteKeyWidth: 19 }  // A0 to C8
@@ -589,166 +804,15 @@
             'k': 'C5', 'o': 'C#5', 'l': 'D5', 'p': 'D#5', ';': 'E5', "'": 'F5'
         };
 
-        const SONGS = {
-            odeToJoy: {
-                tempo: 110,
-                notes: [
-                    { note: "E4", time: 1.0, dur: 0.4 }, { note: "E4", time: 1.5, dur: 0.4 },
-                    { note: "F4", time: 2.0, dur: 0.4 }, { note: "G4", time: 2.5, dur: 0.4 },
-                    { note: "G4", time: 3.0, dur: 0.4 }, { note: "F4", time: 3.5, dur: 0.4 },
-                    { note: "E4", time: 4.0, dur: 0.4 }, { note: "D4", time: 4.5, dur: 0.4 },
-                    { note: "C4", time: 5.0, dur: 0.4 }, { note: "C4", time: 5.5, dur: 0.4 },
-                    { note: "D4", time: 6.0, dur: 0.4 }, { note: "E4", time: 6.5, dur: 0.4 },
-                    { note: "E4", time: 7.0, dur: 0.6 }, { note: "D4", time: 7.8, dur: 0.2 },
-                    { note: "D4", time: 8.2, dur: 0.8 }
-                ]
-            },
-            cMajorScale: {
-                tempo: 90,
-                notes: [
-                    { note: "C4", time: 1.0, dur: 0.4 }, { note: "D4", time: 1.5, dur: 0.4 },
-                    { note: "E4", time: 2.0, dur: 0.4 }, { note: "F4", time: 2.5, dur: 0.4 },
-                    { note: "G4", time: 3.0, dur: 0.4 }, { note: "A4", time: 3.5, dur: 0.4 },
-                    { note: "B4", time: 4.0, dur: 0.4 }, { note: "C5", time: 4.5, dur: 0.8 },
-                    { note: "B4", time: 5.5, dur: 0.4 }, { note: "A4", time: 6.0, dur: 0.4 },
-                    { note: "G4", time: 6.5, dur: 0.4 }, { note: "F4", time: 7.0, dur: 0.4 },
-                    { note: "E4", time: 7.5, dur: 0.4 }, { note: "D4", time: 8.0, dur: 0.4 },
-                    { note: "C4", time: 8.5, dur: 0.8 }
-                ]
-            },
-            messedUpHook: {
-                tempo: 126,
-                notes: [
-                    { note: "A4", time: 1.0, dur: 0.3 }, { note: "C5", time: 1.35, dur: 0.3 },
-                    { note: "E5", time: 1.7, dur: 0.5 }, { note: "D5", time: 2.3, dur: 0.3 },
-                    { note: "C5", time: 2.7, dur: 0.3 }, { note: "B4", time: 3.1, dur: 0.6 },
-                    { note: "G4", time: 3.8, dur: 0.3 }, { note: "A4", time: 4.2, dur: 0.9 }
-                ]
-            }
-        };
-
         // ==========================================
-        // 2. ADVANCED TONE.JS AUDIO ENGINE
+        // 2. DOM ELEMENTS & STATE MANAGEMENT
         // ==========================================
-        let currentInstrument = null;
-        let masterBus = null;
-        let metronomeBus = null;
+        const gradeSelect = document.getElementById("gradeSelect");
+        const songSelect = document.getElementById("songSelect");
+        const handSelect = document.getElementById("handSelect");
+        const keyboardSizeSelect = document.getElementById("keyboardSizeSelect");
+        const tempoInput = document.getElementById("tempoInput");
         
-        let metronomeWoodblock, metronomeDigital, metronomeDrum;
-        let pianoSamples = null;
-        let pianoSamplesLoading = null;
-        
-        const SALAMANDER_PIANO_URL = "https://tonejs.github.io/audio/salamander/";
-
-        // Volume Sliders
-        const instVolSlider = document.getElementById("instVolSlider");
-        const metroVolSlider = document.getElementById("metroVolSlider");
-
-        instVolSlider.addEventListener("input", (e) => {
-            if (masterBus) masterBus.gain.value = parseFloat(e.target.value);
-        });
-
-        metroVolSlider.addEventListener("input", (e) => {
-            if (metronomeBus) metronomeBus.gain.value = parseFloat(e.target.value);
-        });
-
-        async function loadPianoSamples() {
-            if (pianoSamples) return pianoSamples;
-            if (pianoSamplesLoading) return pianoSamplesLoading;
-
-            pianoSamplesLoading = new Promise((resolve, reject) => {
-                const sampleUrls = {
-                    C4: "C4.mp3", "D#4": "Ds4.mp3", "F#4": "Fs4.mp3", A4: "A4.mp3",
-                    C5: "C5.mp3", "D#5": "Ds5.mp3", "F#5": "Fs5.mp3", A5: "A5.mp3"
-                };
-
-                const entries = Object.entries(sampleUrls);
-                Promise.all(entries.map(async ([note, filename]) => {
-                    const response = await fetch(SALAMANDER_PIANO_URL + filename);
-                    if (!response.ok) throw new Error(`Sample failed: ${filename}`);
-                    const arrayBuffer = await response.arrayBuffer();
-                    const audioBuffer = await Tone.getContext().rawContext.decodeAudioData(arrayBuffer);
-                    return [note, audioBuffer];
-                }))
-                .then(results => {
-                    pianoSamples = Object.fromEntries(results);
-                    resolve(pianoSamples);
-                })
-                .catch(reject);
-            });
-            return pianoSamplesLoading;
-        }
-
-        async function initAudio(instrumentType) {
-            if (!masterBus) {
-                // Main Instrument FX Chain & Bus
-                const reverb = new Tone.Reverb({ decay: 2.5, preDelay: 0.01, wet: 0.2 }).toDestination();
-                const delay = new Tone.FeedbackDelay({ delayTime: "8n", feedback: 0.1, wet: 0.05 }).connect(reverb);
-                const compressor = new Tone.Compressor({ threshold: -18, ratio: 2.5 }).connect(delay);
-                masterBus = new Tone.Gain(parseFloat(instVolSlider.value)).connect(compressor);
-
-                // Dedicated Metronome Bus (Bypasses Reverb/Delay)
-                metronomeBus = new Tone.Gain(parseFloat(metroVolSlider.value)).toDestination();
-
-                metronomeWoodblock = new Tone.MembraneSynth({ pitchDecay: 0.008, envelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.1 } }).connect(metronomeBus);
-                metronomeWoodblock.volume.value = -5;
-
-                metronomeDigital = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "square" }, envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.05 } }).connect(metronomeBus);
-                metronomeDigital.volume.value = -12;
-
-                metronomeDrum = new Tone.MembraneSynth({ pitchDecay: 0.05, envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 } }).connect(metronomeBus);
-                metronomeDrum.volume.value = -2;
-            }
-
-            if (currentInstrument) {
-                currentInstrument.dispose();
-                currentInstrument = null;
-            }
-
-            if (instrumentType === "grandpiano" || instrumentType === "softpiano") {
-                document.getElementById("loadingBanner").style.display = "flex";
-                const loadedSamples = await loadPianoSamples();
-                
-                if (instrumentType === "grandpiano") {
-                    currentInstrument = new Tone.Sampler({ urls: loadedSamples, attack: 0.002, release: 1.8 }).connect(masterBus);
-                } else {
-                    const filter = new Tone.Filter({ type: "lowpass", frequency: 5000, rolloff: -12 }).connect(masterBus);
-                    currentInstrument = new Tone.Sampler({ urls: loadedSamples, attack: 0.008, release: 2.2 }).connect(filter);
-                    currentInstrument.volume.value = -2;
-                }
-                document.getElementById("loadingBanner").style.display = "none";
-            } 
-            else if (instrumentType === "electricpiano") {
-                currentInstrument = new Tone.PolySynth(Tone.FMSynth, {
-                    harmonicity: 2.5, modulationIndex: 1.5, oscillator: { type: "sine" },
-                    envelope: { attack: 0.01, decay: 1.2, sustain: 0.45, release: 1.8 }
-                }).connect(masterBus);
-                currentInstrument.volume.value = -4;
-            } 
-            else if (instrumentType === "strings") {
-                currentInstrument = new Tone.PolySynth(Tone.Synth, {
-                    oscillator: { type: "triangle" }, envelope: { attack: 0.35, decay: 0.5, sustain: 0.65, release: 2.5 }
-                }).connect(masterBus);
-                currentInstrument.volume.value = -8;
-            } 
-            else if (instrumentType === "pad") {
-                currentInstrument = new Tone.PolySynth(Tone.Synth, {
-                    oscillator: { type: "sine" }, envelope: { attack: 0.8, decay: 1.2, sustain: 0.7, release: 3.5 }
-                }).connect(masterBus);
-                currentInstrument.volume.value = -10;
-            } 
-            else if (instrumentType === "bell") {
-                currentInstrument = new Tone.PolySynth(Tone.MetalSynth, {
-                    frequency: 250, envelope: { attack: 0.001, decay: 1.8, release: 2.0 },
-                    harmonicity: 5.1, modulationIndex: 12, resonance: 3500, octaves: 1.5
-                }).connect(masterBus);
-                currentInstrument.volume.value = -12;
-            }
-        }
-
-        // ==========================================
-        // 3. DOM ELEMENTS & STATE MANAGEMENT
-        // ==========================================
         const canvas = document.getElementById("fallingCanvas");
         const ctx = canvas.getContext("2d");
         const pianoEl = document.getElementById("pianoKeyboard");
@@ -759,12 +823,7 @@
         const btnDemo = document.getElementById("btnDemo");
         const btnMetronome = document.getElementById("btnMetronome");
         const btnResetTempo = document.getElementById("btnResetTempo");
-        const songSelect = document.getElementById("songSelect");
-        const playModeSelect = document.getElementById("playModeSelect");
-        const keyboardSizeSelect = document.getElementById("keyboardSizeSelect");
         const instrumentSelect = document.getElementById("instrumentSelect");
-        const metronomeSoundSelect = document.getElementById("metronomeSoundSelect");
-        const tempoInput = document.getElementById("tempoInput");
 
         const statAccuracy = document.getElementById("statAccuracy");
         const statStreak = document.getElementById("statStreak");
@@ -784,9 +843,9 @@
         let currentWaitTarget = null;
         let songTimeOffset = 0;
         let lastFrameTimestamp = 0;
-        let activeSong = null;
+        let activeSong = null; 
         
-        let currentBPM = 110;
+        let currentBPM = 100;
         let speedMultiplier = 1.0;
         let isMetronomeOn = false;
         let lastBeatPlayed = -1;
@@ -800,33 +859,195 @@
         keyboardScrollContainer.addEventListener("scroll", () => { canvasScrollContainer.scrollLeft = keyboardScrollContainer.scrollLeft; });
 
         // ==========================================
-        // 4. SETTINGS CONTROLS
+        // 3. COMPLETION TRACKING & UI HANDLERS
         // ==========================================
+        function isSongCompleted(songId) {
+            return localStorage.getItem('tonevault_completed_' + songId) === 'true';
+        }
+
+        function markSongCompleted(songId) {
+            localStorage.setItem('tonevault_completed_' + songId, 'true');
+        }
+
+        function isGradeCompleted(gradeId) {
+            const songs = Object.keys(CURRICULUM[gradeId].songs);
+            return songs.every(isSongCompleted);
+        }
+
+        function updateGradeDropdown() {
+            const optionsContainer = document.getElementById('gradeSelectOptions');
+            const triggerSpan = document.querySelector('#gradeSelectTrigger span');
+            const customOptions = optionsContainer.querySelectorAll('.custom-option');
+            
+            customOptions.forEach(opt => {
+                const gradeId = opt.dataset.value;
+                const title = CURRICULUM[gradeId].title;
+                const checkmark = isGradeCompleted(gradeId) ? ' <i class="fa-solid fa-circle-check" style="color: #10b981; margin-left: 8px;"></i>' : '';
+                opt.innerHTML = title + checkmark;
+                
+                if (opt.classList.contains('selected')) {
+                    triggerSpan.textContent = title; 
+                }
+            });
+        }
+
+        function populateSongs() {
+            const grade = gradeSelect.value;
+            const songs = CURRICULUM[grade].songs;
+            
+            const select = document.getElementById('songSelect');
+            const optionsContainer = document.getElementById('songSelectOptions');
+            const triggerSpan = document.querySelector('#songSelectTrigger span');
+            
+            select.innerHTML = '';
+            optionsContainer.innerHTML = '';
+            
+            let firstSong = null;
+            let index = 0;
+            
+            for (const [key, data] of Object.entries(songs)) {
+                if(index === 0) firstSong = {key, title: data.title};
+                
+                const optionEl = document.createElement("option");
+                optionEl.value = key;
+                optionEl.textContent = data.title;
+                if (index === 0) optionEl.selected = true;
+                select.appendChild(optionEl);
+
+                const div = document.createElement('div');
+                div.className = 'custom-option' + (index === 0 ? ' selected' : '');
+                div.dataset.value = key;
+                
+                const checkmark = isSongCompleted(key) ? ' <i class="fa-solid fa-circle-check" style="color: #10b981; margin-left: 8px;"></i>' : '';
+                div.innerHTML = data.title + checkmark;
+                
+                optionsContainer.appendChild(div);
+                index++;
+            }
+            
+            if(firstSong) triggerSpan.textContent = firstSong.title;
+            
+            resetTempo();
+        }
+
+        function getCurrentSongData() {
+            const grade = gradeSelect.value;
+            const songKey = songSelect.value;
+            return CURRICULUM[grade].songs[songKey];
+        }
+
         function updateTempoState() {
-            const defaultTempo = SONGS[songSelect.value].tempo;
+            const defaultTempo = getCurrentSongData().tempo;
             speedMultiplier = currentBPM / defaultTempo;
         }
 
         function resetTempo() {
-            currentBPM = SONGS[songSelect.value].tempo;
+            currentBPM = getCurrentSongData().tempo;
             tempoInput.value = currentBPM;
             updateTempoState();
+            buildDynamicPiano();
         }
 
-        songSelect.addEventListener("change", () => {
-            resetTempo();
-            if (keyboardSizeSelect.value === "auto") buildDynamicPiano();
+        gradeSelect.addEventListener("change", populateSongs);
+        songSelect.addEventListener("change", resetTempo);
+        handSelect.addEventListener("change", () => {
+            if (isPlaying || isCountingDown) stopPractice();
+            buildDynamicPiano();
         });
 
         tempoInput.addEventListener("change", (e) => {
             let val = parseFloat(e.target.value);
             if (val < 30) val = 30; if (val > 300) val = 300;
-            currentBPM = val;
-            tempoInput.value = currentBPM;
+            currentBPM = val; tempoInput.value = currentBPM;
             updateTempoState();
         });
-
         btnResetTempo.addEventListener("click", resetTempo);
+
+        // Initialize UI
+        populateSongs();
+        updateGradeDropdown();
+
+        // ==========================================
+        // 4. ADVANCED TONE.JS AUDIO ENGINE
+        // ==========================================
+        let currentInstrument = null;
+        let masterBus = null;
+        let metronomeBus = null;
+        
+        let metronomeWoodblock, metronomeDigital, metronomeDrum;
+        let pianoSamples = null;
+        let pianoSamplesLoading = null;
+        
+        const SALAMANDER_PIANO_URL = "https://tonejs.github.io/audio/salamander/";
+        const instVolSlider = document.getElementById("instVolSlider");
+        const metroVolSlider = document.getElementById("metroVolSlider");
+
+        instVolSlider.addEventListener("input", (e) => { if (masterBus) masterBus.gain.value = parseFloat(e.target.value); });
+        metroVolSlider.addEventListener("input", (e) => { if (metronomeBus) metronomeBus.gain.value = parseFloat(e.target.value); });
+
+        async function loadPianoSamples() {
+            if (pianoSamples) return pianoSamples;
+            if (pianoSamplesLoading) return pianoSamplesLoading;
+            pianoSamplesLoading = new Promise((resolve, reject) => {
+                const sampleUrls = {
+                    C3: "C3.mp3", "D#3": "Ds3.mp3", "F#3": "Fs3.mp3", A3: "A3.mp3",
+                    C4: "C4.mp3", "D#4": "Ds4.mp3", "F#4": "Fs4.mp3", A4: "A4.mp3",
+                    C5: "C5.mp3", "D#5": "Ds5.mp3", "F#5": "Fs5.mp3", A5: "A5.mp3"
+                };
+                const entries = Object.entries(sampleUrls);
+                Promise.all(entries.map(async ([note, filename]) => {
+                    const response = await fetch(SALAMANDER_PIANO_URL + filename);
+                    if (!response.ok) throw new Error(`Sample failed: ${filename}`);
+                    const arrayBuffer = await response.arrayBuffer();
+                    const audioBuffer = await Tone.getContext().rawContext.decodeAudioData(arrayBuffer);
+                    return [note, audioBuffer];
+                })).then(results => {
+                    pianoSamples = Object.fromEntries(results);
+                    resolve(pianoSamples);
+                }).catch(reject);
+            });
+            return pianoSamplesLoading;
+        }
+
+        async function initAudio(instrumentType) {
+            if (!masterBus) {
+                const reverb = new Tone.Reverb({ decay: 2.5, preDelay: 0.01, wet: 0.2 }).toDestination();
+                const delay = new Tone.FeedbackDelay({ delayTime: "8n", feedback: 0.1, wet: 0.05 }).connect(reverb);
+                const compressor = new Tone.Compressor({ threshold: -18, ratio: 2.5 }).connect(delay);
+                masterBus = new Tone.Gain(parseFloat(instVolSlider.value)).connect(compressor);
+
+                metronomeBus = new Tone.Gain(parseFloat(metroVolSlider.value)).toDestination();
+                metronomeWoodblock = new Tone.MembraneSynth({ pitchDecay: 0.008, envelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.1 } }).connect(metronomeBus);
+                metronomeWoodblock.volume.value = -5;
+                metronomeDigital = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "square" }, envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.05 } }).connect(metronomeBus);
+                metronomeDigital.volume.value = -12;
+                metronomeDrum = new Tone.MembraneSynth({ pitchDecay: 0.05, envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 } }).connect(metronomeBus);
+                metronomeDrum.volume.value = -2;
+            }
+
+            if (currentInstrument) { currentInstrument.dispose(); currentInstrument = null; }
+
+            if (instrumentType === "grandpiano" || instrumentType === "softpiano") {
+                document.getElementById("loadingBanner").style.display = "flex";
+                const loadedSamples = await loadPianoSamples();
+                if (instrumentType === "grandpiano") {
+                    currentInstrument = new Tone.Sampler({ urls: loadedSamples, attack: 0.002, release: 1.8 }).connect(masterBus);
+                } else {
+                    const filter = new Tone.Filter({ type: "lowpass", frequency: 5000, rolloff: -12 }).connect(masterBus);
+                    currentInstrument = new Tone.Sampler({ urls: loadedSamples, attack: 0.008, release: 2.2 }).connect(filter);
+                    currentInstrument.volume.value = -2;
+                }
+                document.getElementById("loadingBanner").style.display = "none";
+            } 
+            else if (instrumentType === "electricpiano") {
+                currentInstrument = new Tone.PolySynth(Tone.FMSynth, { harmonicity: 2.5, modulationIndex: 1.5, oscillator: { type: "sine" }, envelope: { attack: 0.01, decay: 1.2, sustain: 0.45, release: 1.8 } }).connect(masterBus);
+                currentInstrument.volume.value = -4;
+            } 
+            else if (instrumentType === "bell") {
+                currentInstrument = new Tone.PolySynth(Tone.MetalSynth, { frequency: 250, envelope: { attack: 0.001, decay: 1.8, release: 2.0 }, harmonicity: 5.1, modulationIndex: 12, resonance: 3500, octaves: 1.5 }).connect(masterBus);
+                currentInstrument.volume.value = -12;
+            }
+        }
 
         instrumentSelect.addEventListener("change", async (e) => {
             await Tone.start();
@@ -834,44 +1055,33 @@
         });
 
         function triggerMetronomeClick(isDownbeat, time) {
-            const type = metronomeSoundSelect.value;
-            if (type === "woodblock") {
-                metronomeWoodblock.triggerAttackRelease(isDownbeat ? "C5" : "G4", "32n", time, isDownbeat ? 1.0 : 0.6);
-            } else if (type === "digital") {
-                metronomeDigital.triggerAttackRelease(isDownbeat ? "C6" : "C5", "64n", time, isDownbeat ? 0.8 : 0.4);
-            } else if (type === "drum") {
-                metronomeDrum.triggerAttackRelease(isDownbeat ? "C2" : "G2", "16n", time, isDownbeat ? 1.0 : 0.5);
-            }
+            const type = document.getElementById("metronomeSoundSelect").value;
+            if (type === "woodblock") metronomeWoodblock.triggerAttackRelease(isDownbeat ? "C5" : "G4", "32n", time, isDownbeat ? 1.0 : 0.6);
+            else if (type === "digital") metronomeDigital.triggerAttackRelease(isDownbeat ? "C6" : "C5", "64n", time, isDownbeat ? 0.8 : 0.4);
+            else if (type === "drum") metronomeDrum.triggerAttackRelease(isDownbeat ? "C2" : "G2", "16n", time, isDownbeat ? 1.0 : 0.5);
         }
 
         btnMetronome.addEventListener("click", async () => {
             await Tone.start();
             if (!currentInstrument) await initAudio(instrumentSelect.value);
-            
             isMetronomeOn = !isMetronomeOn;
             btnMetronome.classList.toggle("active", isMetronomeOn);
-            
-            if (isMetronomeOn && !isPlaying && !isCountingDown) {
-                triggerMetronomeClick(true, Tone.now());
-            }
+            if (isMetronomeOn && !isPlaying && !isCountingDown) triggerMetronomeClick(true, Tone.now());
         });
-
-        resetTempo();
 
         // ==========================================
         // 5. DYNAMIC KEYBOARD GENERATION
         // ==========================================
-        function getAutoSongRange(songKey) {
-            const song = SONGS[songKey];
-            if (!song || !song.notes.length) return KEYBOARD_RANGES["49"];
+        function getAutoSongRange(songNotes) {
+            if (!songNotes.length) return { startMidi: 36, endMidi: 84, whiteKeyWidth: 32 };
             let minMidi = 127; let maxMidi = 0;
-            song.notes.forEach(n => {
+            songNotes.forEach(n => {
                 const midi = Tone.Midi(n.note).toMidi();
                 if (midi < minMidi) minMidi = midi;
                 if (midi > maxMidi) maxMidi = midi;
             });
-            let startMidi = Math.max(21, minMidi - 7);
-            let endMidi = Math.min(108, maxMidi + 7);
+            let startMidi = Math.max(21, minMidi - 5);
+            let endMidi = Math.min(108, maxMidi + 5);
             while (endMidi - startMidi < 24) {
                 if (startMidi > 21) startMidi--;
                 if (endMidi < 108) endMidi++;
@@ -886,9 +1096,12 @@
         function buildDynamicPiano() {
             pianoEl.innerHTML = "";
             keyPositions = {};
-            let rangeConfig = keyboardSizeSelect.value === "auto" ? getAutoSongRange(songSelect.value) : KEYBOARD_RANGES[keyboardSizeSelect.value];
             
-            // Calculate total white keys
+            const rawSongData = getCurrentSongData();
+            const hand = handSelect.value;
+            const filteredNotes = rawSongData.notes.filter(n => hand === "both" || n.hand === hand);
+
+            let rangeConfig = keyboardSizeSelect.value === "auto" ? getAutoSongRange(filteredNotes) : KEYBOARD_RANGES[keyboardSizeSelect.value];
             let whiteCount = 0;
             for (let i = rangeConfig.startMidi; i <= rangeConfig.endMidi; i++) {
                 if (!Tone.Midi(i).toNote().includes('#')) whiteCount++;
@@ -896,11 +1109,7 @@
 
             let containerWidth = canvasScrollContainer.clientWidth || 1170;
             let whiteWidth = rangeConfig.whiteKeyWidth;
-
-            // Automatically stretch the keys to fill the empty space horizontally
-            if ((whiteCount * whiteWidth) < containerWidth) {
-                whiteWidth = containerWidth / whiteCount;
-            }
+            if ((whiteCount * whiteWidth) < containerWidth) whiteWidth = containerWidth / whiteCount;
             if (whiteWidth > 65) whiteWidth = 65; 
 
             const blackWidth = whiteWidth * 0.65;
@@ -919,13 +1128,10 @@
             const xOffset = Math.max(0, (canvas.width - totalPianoWidth) / 2);
 
             whiteKeys.forEach(k => {
-                // Split pitch and octave for stacked layout
                 const pitch = k.note.replace(/[0-9]/g, '');
                 const octave = k.note.replace(/[^0-9]/g, '');
-
                 const keyDiv = document.createElement("div"); keyDiv.className = "key white-key"; keyDiv.id = `key-${k.note}`; keyDiv.style.width = `${whiteWidth}px`;
                 const qwertyKey = Object.keys(QWERTY_MAP).find(key => QWERTY_MAP[key] === k.note);
-                
                 keyDiv.innerHTML = `<span class="pitch">${pitch}</span><span class="octave">${octave}</span>${qwertyKey ? `<span class="key-hint">${qwertyKey.toUpperCase()}</span>` : ''}`;
                 keyDiv.addEventListener("mousedown", () => handleUserNoteOn(k.note));
                 keyDiv.addEventListener("mouseup", () => handleUserNoteOff(k.note));
@@ -934,14 +1140,11 @@
             });
 
             blackKeys.forEach(k => {
-                // Split pitch and octave for stacked layout
                 const pitch = k.note.replace(/[0-9]/g, '');
                 const octave = k.note.replace(/[^0-9]/g, '');
-
                 const keyDiv = document.createElement("div"); keyDiv.className = "key black-key"; keyDiv.id = `key-${k.note}`; keyDiv.style.width = `${blackWidth}px`;
                 const leftPos = (k.prevWhiteIndex * whiteWidth) + (whiteWidth - (blackWidth / 2)); keyDiv.style.left = `${leftPos}px`;
                 const qwertyKey = Object.keys(QWERTY_MAP).find(key => QWERTY_MAP[key] === k.note);
-                
                 keyDiv.innerHTML = `<span class="pitch">${pitch}</span><span class="octave">${octave}</span>${qwertyKey ? `<span class="key-hint">${qwertyKey.toUpperCase()}</span>` : ''}`;
                 keyDiv.addEventListener("mousedown", () => handleUserNoteOn(k.note));
                 keyDiv.addEventListener("mouseup", () => handleUserNoteOff(k.note));
@@ -954,10 +1157,9 @@
                 canvasScrollContainer.scrollLeft = centerScroll; keyboardScrollContainer.scrollLeft = centerScroll;
             }
         }
-
+        
         keyboardSizeSelect.addEventListener("change", buildDynamicPiano);
         window.addEventListener("resize", buildDynamicPiano);
-        buildDynamicPiano();
 
         // ==========================================
         // 6. NOTE TRIGGERING & SCORING
@@ -981,7 +1183,6 @@
                     }
                     return;
                 }
-
                 const target = activeSong.notes.find(n => n.note === note && Math.abs(n.time - songTimeOffset) < 0.35 && !n.hit);
                 if (target) { target.hit = true; notesHit++; currentStreak++; totalScore += 100 + (currentStreak * 10); } 
                 else { currentStreak = 0; }
@@ -1005,14 +1206,13 @@
             const note = QWERTY_MAP[e.key.toLowerCase()];
             if (note && !isCountingDown) handleUserNoteOn(note);
         });
-
         window.addEventListener("keyup", (e) => {
             const note = QWERTY_MAP[e.key.toLowerCase()];
             if (note) handleUserNoteOff(note);
         });
 
         // ==========================================
-        // 7. ANIMATION ENGINE & METRONOME
+        // 7. ANIMATION ENGINE
         // ==========================================
         const HIT_ZONE_Y = 370;
         const FALL_SPEED = 220; 
@@ -1032,7 +1232,7 @@
                 if (!isWaitingForNote) {
                     songTimeOffset += deltaSeconds * speedMultiplier;
                     
-                    const baseTempo = SONGS[songSelect.value].tempo;
+                    const baseTempo = activeSong.tempo;
                     const beatInterval = 60 / baseTempo; 
                     const currentBeat = Math.floor(songTimeOffset / beatInterval);
                     
@@ -1044,7 +1244,8 @@
                     }
                 }
 
-                if (!isDemoMode && playModeSelect.value === "wait" && !isWaitingForNote) {
+                const playMode = document.getElementById("playModeSelect").value;
+                if (!isDemoMode && playMode === "wait" && !isWaitingForNote) {
                     const upcomingNote = activeSong.notes.find(n => !n.hit && (n.time - songTimeOffset) <= 0.02);
                     if (upcomingNote) {
                         isWaitingForNote = true; currentWaitTarget = upcomingNote;
@@ -1056,13 +1257,10 @@
                 let activeNotesRemain = false;
 
                 activeSong.notes.forEach(n => {
-                    
                     if (isDemoMode) {
                         if (!n.hit && songTimeOffset >= n.time) {
                             n.hit = true; n.demoActive = true;
-                            if (currentInstrument && Tone.context.state === 'running') {
-                                currentInstrument.triggerAttack(n.note);
-                            }
+                            if (currentInstrument && Tone.context.state === 'running') currentInstrument.triggerAttack(n.note);
                             const el = document.getElementById(`key-${n.note}`);
                             if (el) el.classList.add("active");
                         }
@@ -1083,8 +1281,12 @@
                         const pos = keyPositions[n.note];
 
                         if (pos) {
-                            ctx.fillStyle = n.hit ? "#10b981" : (pos.isBlack ? "#0077ff" : "#00d4ff");
-                            ctx.shadowColor = pos.isBlack ? "#0077ff" : "#00d4ff";
+                            // Assign distinct colors based on hand assignment (White for L, Cyan for R)
+                            let fillCol = "#00d4ff"; 
+                            if (n.hand === "L") fillCol = "#ffffff"; 
+                            
+                            ctx.fillStyle = n.hit ? "#10b981" : fillCol;
+                            ctx.shadowColor = fillCol;
                             ctx.shadowBlur = 8;
                             ctx.beginPath();
                             ctx.roundRect(pos.x + 2, blockY - blockHeight, pos.w - 4, blockHeight, 5);
@@ -1120,8 +1322,7 @@
 
             if (isDemoMode) {
                 btnDemo.innerHTML = '<i class="fa-solid fa-stop"></i> Stop Demo';
-                btnDemo.style.background = "#ef4444";
-                btnDemo.style.borderColor = "#ef4444";
+                btnDemo.style.background = "#ef4444"; btnDemo.style.borderColor = "#ef4444";
                 btnPlay.disabled = true; btnPlay.style.opacity = "0.5";
             } else {
                 btnPlay.innerHTML = '<i class="fa-solid fa-stop"></i> Stop Practice';
@@ -1129,14 +1330,16 @@
                 btnDemo.disabled = true; btnDemo.style.opacity = "0.5";
             }
 
-            const selectedKey = songSelect.value;
-            activeSong = JSON.parse(JSON.stringify(SONGS[selectedKey]));
+            const rawSongData = getCurrentSongData();
+            activeSong = JSON.parse(JSON.stringify(rawSongData));
+            const hand = handSelect.value;
+            activeSong.notes = activeSong.notes.filter(n => hand === "both" || n.hand === hand);
+            
             totalExpectedNotes = activeSong.notes.length;
             notesHit = 0; currentStreak = 0; totalScore = 0;
             updateScoreboard();
             
-            isCountingDown = true;
-            isPlaying = false; 
+            isCountingDown = true; isPlaying = false; 
             
             let count = 3;
             countdownBanner.style.display = "flex";
@@ -1144,7 +1347,6 @@
             triggerMetronomeClick(true, Tone.now());
 
             const tickIntervalMs = 60000 / currentBPM;
-
             countdownTimer = setInterval(() => {
                 count--;
                 if (count > 0) {
@@ -1157,9 +1359,7 @@
                     clearInterval(countdownTimer);
                     countdownBanner.style.display = "none";
                     isCountingDown = false;
-                    
-                    songTimeOffset = 0;
-                    lastBeatPlayed = -1;
+                    songTimeOffset = 0; lastBeatPlayed = -1;
                     lastFrameTimestamp = performance.now();
                     isPlaying = true;
                 }
@@ -1173,6 +1373,16 @@
             isWaitingForNote = false; currentWaitTarget = null;
             waitingBanner.style.display = "none";
             
+            // Check for Completion (>= 70% Accuracy)
+            if (!isDemoMode && activeSong && totalExpectedNotes > 0) {
+                const accuracy = (notesHit / totalExpectedNotes) * 100;
+                if (accuracy >= 70) {
+                    markSongCompleted(songSelect.value);
+                    populateSongs(); // Re-render to show checkmark
+                    updateGradeDropdown();
+                }
+            }
+
             if (isDemoMode && activeSong) {
                 activeSong.notes.forEach(n => {
                     if (n.demoActive) {
@@ -1183,43 +1393,35 @@
                 });
             }
             
-            activeSong = null;
-            isDemoMode = false;
+            activeSong = null; isDemoMode = false;
             
             btnPlay.disabled = false; btnPlay.style.opacity = "1";
             btnPlay.innerHTML = '<i class="fa-solid fa-play"></i> Start Practice';
             btnPlay.style.background = "linear-gradient(135deg, #00d4ff, #0077ff)";
 
             btnDemo.disabled = false; btnDemo.style.opacity = "1";
-            btnDemo.innerHTML = '<i class="fa-solid fa-eye"></i> Watch Demo';
+            btnDemo.innerHTML = '<i class="fa-solid fa-eye"></i> Demo';
             btnDemo.style.background = "rgba(255, 255, 255, 0.1)";
             btnDemo.style.borderColor = "rgba(255, 255, 255, 0.2)";
         }
 
         btnPlay.addEventListener("click", () => {
-            if (isPlaying || isCountingDown) stopPractice();
-            else startPractice(false);
+            if (isPlaying || isCountingDown) stopPractice(); else startPractice(false);
         });
 
         btnDemo.addEventListener("click", () => {
-            if (isPlaying || isCountingDown) stopPractice();
-            else startPractice(true);
+            if (isPlaying || isCountingDown) stopPractice(); else startPractice(true);
         });
 
         // ==========================================
         // 9. WEB MIDI API INTEGRATION
         // ==========================================
-        if (navigator.requestMIDIAccess) {
-            navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
-        }
+        if (navigator.requestMIDIAccess) navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
 
         function onMIDISuccess(midiAccess) {
             const inputs = midiAccess.inputs.values();
             let count = 0;
-            for (let input of inputs) {
-                input.onmidimessage = handleMIDIMessage;
-                count++;
-            }
+            for (let input of inputs) { input.onmidimessage = handleMIDIMessage; count++; }
             updateMidiBadge(count);
 
             midiAccess.onstatechange = (e) => {
