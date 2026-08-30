@@ -704,6 +704,10 @@
                     let currentChordIdx = 0;
                     const arpDensitySeed = Math.random();
 
+                    // NEW: Track exact steps to prevent double-triggering
+                    const stepsPerBar = Math.round(barDuration / stepDuration);
+                    let currentStep = 0;
+
                     // ==========================================
                     // SECTION/PATTERN LOGIC MODIFIERS
                     // ==========================================
@@ -711,14 +715,16 @@
                     const isSparse = ['intro', 'verse', 'alapana', 'adagio', 'comping'].includes(pattern);
                     const isBuild = ['build', 'prechorus', 'crescendo'].includes(pattern);
 
-                    while (currentTime + stepDuration <= exactMaxTime) {
+                    // Changed to < to prevent floating point rounding errors at the exact end
+                    while (currentTime + 0.001 < exactMaxTime) {
                         if (Math.floor(currentTime / (barDuration * 2)) !== currentChordIdx) {
                             currentChordIdx = Math.floor(currentTime / (barDuration * 2)) % chordProgression.length;
                         }
 
                         const baseDegree = chordProgression[currentChordIdx];
-                        const beatPositionInBar = Math.floor((currentTime % barDuration) / secondsPerTimeUnit);
-                        const isDownbeat = beatPositionInBar === 0;
+
+                        // NEW: Mathematically perfect downbeat check
+                        const isDownbeat = (currentStep % stepsPerBar === 0);
 
                         // Dynamic Velocity Curve for Builds
                         let currentVel = 0.75;
@@ -726,13 +732,14 @@
                         if (isDense) currentVel = 0.85;
                         if (isSparse) currentVel = 0.55;
 
-                        // Chords on Downbeats
+                        // Chords strictly on Downbeats
                         if (isDownbeat) {
                             let duration = Math.min(barDuration * 0.8, exactMaxTime - currentTime);
                             const midiNote = rootNoteVal + intervals[baseDegree % intervals.length];
+
                             track.addNote({ midi: midiNote, time: currentTime, duration: duration, velocity: currentVel });
                             generatedNotes.push({ name: Tone.Midi(midiNote).toNote(), duration: duration, time: currentTime, velocity: currentVel });
-                            
+
                             // Add Bass Octave if Dense
                             if(isDense) {
                                 track.addNote({ midi: midiNote - 12, time: currentTime, duration: duration, velocity: currentVel });
@@ -758,9 +765,8 @@
                         }
 
                         currentTime += stepDuration;
-                        currentTime = Math.min(currentTime, exactMaxTime);
+                        currentStep++; // NEW: Increment step perfectly
                     }
-
                     // Export MIDI Blob
                     const midiArray = midi.toArray();
                     const midiBlob = new Blob([midiArray], { type: "audio/midi" });
