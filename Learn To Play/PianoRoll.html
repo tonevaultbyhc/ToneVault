@@ -15,15 +15,15 @@
         *, *::before, *::after { box-sizing: border-box; }
         body { margin: 0; padding: 0; color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
 
-        .container { max-width: 1750px; margin: 40px auto 30px auto; padding: 0 20px; }
+        .container { max-width: 1750px; margin: 50px auto 30px auto; padding: 0 20px; }
 
         /* Split Top Section (Title Left, Scoreboard Right) */
         .top-nav-split {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 30px;
-            margin-bottom: 25px;
+            margin-top: 35px;
+            margin-bottom: 20px;
             padding: 0 5px;
         }
 
@@ -720,4 +720,447 @@
             if (!masterBus) {
                 const reverb = new Tone.Reverb({ decay: 2.5, preDelay: 0.01, wet: 0.2 }).toDestination();
                 const delay = new Tone.FeedbackDelay({ delayTime: "8n", feedback: 0.1, wet: 0.05 }).connect(reverb);
-                const compressor = new Tone.Compressor({ threshold: -18, ratio: 2.5 }).connect
+                const compressor = new Tone.Compressor({ threshold: -18, ratio: 2.5 }).connect(delay);
+                masterBus = new Tone.Gain(parseFloat(instVolSlider.value)).connect(compressor);
+
+                metronomeBus = new Tone.Gain(parseFloat(metroVolSlider.value)).toDestination();
+                metronomeWoodblock = new Tone.MembraneSynth({ pitchDecay: 0.008, envelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.1 } }).connect(metronomeBus);
+                metronomeWoodblock.volume.value = -5;
+                metronomeDigital = new Tone.PolySynth(Tone.Synth, { oscillator: { type: "square" }, envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.05 } }).connect(metronomeBus);
+                metronomeDigital.volume.value = -12;
+                metronomeDrum = new Tone.MembraneSynth({ pitchDecay: 0.05, envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 } }).connect(metronomeBus);
+                metronomeDrum.volume.value = -2;
+            }
+
+            if (currentInstrument) { currentInstrument.dispose(); currentInstrument = null; }
+
+            if (instrumentType === "grandpiano" || instrumentType === "softpiano") {
+                document.getElementById("loadingBanner").style.display = "flex";
+                const loadedSamples = await loadPianoSamples();
+                if (instrumentType === "grandpiano") {
+                    currentInstrument = new Tone.Sampler({ urls: loadedSamples, attack: 0.002, release: 1.8 }).connect(masterBus);
+                } else {
+                    const filter = new Tone.Filter({ type: "lowpass", frequency: 5000, rolloff: -12 }).connect(masterBus);
+                    currentInstrument = new Tone.Sampler({ urls: loadedSamples, attack: 0.008, release: 2.2 }).connect(filter);
+                    currentInstrument.volume.value = -2;
+                }
+                document.getElementById("loadingBanner").style.display = "none";
+            } 
+            else if (instrumentType === "electricpiano") {
+                currentInstrument = new Tone.PolySynth(Tone.FMSynth, { harmonicity: 2.5, modulationIndex: 1.5, oscillator: { type: "sine" }, envelope: { attack: 0.01, decay: 1.2, sustain: 0.45, release: 1.8 } }).connect(masterBus);
+                currentInstrument.volume.value = -4;
+            } 
+            else if (instrumentType === "bell") {
+                currentInstrument = new Tone.PolySynth(Tone.MetalSynth, { frequency: 250, envelope: { attack: 0.001, decay: 1.8, release: 2.0 }, harmonicity: 5.1, modulationIndex: 12, resonance: 3500, octaves: 1.5 }).connect(masterBus);
+                currentInstrument.volume.value = -12;
+            }
+        }
+
+        instrumentSelect.addEventListener("change", async (e) => {
+            await Tone.start();
+            await initAudio(e.target.value);
+        });
+
+        function triggerMetronomeClick(isDownbeat, time) {
+            const type = document.getElementById("metronomeSoundSelect").value;
+            if (type === "woodblock") metronomeWoodblock.triggerAttackRelease(isDownbeat ? "C5" : "G4", "32n", time, isDownbeat ? 1.0 : 0.6);
+            else if (type === "digital") metronomeDigital.triggerAttackRelease(isDownbeat ? "C6" : "C5", "64n", time, isDownbeat ? 0.8 : 0.4);
+            else if (type === "drum") metronomeDrum.triggerAttackRelease(isDownbeat ? "C2" : "G2", "16n", time, isDownbeat ? 1.0 : 0.5);
+        }
+
+        btnMetronome.addEventListener("click", async () => {
+            await Tone.start();
+            if (!currentInstrument) await initAudio(instrumentSelect.value);
+            isMetronomeOn = !isMetronomeOn;
+            btnMetronome.classList.toggle("active", isMetronomeOn);
+            if (isMetronomeOn && !isPlaying && !isCountingDown) triggerMetronomeClick(true, Tone.now());
+        });
+
+        // ==========================================
+        // 5. DYNAMIC KEYBOARD GENERATION
+        // ==========================================
+        function getAutoSongRange(songNotes) {
+            if (!songNotes.length) return { startMidi: 36, endMidi: 84, whiteKeyWidth: 32 };
+            let minMidi = 127; let maxMidi = 0;
+            songNotes.forEach(n => {
+                const midi = Tone.Midi(n.note).toMidi();
+                if (midi < minMidi) minMidi = midi;
+                if (midi > maxMidi) maxMidi = midi;
+            });
+            let startMidi = Math.max(21, minMidi - 5);
+            let endMidi = Math.min(108, maxMidi + 5);
+            while (endMidi - startMidi < 24) {
+                if (startMidi > 21) startMidi--;
+                if (endMidi < 108) endMidi++;
+            }
+            let whiteCount = 0;
+            for (let i = startMidi; i <= endMidi; i++) if (!Tone.Midi(i).toNote().includes('#')) whiteCount++;
+            let calcWidth = Math.floor(1000 / whiteCount);
+            if (calcWidth > 55) calcWidth = 55; if (calcWidth < 19) calcWidth = 19;
+            return { startMidi, endMidi, whiteKeyWidth: calcWidth };
+        }
+
+        function buildDynamicPiano() {
+            pianoEl.innerHTML = "";
+            keyPositions = {};
+            
+            const rawSongData = getCurrentSongData();
+            const filteredNotes = rawSongData.notes; 
+
+            let rangeConfig = keyboardSizeSelect.value === "auto" ? getAutoSongRange(filteredNotes) : KEYBOARD_RANGES[keyboardSizeSelect.value];
+            
+            let whiteCount = 0;
+            for (let i = rangeConfig.startMidi; i <= rangeConfig.endMidi; i++) {
+                if (!Tone.Midi(i).toNote().includes('#')) whiteCount++;
+            }
+
+            let containerWidth = canvasScrollContainer.clientWidth || 1100;
+            let whiteWidth = rangeConfig.whiteKeyWidth;
+            
+            if (whiteWidth === "fit" || keyboardSizeSelect.value === "88") {
+                whiteWidth = containerWidth / whiteCount;
+            } else if ((whiteCount * whiteWidth) < containerWidth) {
+                whiteWidth = containerWidth / whiteCount;
+            }
+
+            const blackWidth = whiteWidth * 0.65;
+            let whiteKeys = []; let blackKeys = []; let whiteIndex = 0;
+
+            for (let midi = rangeConfig.startMidi; midi <= rangeConfig.endMidi; midi++) {
+                const noteName = Tone.Midi(midi).toNote();
+                if (!noteName.includes("#")) whiteKeys.push({ midi, note: noteName, whiteIndex: whiteIndex++ });
+                else blackKeys.push({ midi, note: noteName, prevWhiteIndex: whiteIndex - 1 });
+            }
+
+            const totalPianoWidth = whiteIndex * whiteWidth;
+            pianoEl.style.width = `${totalPianoWidth}px`;
+            canvas.width = Math.max(totalPianoWidth, containerWidth);
+            canvas.height = 320;
+            const xOffset = Math.max(0, (canvas.width - totalPianoWidth) / 2);
+
+            whiteKeys.forEach(k => {
+                const pitch = k.note.replace(/[0-9]/g, '');
+                const octave = k.note.replace(/[^0-9]/g, '');
+                const keyDiv = document.createElement("div"); keyDiv.className = "key white-key"; keyDiv.id = `key-${k.note}`; keyDiv.style.width = `${whiteWidth}px`;
+                const qwertyKey = Object.keys(QWERTY_MAP).find(key => QWERTY_MAP[key] === k.note);
+                
+                const showLabel = whiteWidth > 22;
+                keyDiv.innerHTML = showLabel ? `<span class="pitch">${pitch}</span><span class="octave">${octave}</span>${qwertyKey ? `<span class="key-hint">${qwertyKey.toUpperCase()}</span>` : ''}` : '';
+                
+                keyDiv.addEventListener("mousedown", () => handleUserNoteOn(k.note));
+                keyDiv.addEventListener("mouseup", () => handleUserNoteOff(k.note));
+                pianoEl.appendChild(keyDiv);
+                keyPositions[k.note] = { x: xOffset + (k.whiteIndex * whiteWidth), w: whiteWidth, isBlack: false };
+            });
+
+            blackKeys.forEach(k => {
+                const pitch = k.note.replace(/[0-9]/g, '');
+                const octave = k.note.replace(/[^0-9]/g, '');
+                const keyDiv = document.createElement("div"); keyDiv.className = "key black-key"; keyDiv.id = `key-${k.note}`; keyDiv.style.width = `${blackWidth}px`;
+                const leftPos = (k.prevWhiteIndex * whiteWidth) + (whiteWidth - (blackWidth / 2)); keyDiv.style.left = `${leftPos}px`;
+                const qwertyKey = Object.keys(QWERTY_MAP).find(key => QWERTY_MAP[key] === k.note);
+                
+                const showLabel = whiteWidth > 28;
+                keyDiv.innerHTML = showLabel ? `<span class="pitch">${pitch}</span><span class="octave">${octave}</span>${qwertyKey ? `<span class="key-hint">${qwertyKey.toUpperCase()}</span>` : ''}` : '';
+                
+                keyDiv.addEventListener("mousedown", () => handleUserNoteOn(k.note));
+                keyDiv.addEventListener("mouseup", () => handleUserNoteOff(k.note));
+                pianoEl.appendChild(keyDiv);
+                keyPositions[k.note] = { x: xOffset + leftPos, w: blackWidth, isBlack: true };
+            });
+
+            if (totalPianoWidth > containerWidth) {
+                const centerScroll = (totalPianoWidth - containerWidth) / 2;
+                canvasScrollContainer.scrollLeft = centerScroll; keyboardScrollContainer.scrollLeft = centerScroll;
+            }
+        }
+        
+        keyboardSizeSelect.addEventListener("change", buildDynamicPiano);
+        window.addEventListener("resize", buildDynamicPiano);
+
+        // ==========================================
+        // 6. NOTE TRIGGERING & SCORING
+        // ==========================================
+        async function handleUserNoteOn(note) {
+            await Tone.start();
+            if (!currentInstrument) await initAudio(instrumentSelect.value);
+            
+            currentInstrument.triggerAttack(note);
+            const el = document.getElementById(`key-${note}`);
+            if (el) el.classList.add("active");
+
+            if (isPlaying && activeSong && !isDemoMode) {
+                if (isWaitingForNote && currentWaitTarget) {
+                    if (currentWaitTarget.note === note) {
+                        currentWaitTarget.hit = true;
+                        isWaitingForNote = false; currentWaitTarget = null;
+                        waitingBanner.style.display = "none";
+                        notesHit++; currentStreak++; totalScore += 120 + (currentStreak * 10);
+                        updateScoreboard();
+                    }
+                    return;
+                }
+                const target = activeSong.notes.find(n => n.note === note && Math.abs(n.time - songTimeOffset) < 0.35 && !n.hit);
+                if (target) { target.hit = true; notesHit++; currentStreak++; totalScore += 100 + (currentStreak * 10); } 
+                else { currentStreak = 0; }
+                updateScoreboard();
+            }
+        }
+
+        function handleUserNoteOff(note) {
+            if (currentInstrument) currentInstrument.triggerRelease(note);
+            const el = document.getElementById(`key-${note}`);
+            if (el) el.classList.remove("active");
+        }
+
+        function updateScoreboard() {
+            statStreak.innerText = currentStreak; statScore.innerText = totalScore;
+            statAccuracy.innerText = `${totalExpectedNotes > 0 ? Math.round((notesHit / totalExpectedNotes) * 100) : 100}%`;
+        }
+
+        window.addEventListener("keydown", (e) => {
+            if (e.repeat) return;
+            const note = QWERTY_MAP[e.key.toLowerCase()];
+            if (note && !isCountingDown) handleUserNoteOn(note);
+        });
+        window.addEventListener("keyup", (e) => {
+            const note = QWERTY_MAP[e.key.toLowerCase()];
+            if (note) handleUserNoteOff(note);
+        });
+
+        // ==========================================
+        // 7. ANIMATION ENGINE
+        // ==========================================
+        const HIT_ZONE_Y = 290;
+        const FALL_SPEED = 200; 
+
+        function renderEngine(timestamp) {
+            if (!lastFrameTimestamp) lastFrameTimestamp = timestamp;
+            const deltaSeconds = (timestamp - lastFrameTimestamp) / 1000;
+            lastFrameTimestamp = timestamp;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = "rgba(0, 212, 255, 0.4)";
+            ctx.lineWidth = 2; ctx.beginPath();
+            ctx.moveTo(0, HIT_ZONE_Y); ctx.lineTo(canvas.width, HIT_ZONE_Y); ctx.stroke();
+
+            if (isPlaying && activeSong) {
+                if (!isWaitingForNote) {
+                    songTimeOffset += deltaSeconds * speedMultiplier;
+                    
+                    const baseTempo = activeSong.tempo;
+                    const beatInterval = 60 / baseTempo; 
+                    const currentBeat = Math.floor(songTimeOffset / beatInterval);
+                    
+                    if (currentBeat > lastBeatPlayed && songTimeOffset >= 0) {
+                        lastBeatPlayed = currentBeat;
+                        if (isMetronomeOn && Tone.context.state === 'running') {
+                            triggerMetronomeClick(currentBeat % 4 === 0, Tone.now());
+                        }
+                    }
+                }
+
+                const playMode = document.getElementById("playModeSelect").value;
+                if (!isDemoMode && playMode === "wait" && !isWaitingForNote) {
+                    const upcomingNote = activeSong.notes.find(n => !n.hit && (n.time - songTimeOffset) <= 0.02);
+                    if (upcomingNote) {
+                        isWaitingForNote = true; currentWaitTarget = upcomingNote;
+                        waitingNoteName.innerText = upcomingNote.note;
+                        waitingBanner.style.display = "block";
+                    }
+                }
+
+                let activeNotesRemain = false;
+
+                activeSong.notes.forEach(n => {
+                    if (isDemoMode) {
+                        if (!n.hit && songTimeOffset >= n.time) {
+                            n.hit = true; n.demoActive = true;
+                            if (currentInstrument && Tone.context.state === 'running') currentInstrument.triggerAttack(n.note);
+                            const el = document.getElementById(`key-${n.note}`);
+                            if (el) el.classList.add("active");
+                        }
+                        if (n.demoActive && songTimeOffset >= n.time + n.dur) {
+                            n.demoActive = false;
+                            if (currentInstrument) currentInstrument.triggerRelease(n.note);
+                            const el = document.getElementById(`key-${n.note}`);
+                            if (el) el.classList.remove("active");
+                        }
+                    }
+
+                    const timeUntilHit = n.time - songTimeOffset;
+                    const blockY = HIT_ZONE_Y - (timeUntilHit * FALL_SPEED);
+                    const blockHeight = Math.max(n.dur * FALL_SPEED, 16);
+
+                    if (blockY + blockHeight > 0 && blockY < canvas.height + 100) {
+                        activeNotesRemain = true;
+                        const pos = keyPositions[n.note];
+
+                        if (pos) {
+                            let fillCol = "#00d4ff"; 
+                            
+                            ctx.fillStyle = n.hit ? "#ffffff" : fillCol;
+                            ctx.shadowColor = n.hit ? "#00d4ff" : fillCol;
+                            ctx.shadowBlur = n.hit ? 15 : 8;
+                            
+                            ctx.beginPath();
+                            ctx.roundRect(pos.x + 2, blockY - blockHeight, pos.w - 4, blockHeight, 5);
+                            ctx.fill();
+                            ctx.shadowBlur = 0;
+
+                            if (pos.w > 20 && blockHeight > 18) {
+                                ctx.fillStyle = pos.isBlack ? "#ffffff" : "#000000";
+                                ctx.font = "bold 11px 'Segoe UI'";
+                                ctx.textAlign = "center";
+                                ctx.textBaseline = "middle";
+                                ctx.fillText(n.note, pos.x + (pos.w / 2), blockY - 10);
+                            }
+                        }
+                    }
+                });
+
+                if (!activeNotesRemain && songTimeOffset > activeSong.notes[activeSong.notes.length - 1].time + 2) {
+                    stopPractice();
+                }
+            }
+            requestAnimationFrame(renderEngine);
+        }
+        requestAnimationFrame(renderEngine);
+
+        // ==========================================
+        // 8. PLAYBACK & COUNTDOWN LOGIC
+        // ==========================================
+        async function startPractice(demo = false) {
+            isDemoMode = demo;
+            await Tone.start();
+            if (!currentInstrument) await initAudio(instrumentSelect.value);
+
+            if (isDemoMode) {
+                btnDemo.innerHTML = '<i class="fa-solid fa-stop"></i> Stop Demo';
+                btnDemo.style.background = "#ef4444"; btnDemo.style.borderColor = "#ef4444";
+                btnPlay.disabled = true; btnPlay.style.opacity = "0.5";
+            } else {
+                btnPlay.innerHTML = '<i class="fa-solid fa-stop"></i> Stop Practice';
+                btnPlay.style.background = "#ef4444";
+                btnDemo.disabled = true; btnDemo.style.opacity = "0.5";
+            }
+
+            const rawSongData = getCurrentSongData();
+            activeSong = JSON.parse(JSON.stringify(rawSongData));
+            
+            totalExpectedNotes = activeSong.notes.length;
+            notesHit = 0; currentStreak = 0; totalScore = 0;
+            updateScoreboard();
+            
+            isCountingDown = true; isPlaying = false; 
+            
+            let count = 3;
+            countdownBanner.style.display = "flex";
+            countdownBanner.innerText = count;
+            triggerMetronomeClick(true, Tone.now());
+
+            const tickIntervalMs = 60000 / currentBPM;
+            countdownTimer = setInterval(() => {
+                count--;
+                if (count > 0) {
+                    countdownBanner.innerText = count;
+                    triggerMetronomeClick(false, Tone.now());
+                } else if (count === 0) {
+                    countdownBanner.innerText = "GO!";
+                    triggerMetronomeClick(true, Tone.now());
+                } else {
+                    clearInterval(countdownTimer);
+                    countdownBanner.style.display = "none";
+                    isCountingDown = false;
+                    songTimeOffset = 0; lastBeatPlayed = -1;
+                    lastFrameTimestamp = performance.now();
+                    isPlaying = true;
+                }
+            }, tickIntervalMs);
+        }
+
+        function stopPractice() {
+            clearInterval(countdownTimer);
+            countdownBanner.style.display = "none";
+            isCountingDown = false; isPlaying = false; 
+            isWaitingForNote = false; currentWaitTarget = null;
+            waitingBanner.style.display = "none";
+            
+            if (!isDemoMode && activeSong && totalExpectedNotes > 0) {
+                const accuracy = (notesHit / totalExpectedNotes) * 100;
+                if (accuracy >= 70) {
+                    markSongCompleted(songSelect.value);
+                    populateSongs(); 
+                    updateGradeDropdown();
+                }
+            }
+
+            if (isDemoMode && activeSong) {
+                activeSong.notes.forEach(n => {
+                    if (n.demoActive) {
+                        if (currentInstrument) currentInstrument.triggerRelease(n.note);
+                        const el = document.getElementById(`key-${n.note}`);
+                        if (el) el.classList.remove("active");
+                    }
+                });
+            }
+            
+            activeSong = null; isDemoMode = false;
+            
+            btnPlay.disabled = false; btnPlay.style.opacity = "1";
+            btnPlay.innerHTML = '<i class="fa-solid fa-play"></i> Practice';
+            btnPlay.style.background = "linear-gradient(135deg, #00d4ff, #0077ff)";
+
+            btnDemo.disabled = false; btnDemo.style.opacity = "1";
+            btnDemo.innerHTML = '<i class="fa-solid fa-eye"></i> Demo';
+            btnDemo.style.background = "rgba(255, 255, 255, 0.1)";
+            btnDemo.style.borderColor = "rgba(255, 255, 255, 0.2)";
+        }
+
+        btnPlay.addEventListener("click", () => {
+            if (isPlaying || isCountingDown) stopPractice(); else startPractice(false);
+        });
+
+        btnDemo.addEventListener("click", () => {
+            if (isPlaying || isCountingDown) stopPractice(); else startPractice(true);
+        });
+
+        // ==========================================
+        // 9. WEB MIDI API INTEGRATION
+        // ==========================================
+        if (navigator.requestMIDIAccess) navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
+
+        function onMIDISuccess(midiAccess) {
+            const inputs = midiAccess.inputs.values();
+            let count = 0;
+            for (let input of inputs) { input.onmidimessage = handleMIDIMessage; count++; }
+            updateMidiBadge(count);
+
+            midiAccess.onstatechange = (e) => {
+                if (e.port.type === "input") updateMidiBadge(Array.from(midiAccess.inputs.values()).length);
+            };
+        }
+
+        function updateMidiBadge(count) {
+            if (count > 0) {
+                midiBadge.classList.add("connected");
+                midiBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> MIDI: Active`;
+            } else {
+                midiBadge.classList.remove("connected");
+                midiBadge.innerHTML = `<i class="fa-solid fa-circle-dot"></i> MIDI: Inactive`;
+            }
+        }
+
+        function onMIDIFailure() { console.log("Web MIDI access not available."); }
+
+        function handleMIDIMessage(event) {
+            const [status, noteNumber, velocity] = event.data;
+            const command = status >> 4;
+            const noteName = Tone.Midi(noteNumber).toNote();
+            if (command === 9 && velocity > 0 && !isCountingDown) handleUserNoteOn(noteName);
+            else if (command === 8 || (command === 9 && velocity === 0)) handleUserNoteOff(noteName);
+        }
+    </script>
+</body>
+</html>
