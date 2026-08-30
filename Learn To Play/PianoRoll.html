@@ -18,7 +18,7 @@
         *, *::before, *::after { box-sizing: border-box; }
         body { margin: 0; padding: 0; color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
 
-        .container { max-width: 1500px; margin: 120px auto 40px auto; padding: 0 20px; }
+        .container { max-width: 1300px; margin: 120px auto 40px auto; padding: 0 20px; }
 
         /* Header / Stats Dashboard */
         .dashboard-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 25px; }
@@ -30,23 +30,20 @@
         .stat-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: #888; }
         .stat-val { font-size: 1.15rem; font-weight: 700; color: #00d4ff; font-family: monospace; }
 
-        /* 3-COLUMN STUDIO LAYOUT */
-        .layout-grid {
+        /* Information Theory Cards (Moved Below) */
+        .info-cards-container {
             display: grid;
-            grid-template-columns: 280px minmax(0, 1fr) 280px;
+            grid-template-columns: 1fr 1fr;
             gap: 25px;
-            align-items: start;
+            margin-top: 25px;
         }
 
-        /* Information Theory Cards (Left & Right) */
         .info-card {
             background: rgba(20, 20, 25, 0.95);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 14px;
             padding: 25px 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            position: sticky;
-            top: 100px;
         }
         .info-card h3 { color: #00d4ff; margin-top: 0; font-size: 1.05rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;}
         .info-card p { color: #bbb; font-size: 0.9rem; line-height: 1.6; margin-bottom: 15px; }
@@ -125,9 +122,8 @@
         .midi-badge.connected { color: #10b981; border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.1); }
 
         /* Responsive Breakpoints */
-        @media (max-width: 1200px) {
-            .layout-grid { grid-template-columns: 1fr; }
-            .center-stage { order: -1; } /* Moves piano to top on mobile */
+        @media (max-width: 768px) {
+            .info-cards-container { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -161,206 +157,205 @@
             </div>
         </div>
 
-        <!-- 3-COLUMN STUDIO LAYOUT -->
-        <div class="layout-grid">
+        <div class="center-stage">
             
-            <!-- LEFT PANEL: GRADE THEORY -->
-            <aside class="info-card left-sidebar">
-                <h3><i class="fa-solid fa-graduation-cap"></i> Grade Module</h3>
-                <p id="gradeDescText">Loading module details...</p>
-            </aside>
-
-            <!-- CENTER PANEL: MAIN STAGE & CONTROLS -->
-            <div class="center-stage">
+            <!-- Audio Settings Sub-Ribbon (Custom Dropdowns) -->
+            <div class="audio-ribbon">
+                <div class="control-element">
+                    <label style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-sliders"></i> Inst:</label>
+                    <div class="custom-select-wrapper" id="instrumentSelectWrapper" style="width: 150px;">
+                        <div class="custom-select-trigger" id="instrumentSelectTrigger">
+                            <span>Concert Piano</span>
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </div>
+                        <div class="custom-select-options" id="instrumentSelectOptions">
+                            <div class="custom-option selected" data-value="grandpiano">Concert Piano</div>
+                            <div class="custom-option" data-value="electricpiano">Electric Piano</div>
+                            <div class="custom-option" data-value="softpiano">Soft Piano</div>
+                            <div class="custom-option" data-value="bell">Soft Bell</div>
+                        </div>
+                    </div>
+                    <select id="instrumentSelect" style="display: none;">
+                        <option value="grandpiano" selected>Concert Piano</option>
+                        <option value="electricpiano">Electric Piano</option>
+                        <option value="softpiano">Soft Piano</option>
+                        <option value="bell">Soft Bell</option>
+                    </select>
+                </div>
                 
-                <!-- Audio Settings Sub-Ribbon -->
-                <div class="audio-ribbon">
-                    <div class="control-element">
-                        <label style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-sliders"></i> Inst:</label>
-                        <div class="custom-select-wrapper" id="instrumentSelectWrapper" style="width: 150px;">
-                            <div class="custom-select-trigger" id="instrumentSelectTrigger">
-                                <span>Concert Piano</span>
-                                <i class="fa-solid fa-chevron-down"></i>
-                            </div>
-                            <div class="custom-select-options" id="instrumentSelectOptions">
-                                <div class="custom-option selected" data-value="grandpiano">Concert Piano</div>
-                                <div class="custom-option" data-value="electricpiano">Electric Piano</div>
-                                <div class="custom-option" data-value="softpiano">Soft Piano</div>
-                                <div class="custom-option" data-value="bell">Soft Bell</div>
-                            </div>
-                        </div>
-                        <select id="instrumentSelect" style="display: none;">
-                            <option value="grandpiano" selected>Concert Piano</option>
-                            <option value="electricpiano">Electric Piano</option>
-                            <option value="softpiano">Soft Piano</option>
-                            <option value="bell">Soft Bell</option>
-                        </select>
-                    </div>
-                    
-                    <div class="control-element">
-                        <label for="instVolSlider" style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-volume-high"></i> Vol:</label>
-                        <input type="range" id="instVolSlider" min="0" max="1.5" step="0.05" value="0.9" style="width: 70px;">
-                    </div>
-
-                    <div class="control-element" style="margin-left: 15px; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px;">
-                        <label style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-wave-square"></i> Metro:</label>
-                        <div class="custom-select-wrapper" id="metronomeSoundSelectWrapper" style="width: 130px;">
-                            <div class="custom-select-trigger" id="metronomeSoundSelectTrigger">
-                                <span>Digital Click</span>
-                                <i class="fa-solid fa-chevron-down"></i>
-                            </div>
-                            <div class="custom-select-options" id="metronomeSoundSelectOptions">
-                                <div class="custom-option selected" data-value="digital">Digital Click</div>
-                                <div class="custom-option" data-value="woodblock">Woodblock</div>
-                                <div class="custom-option" data-value="drum">Kick Drum</div>
-                            </div>
-                        </div>
-                        <select id="metronomeSoundSelect" style="display: none;">
-                            <option value="digital" selected>Digital Click</option>
-                            <option value="woodblock">Woodblock</option>
-                            <option value="drum">Kick Drum</option>
-                        </select>
-                    </div>
-                    
-                    <div class="control-element">
-                        <input type="range" id="metroVolSlider" min="0" max="1.5" step="0.05" value="0.8" style="width: 70px;">
-                    </div>
+                <div class="control-element">
+                    <label for="instVolSlider" style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-volume-high"></i> Vol:</label>
+                    <input type="range" id="instVolSlider" min="0" max="1.5" step="0.05" value="0.9" style="width: 70px;">
                 </div>
 
-                <!-- Controls Ribbon -->
-                <div class="controls-ribbon">
-                    <div class="control-group-left">
-                        <div class="control-element">
-                            <label style="font-size: 0.85rem; color: #aaa;">Grade:</label>
-                            <div class="custom-select-wrapper" id="gradeSelectWrapper" style="width: 200px;">
-                                <div class="custom-select-trigger" id="gradeSelectTrigger">
-                                    <span>Grade 1: Fundamentals</span>
-                                    <i class="fa-solid fa-chevron-down"></i>
-                                </div>
-                                <div class="custom-select-options" id="gradeSelectOptions">
-                                    <div class="custom-option selected" data-value="grade1">Grade 1: Fundamentals</div>
-                                </div>
-                            </div>
-                            <select id="gradeSelect" style="display: none;">
-                                <option value="grade1" selected>Grade 1: Fundamentals</option>
-                            </select>
+                <div class="control-element" style="margin-left: 15px; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px;">
+                    <label style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-wave-square"></i> Metro:</label>
+                    <div class="custom-select-wrapper" id="metronomeSoundSelectWrapper" style="width: 130px;">
+                        <div class="custom-select-trigger" id="metronomeSoundSelectTrigger">
+                            <span>Digital Click</span>
+                            <i class="fa-solid fa-chevron-down"></i>
                         </div>
-
-                        <div class="control-element">
-                            <label style="font-size: 0.85rem; color: #aaa;">Exercise:</label>
-                            <div class="custom-select-wrapper" id="songSelectWrapper" style="width: 240px;">
-                                <div class="custom-select-trigger" id="songSelectTrigger">
-                                    <span>1. Finding Middle C</span>
-                                    <i class="fa-solid fa-chevron-down"></i>
-                                </div>
-                                <div class="custom-select-options" id="songSelectOptions"></div>
-                            </div>
-                            <select id="songSelect" style="display: none;"></select>
-                        </div>
-
-                        <div class="control-element">
-                            <label style="font-size: 0.85rem; color: #aaa;">Range:</label>
-                            <div class="custom-select-wrapper" id="keyboardSizeSelectWrapper" style="width: 90px;">
-                                <div class="custom-select-trigger" id="keyboardSizeSelectTrigger">
-                                    <span>Auto</span>
-                                    <i class="fa-solid fa-chevron-down"></i>
-                                </div>
-                                <div class="custom-select-options" id="keyboardSizeSelectOptions">
-                                    <div class="custom-option selected" data-value="auto">Auto</div>
-                                    <div class="custom-option" data-value="25">25-Key</div>
-                                    <div class="custom-option" data-value="49">49-Key</div>
-                                    <div class="custom-option" data-value="61">61-Key</div>
-                                    <div class="custom-option" data-value="88">88-Key</div>
-                                </div>
-                            </div>
-                            <select id="keyboardSizeSelect" style="display: none;">
-                                <option value="auto" selected>Auto</option>
-                                <option value="25">25-Key</option>
-                                <option value="49">49-Key</option>
-                                <option value="61">61-Key</option>
-                                <option value="88">88-Key</option>
-                            </select>
-                        </div>
-
-                        <div class="control-element">
-                            <label style="font-size: 0.85rem; color: #aaa;">Mode:</label>
-                            <div class="custom-select-wrapper" id="playModeSelectWrapper" style="width: 160px;">
-                                <div class="custom-select-trigger" id="playModeSelectTrigger">
-                                    <span>Wait for Right Key</span>
-                                    <i class="fa-solid fa-chevron-down"></i>
-                                </div>
-                                <div class="custom-select-options" id="playModeSelectOptions">
-                                    <div class="custom-option selected" data-value="wait">Wait for Right Key</div>
-                                    <div class="custom-option" data-value="continuous">Continuous Flow</div>
-                                </div>
-                            </div>
-                            <select id="playModeSelect" style="display: none;">
-                                <option value="wait" selected>Wait for Right Key</option>
-                                <option value="continuous">Continuous Flow</option>
-                            </select>
-                        </div>
-
-                        <div class="control-element">
-                            <label for="tempoInput" style="font-size: 0.85rem; color: #aaa;">BPM:</label>
-                            <input type="number" id="tempoInput" min="30" max="300" style="width: 60px;">
-                            <button id="btnResetTempo" class="btn-icon" title="Reset to Song Default"><i class="fa-solid fa-rotate-left"></i></button>
-                        </div>
-
-                        <div class="control-element">
-                            <button id="btnMetronome" class="btn-icon" title="Toggle Metronome"><i class="fa-solid fa-stopwatch"></i> Metronome</button>
-                        </div>
-
-                        <div class="control-element">
-                            <div id="midiStatus" class="midi-badge">
-                                <i class="fa-solid fa-circle-dot"></i> MIDI: Inactive
-                            </div>
+                        <div class="custom-select-options" id="metronomeSoundSelectOptions">
+                            <div class="custom-option selected" data-value="digital">Digital Click</div>
+                            <div class="custom-option" data-value="woodblock">Woodblock</div>
+                            <div class="custom-option" data-value="drum">Kick Drum</div>
                         </div>
                     </div>
-
-                    <div style="display: flex; gap: 10px; padding-top: 5px; width: 100%; justify-content: flex-end;">
-                        <button id="btnDemo" class="btn-secondary">
-                            <i class="fa-solid fa-eye"></i> Watch Demo
-                        </button>
-                        <button id="btnPlay" class="primary-btn">
-                            <i class="fa-solid fa-play"></i> Start Practice
-                        </button>
-                    </div>
+                    <select id="metronomeSoundSelect" style="display: none;">
+                        <option value="digital" selected>Digital Click</option>
+                        <option value="woodblock">Woodblock</option>
+                        <option value="drum">Kick Drum</option>
+                    </select>
                 </div>
-
-                <!-- Main Stage: Falling Notes Canvas & Virtual Piano -->
-                <div class="stage-wrapper">
-                    <div id="countdownBanner" class="overlay-banner">3</div>
-                    <div id="loadingBanner" class="overlay-banner loading-banner">
-                        <i class="fa-solid fa-spinner fa-spin"></i>
-                        <span>Loading High-Quality Audio Samples...</span>
-                    </div>
-                    <div id="waitingBanner" class="waiting-badge">
-                        <i class="fa-solid fa-hand"></i> Press <span id="waitingNoteName" style="color:#fff; text-decoration: underline;">C4</span>
-                    </div>
-
-                    <div class="canvas-scroll-container" id="canvasScrollContainer">
-                        <canvas id="fallingCanvas"></canvas>
-                    </div>
-                    
-                    <div class="keyboard-wrapper" id="keyboardScrollContainer">
-                        <div class="piano" id="pianoKeyboard">
-                            <!-- Keys dynamically injected -->
-                        </div>
-                    </div>
+                
+                <div class="control-element">
+                    <input type="range" id="metroVolSlider" min="0" max="1.5" step="0.05" value="0.8" style="width: 70px;">
                 </div>
             </div>
 
-            <!-- RIGHT PANEL: EXERCISE FOCUS -->
-            <aside class="info-card right-sidebar">
-                <h3><i class="fa-solid fa-music"></i> Exercise Focus</h3>
-                <p id="songDescText">Loading exercise details...</p>
-                <div class="highlight-box">
-                    <strong><i class="fa-solid fa-hand"></i> Finger Placement</strong>
-                    <p id="fingeringText">Loading placement details...</p>
-                </div>
-            </aside>
+            <!-- Two-Tier Curriculum Controls Ribbon -->
+            <div class="controls-ribbon">
+                <div class="control-group-left">
+                    
+                    <div class="control-element">
+                        <label style="font-size: 0.85rem; color: #aaa;">Grade:</label>
+                        <div class="custom-select-wrapper" id="gradeSelectWrapper" style="width: 200px;">
+                            <div class="custom-select-trigger" id="gradeSelectTrigger">
+                                <span>Grade 1: Fundamentals</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="gradeSelectOptions">
+                                <div class="custom-option selected" data-value="grade1">Grade 1: Fundamentals</div>
+                            </div>
+                        </div>
+                        <select id="gradeSelect" style="display: none;">
+                            <option value="grade1" selected>Grade 1: Fundamentals</option>
+                        </select>
+                    </div>
 
+                    <div class="control-element">
+                        <label style="font-size: 0.85rem; color: #aaa;">Exercise:</label>
+                        <div class="custom-select-wrapper" id="songSelectWrapper" style="width: 240px;">
+                            <div class="custom-select-trigger" id="songSelectTrigger">
+                                <span>1. Finding Middle C</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="songSelectOptions"></div>
+                        </div>
+                        <select id="songSelect" style="display: none;"></select>
+                    </div>
+
+                    <div class="control-element">
+                        <label style="font-size: 0.85rem; color: #aaa;">Range:</label>
+                        <div class="custom-select-wrapper" id="keyboardSizeSelectWrapper" style="width: 90px;">
+                            <div class="custom-select-trigger" id="keyboardSizeSelectTrigger">
+                                <span>Auto</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="keyboardSizeSelectOptions">
+                                <div class="custom-option selected" data-value="auto">Auto</div>
+                                <div class="custom-option" data-value="25">25-Key</div>
+                                <div class="custom-option" data-value="49">49-Key</div>
+                                <div class="custom-option" data-value="61">61-Key</div>
+                                <div class="custom-option" data-value="88">88-Key</div>
+                            </div>
+                        </div>
+                        <select id="keyboardSizeSelect" style="display: none;">
+                            <option value="auto" selected>Auto</option>
+                            <option value="25">25-Key</option>
+                            <option value="49">49-Key</option>
+                            <option value="61">61-Key</option>
+                            <option value="88">88-Key</option>
+                        </select>
+                    </div>
+
+                    <div class="control-element">
+                        <label style="font-size: 0.85rem; color: #aaa;">Mode:</label>
+                        <div class="custom-select-wrapper" id="playModeSelectWrapper" style="width: 160px;">
+                            <div class="custom-select-trigger" id="playModeSelectTrigger">
+                                <span>Wait for Right Key</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="playModeSelectOptions">
+                                <div class="custom-option selected" data-value="wait">Wait for Right Key</div>
+                                <div class="custom-option" data-value="continuous">Continuous Flow</div>
+                            </div>
+                        </div>
+                        <select id="playModeSelect" style="display: none;">
+                            <option value="wait" selected>Wait for Right Key</option>
+                            <option value="continuous">Continuous Flow</option>
+                        </select>
+                    </div>
+
+                    <div class="control-element">
+                        <label for="tempoInput" style="font-size: 0.85rem; color: #aaa;">BPM:</label>
+                        <input type="number" id="tempoInput" min="30" max="300" style="width: 60px;">
+                        <button id="btnResetTempo" class="btn-icon" title="Reset to Song Default"><i class="fa-solid fa-rotate-left"></i></button>
+                    </div>
+
+                    <div class="control-element">
+                        <button id="btnMetronome" class="btn-icon" title="Toggle Metronome"><i class="fa-solid fa-stopwatch"></i> Metronome</button>
+                    </div>
+
+                    <div class="control-element">
+                        <div id="midiStatus" class="midi-badge">
+                            <i class="fa-solid fa-circle-dot"></i> MIDI: Inactive
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; padding-top: 5px; width: 100%; justify-content: flex-end;">
+                    <button id="btnDemo" class="btn-secondary">
+                        <i class="fa-solid fa-eye"></i> Watch Demo
+                    </button>
+                    <button id="btnPlay" class="primary-btn">
+                        <i class="fa-solid fa-play"></i> Start Practice
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Stage: Falling Notes Canvas & Virtual Piano -->
+            <div class="stage-wrapper">
+                <div id="countdownBanner" class="overlay-banner">3</div>
+                <div id="loadingBanner" class="overlay-banner loading-banner">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    <span>Loading High-Quality Audio Samples...</span>
+                </div>
+                <div id="waitingBanner" class="waiting-badge">
+                    <i class="fa-solid fa-hand"></i> Press <span id="waitingNoteName" style="color:#fff; text-decoration: underline;">C4</span>
+                </div>
+
+                <div class="canvas-scroll-container" id="canvasScrollContainer">
+                    <canvas id="fallingCanvas"></canvas>
+                </div>
+                
+                <div class="keyboard-wrapper" id="keyboardScrollContainer">
+                    <div class="piano" id="pianoKeyboard">
+                        <!-- Keys dynamically injected -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- BOTTOM INFO CARDS -->
+            <div class="info-cards-container">
+                <!-- LEFT PANEL: GRADE THEORY -->
+                <aside class="info-card">
+                    <h3><i class="fa-solid fa-graduation-cap"></i> Grade Module</h3>
+                    <p id="gradeDescText">Loading module details...</p>
+                </aside>
+
+                <!-- RIGHT PANEL: EXERCISE FOCUS -->
+                <aside class="info-card">
+                    <h3><i class="fa-solid fa-music"></i> Exercise Focus</h3>
+                    <p id="songDescText">Loading exercise details...</p>
+                    <div class="highlight-box">
+                        <strong><i class="fa-solid fa-hand"></i> Finger Placement</strong>
+                        <p id="fingeringText">Loading placement details...</p>
+                    </div>
+                </aside>
+            </div>
         </div>
+
     </div>
 
     <!-- UNIVERSAL FOOTER -->
@@ -427,7 +422,7 @@
         const CURRICULUM = {
             grade1: {
                 title: "Grade 1: Fundamentals",
-                description: "Welcome to Grade 1! This module focuses on the absolute basics of keyboard geography. You will learn to locate Middle C, navigate the white keys using a standard 5-finger position, and identify the black key groupings. No prior experience is needed.",
+                description: "Welcome to Grade 1! This module focuses on the absolute basics of keyboard geography using only your right hand. You will learn to locate Middle C, navigate the white keys using a standard 5-finger position, and identify the black key groupings. No prior experience is needed.",
                 songs: {
                     findingMiddleC: {
                         title: "1. Finding Middle C", 
@@ -1000,7 +995,7 @@
                         if (pos) {
                             let fillCol = "#00d4ff"; 
                             
-                            // CHANGE: Note Hit Color changed from green to Glowing White/Cyan
+                            // Glowing White/Cyan on hit
                             ctx.fillStyle = n.hit ? "#ffffff" : fillCol;
                             ctx.shadowColor = n.hit ? "#00d4ff" : fillCol;
                             ctx.shadowBlur = n.hit ? 15 : 8;
