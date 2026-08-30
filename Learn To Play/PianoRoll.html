@@ -18,13 +18,14 @@
         *, *::before, *::after { box-sizing: border-box; }
         body { margin: 0; padding: 0; color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
 
-        .container { max-width: 1750px; margin: 110px auto 30px auto; padding: 0 20px; }
+        /* Container perfectly matches the outer yellow boundary lines */
+        .container { max-width: 100%; margin: 100px auto 30px auto; padding: 0 40px; }
 
-        /* 3-COLUMN FULL-SCREEN STUDIO LAYOUT */
+        /* Full Screen Studio Layout: Left Card | Center Stage | Right Card */
         .layout-grid {
             display: grid;
             grid-template-columns: 280px minmax(0, 1fr) 280px;
-            gap: 20px;
+            gap: 25px;
             align-items: start;
         }
 
@@ -38,9 +39,9 @@
             margin-bottom: 15px;
         }
 
-        .title-group h1 { font-size: 1.6rem; font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: 1.5px; }
-        .title-group h1 span { color: #00d4ff; font-size: 1.6rem; font-weight: 800; }
-        .title-group span.sub { font-size: 0.75rem; color: #888; display: block; margin-top: 2px; }
+        .title-group h1 { font-size: 1.5rem; font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: 1.5px; }
+        .title-group h1 span { color: #00d4ff; font-size: 1.5rem; font-weight: 800; }
+        .title-group span.sub { font-size: 0.72rem; color: #888; display: block; margin-top: 2px; }
 
         .stats-bar { display: flex; justify-content: space-between; gap: 8px; }
         .stat-item { display: flex; flex-direction: column; align-items: center; flex: 1; background: rgba(10, 10, 15, 0.6); padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
@@ -58,7 +59,7 @@
         .info-card h3 { color: #00d4ff; margin-top: 0; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;}
         .info-card p { color: #bbb; font-size: 0.85rem; line-height: 1.5; margin-bottom: 12px; }
         
-        .highlight-box { background: rgba(0, 212, 255, 0.05); border-left: 3px solid #00d4ff; padding: 10px; border-radius: 0 6px 6px 0; margin-bottom: 10px; }
+        .highlight-box { background: rgba(0, 212, 255, 0.05); border-left: 3px solid #00d4ff; padding: 10px; border-radius: 0 6px 6px 0; margin-bottom: 0; }
         .highlight-box strong { color: #fff; font-size: 0.8rem; text-transform: uppercase; display: block; margin-bottom: 4px; }
         .highlight-box p { margin: 0; color: #00d4ff; font-size: 0.8rem; line-height: 1.4; }
 
@@ -154,7 +155,7 @@
 
     <div class="container">
 
-        <!-- 3-COLUMN STUDIO LAYOUT -->
+        <!-- 3-COLUMN STUDIO LAYOUT ALIGNED TO NAVIGATION EDGES -->
         <div class="layout-grid">
             
             <!-- LEFT PANEL: TITLE + GRADE THEORY -->
@@ -246,7 +247,7 @@
                         
                         <div class="control-element">
                             <label style="font-size: 0.8rem; color: #aaa;">Grade:</label>
-                            <div class="custom-select-wrapper" id="gradeSelectWrapper" style="width: 170px;">
+                            <div class="custom-select-wrapper" id="gradeSelectWrapper" style="width: 160px;">
                                 <div class="custom-select-trigger" id="gradeSelectTrigger">
                                     <span>Grade 1: Fundamentals</span>
                                     <i class="fa-solid fa-chevron-down"></i>
@@ -262,7 +263,7 @@
 
                         <div class="control-element">
                             <label style="font-size: 0.8rem; color: #aaa;">Exercise:</label>
-                            <div class="custom-select-wrapper" id="songSelectWrapper" style="width: 180px;">
+                            <div class="custom-select-wrapper" id="songSelectWrapper" style="width: 170px;">
                                 <div class="custom-select-trigger" id="songSelectTrigger">
                                     <span>1. Finding Middle C</span>
                                     <i class="fa-solid fa-chevron-down"></i>
@@ -298,7 +299,7 @@
 
                         <div class="control-element">
                             <label style="font-size: 0.8rem; color: #aaa;">Mode:</label>
-                            <div class="custom-select-wrapper" id="playModeSelectWrapper" style="width: 130px;">
+                            <div class="custom-select-wrapper" id="playModeSelectWrapper" style="width: 120px;">
                                 <div class="custom-select-trigger" id="playModeSelectTrigger">
                                     <span>Wait for Key</span>
                                     <i class="fa-solid fa-chevron-down"></i>
@@ -513,23 +514,23 @@
         };
 
         const KEYBOARD_RANGES = {
-            "25": { startMidi: 48, endMidi: 72, whiteKeyWidth: 42 },  
-            "49": { startMidi: 36, endMidi: 84, whiteKeyWidth: 34 },  
-            "61": { startMidi: 36, endMidi: 96, whiteKeyWidth: 28 },  
+            "25": { startMidi: 48, endMidi: 72, whiteKeyWidth: 40 },  
+            "49": { startMidi: 36, endMidi: 84, whiteKeyWidth: 32 },  
+            "61": { startMidi: 36, endMidi: 96, whiteKeyWidth: 26 },  
             "88": { startMidi: 21, endMidi: 108, whiteKeyWidth: "fit" }  
         };
 
-        // Comprehensive QWERTY mapping covering both white and black keys across multiple octaves
+        // Complete multi-octave QWERTY mapping covering both white and black keys from A0 to C8
         const QWERTY_MAP = {
-            // Low Octave
-            'z': 'C3', 's': 'C#3', 'x': 'D3', 'd': 'D#3', 'c': 'E3', 'v': 'F3',
-            'g': 'F#3', 'b': 'G3', 'h': 'G#3', 'n': 'A3', 'j': 'A#3', 'm': 'B3',
-            // Middle Octave
-            'q': 'C4', '2': 'C#4', 'w': 'D4', '3': 'D#4', 'e': 'E4', 'r': 'F4',
-            '5': 'F#4', 't': 'G4', '6': 'G#4', 'y': 'A4', '7': 'A#4', 'u': 'B4',
-            // High Octave
-            'i': 'C5', '9': 'C#5', 'o': 'D5', '0': 'D#5', 'p': 'E5', '[': 'F5',
-            '=': 'F#5', ']': 'G5', 'a': 'G#5'
+            '1': 'A0', '2': 'A#0', '3': 'B0',
+            '4': 'C1', '5': 'C#1', '6': 'D1', '7': 'D#1', '8': 'E1', '9': 'F1', '0': 'F#1',
+            'z': 'G1', 's': 'G#1', 'x': 'A1', 'd': 'A#1', 'c': 'B1',
+            'v': 'C2', 'g': 'C#2', 'b': 'D2', 'h': 'D#2', 'n': 'E2', 'm': 'F2',
+            'q': 'C3', '2': 'C#3', 'w': 'D3', '3': 'D#3', 'e': 'E3', 'r': 'F3',
+            '5': 'F#3', 't': 'G3', '6': 'G#3', 'y': 'A3', '7': 'A#3', 'u': 'B3',
+            'i': 'C4', '9': 'C#4', 'o': 'D4', '0': 'D#4', 'p': 'E4', '[': 'F4',
+            '=': 'F#4', ']': 'G4', 'a': 'G#4', 'f': 'A4', 'j': 'A#4', 'k': 'B4',
+            'l': 'C5', ';': 'C#5', "'": 'D5'
         };
 
         // ==========================================
@@ -826,8 +827,8 @@
             }
             let whiteCount = 0;
             for (let i = startMidi; i <= endMidi; i++) if (!Tone.Midi(i).toNote().includes('#')) whiteCount++;
-            let calcWidth = Math.floor(1200 / whiteCount);
-            if (calcWidth > 65) calcWidth = 65; if (calcWidth < 22) calcWidth = 22;
+            let calcWidth = Math.floor(1000 / whiteCount);
+            if (calcWidth > 55) calcWidth = 55; if (calcWidth < 19) calcWidth = 19;
             return { startMidi, endMidi, whiteKeyWidth: calcWidth };
         }
 
@@ -845,7 +846,7 @@
                 if (!Tone.Midi(i).toNote().includes('#')) whiteCount++;
             }
 
-            let containerWidth = canvasScrollContainer.clientWidth || 1500;
+            let containerWidth = canvasScrollContainer.clientWidth || 1100;
             let whiteWidth = rangeConfig.whiteKeyWidth;
             
             if (whiteWidth === "fit" || keyboardSizeSelect.value === "88") {
