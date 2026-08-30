@@ -15,145 +15,67 @@
     <link rel="stylesheet" href="/style.css">
 
     <style>
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
+        *, *::before, *::after { box-sizing: border-box; }
+        body { margin: 0; padding: 0; color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
 
-        body {
-            margin: 0;
-            padding: 0;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow-x: hidden;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 120px auto 40px auto; 
-            padding: 0 15px;
-        }
+        .container { max-width: 1500px; margin: 120px auto 40px auto; padding: 0 20px; }
 
         /* Header / Stats Dashboard */
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 20px;
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 25px; }
+        .title-group h1 { font-size: 2.2rem; margin: 0; text-transform: uppercase; letter-spacing: 1.5px; }
+        .title-group h1 span { color: #00d4ff; }
+
+        .stats-bar { display: flex; gap: 15px; background: rgba(20, 20, 25, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 10px 18px; backdrop-filter: blur(10px); }
+        .stat-item { display: flex; flex-direction: column; align-items: center; }
+        .stat-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: #888; }
+        .stat-val { font-size: 1.15rem; font-weight: 700; color: #00d4ff; font-family: monospace; }
+
+        /* 3-COLUMN STUDIO LAYOUT */
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 280px minmax(0, 1fr) 280px;
+            gap: 25px;
+            align-items: start;
         }
 
-        .title-group h1 {
-            font-size: 2.2rem;
-            margin: 0;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-        }
-
-        .title-group h1 span {
-            color: #00d4ff;
-        }
-
-        .stats-bar {
-            display: flex;
-            gap: 15px;
-            background: rgba(20, 20, 25, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 10px 18px;
-            backdrop-filter: blur(10px);
-        }
-
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .stat-label {
-            font-size: 0.72rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #888;
-        }
-
-        .stat-val {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: #00d4ff;
-            font-family: monospace;
-        }
-
-        /* Controls Ribbon */
-        .controls-ribbon {
+        /* Information Theory Cards (Left & Right) */
+        .info-card {
             background: rgba(20, 20, 25, 0.95);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 14px;
-            padding: 15px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            margin-bottom: 15px;
-            backdrop-filter: blur(10px);
-            z-index: 5;
+            padding: 25px 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 100px;
         }
+        .info-card h3 { color: #00d4ff; margin-top: 0; font-size: 1.05rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;}
+        .info-card p { color: #bbb; font-size: 0.9rem; line-height: 1.6; margin-bottom: 15px; }
+        
+        .highlight-box { background: rgba(0, 212, 255, 0.05); border-left: 3px solid #00d4ff; padding: 12px; border-radius: 0 8px 8px 0; margin-bottom: 15px; }
+        .highlight-box strong { color: #fff; font-size: 0.85rem; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .highlight-box p { margin: 0; color: #00d4ff; font-size: 0.85rem; line-height: 1.5; }
 
-        .control-group-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            flex: 1;
-        }
+        /* Controls Ribbons */
+        .controls-ribbon { background: rgba(20, 20, 25, 0.95); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; backdrop-filter: blur(10px); position: relative; z-index: 50; }
+        .audio-ribbon { background: rgba(15, 15, 20, 0.95); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 10px; padding: 10px 20px; display: flex; gap: 25px; margin-bottom: 15px; align-items: center; flex-wrap: wrap; backdrop-filter: blur(10px); position: relative; z-index: 40; }
+        
+        .control-group-left { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; flex: 1; }
+        .control-element { display: flex; align-items: center; gap: 8px; }
 
-        .control-element {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .control-element input[type="number"] { background: rgba(10, 10, 15, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; padding: 7px 10px; border-radius: 8px; font-size: 0.85rem; outline: none; }
+        .control-element input[type="range"] { accent-color: #00d4ff; cursor: pointer; height: 4px; background: rgba(255, 255, 255, 0.15); border-radius: 2px; -webkit-appearance: none; outline: none; }
+        .control-element input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #00d4ff; }
+        .control-element input[type="number"]:focus { border-color: #00d4ff; }
 
-        .control-element input[type="number"] {
-            background: rgba(10, 10, 15, 0.9);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            color: #fff;
-            padding: 7px 10px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            outline: none;
-        }
-
-        .control-element input[type="range"] {
-            accent-color: #00d4ff;
-            cursor: pointer;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 2px;
-            -webkit-appearance: none;
-            outline: none;
-        }
-
-        .control-element input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: #00d4ff;
-        }
-
-        .control-element input[type="number"]:focus {
-            border-color: #00d4ff;
-        }
-
-        /* CUSTOM DROPDOWN STYLES */
+        /* CUSTOM DROPDOWN STYLES (Z-Index Fixed) */
         .custom-select-wrapper { position: relative; user-select: none; z-index: 1; }
-        .custom-select-wrapper.open { z-index: 100; }
+        .custom-select-wrapper.open { z-index: 999; }
         .custom-select-trigger { background: rgba(10, 10, 15, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #ffffff; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: border-color 0.2s ease, box-shadow 0.2s ease; white-space: nowrap; }
         .custom-select-wrapper.open .custom-select-trigger { border-color: #00d4ff; border-bottom-left-radius: 0; border-bottom-right-radius: 0; background: rgba(15, 15, 20, 0.95); }
         .custom-select-trigger i.fa-chevron-down { color: #00d4ff; transition: transform 0.3s ease; font-size: 0.75rem; margin-left: 10px; }
         .custom-select-wrapper.open .custom-select-trigger i.fa-chevron-down { transform: rotate(180deg); }
-        .custom-select-options { position: absolute; top: 100%; left: 0; right: 0; background: rgba(15, 15, 20, 0.98); backdrop-filter: blur(10px); border: 1px solid #00d4ff; border-top: none; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; box-shadow: 0 15px 30px rgba(0,0,0,0.6); opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 50; overflow-y: auto; max-height: 250px; min-width: 100%; }
+        
+        .custom-select-options { position: absolute; top: 100%; left: 0; right: 0; background: rgba(15, 15, 20, 0.98); backdrop-filter: blur(10px); border: 1px solid #00d4ff; border-top: none; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; box-shadow: 0 15px 30px rgba(0,0,0,0.6); opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 999; overflow-y: auto; max-height: 350px; min-width: 100%; }
         .custom-select-wrapper.open .custom-select-options { opacity: 1; visibility: visible; }
         .custom-option { padding: 10px 12px; color: #bbb; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease; border-bottom: 1px solid rgba(255, 255, 255, 0.05); display: flex; justify-content: space-between; align-items: center; }
         .custom-option:last-child { border-bottom: none; }
@@ -163,273 +85,49 @@
         .custom-select-options::-webkit-scrollbar-thumb { background: #00d4ff; border-radius: 3px; }
         .custom-select-options::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
 
-        .primary-btn {
-            background: linear-gradient(135deg, #00d4ff, #0077ff);
-            color: #000;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 22px;
-            font-size: 0.95rem;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: transform 0.2s, opacity 0.2s;
-            white-space: nowrap;
-        }
-
-        .primary-btn:hover {
-            transform: scale(1.03);
-            opacity: 0.95;
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            padding: 10px 22px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-icon {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 8px 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            font-size: 0.85rem;
-        }
-
-        .btn-icon:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-        
-        .btn-icon.active {
-            background: rgba(0, 212, 255, 0.2);
-            border-color: #00d4ff;
-            color: #00d4ff;
-        }
-
-        /* Sub-Ribbon for Audio Settings */
-        .audio-ribbon {
-            background: rgba(15, 15, 20, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: 10px 20px;
-            display: flex;
-            gap: 25px;
-            margin-bottom: 15px;
-            align-items: center;
-            flex-wrap: wrap;
-            backdrop-filter: blur(10px);
-            z-index: 10;
-        }
+        /* Buttons */
+        .primary-btn { background: linear-gradient(135deg, #00d4ff, #0077ff); color: #000; font-weight: bold; border: none; border-radius: 8px; padding: 10px 22px; font-size: 0.95rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: transform 0.2s, opacity 0.2s; white-space: nowrap; }
+        .primary-btn:hover { transform: scale(1.03); opacity: 0.95; }
+        .btn-secondary { background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; padding: 10px 22px; font-size: 0.95rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; white-space: nowrap; }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.2); }
+        .btn-icon { background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px 12px; border-radius: 8px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.85rem; }
+        .btn-icon:hover { background: rgba(255, 255, 255, 0.2); }
+        .btn-icon.active { background: rgba(0, 212, 255, 0.2); border-color: #00d4ff; color: #00d4ff; }
 
         /* Stage Area (Canvas + Piano) */
-        .stage-wrapper {
-            background: rgba(12, 12, 18, 0.95);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            backdrop-filter: blur(10px);
-        }
-
-        .canvas-scroll-container {
-            width: 100%;
-            overflow-x: auto;
-            overflow-y: hidden;
-            scrollbar-width: thin;
-            scrollbar-color: #00d4ff rgba(20, 20, 25, 0.8);
-        }
-
-        #fallingCanvas {
-            display: block;
-            background: radial-gradient(circle at bottom, rgba(0, 212, 255, 0.04) 0%, rgba(5, 5, 10, 0.95) 75%);
-        }
+        .stage-wrapper { background: rgba(12, 12, 18, 0.95); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; overflow: hidden; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6); display: flex; flex-direction: column; position: relative; backdrop-filter: blur(10px); z-index: 10; }
+        .canvas-scroll-container { width: 100%; overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; scrollbar-color: #00d4ff rgba(20, 20, 25, 0.8); }
+        #fallingCanvas { display: block; background: radial-gradient(circle at bottom, rgba(0, 212, 255, 0.04) 0%, rgba(5, 5, 10, 0.95) 75%); }
 
         /* Overlays */
-        .overlay-banner {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.65);
-            backdrop-filter: blur(4px);
-            display: none;
-            justify-content: center;
-            align-items: center;
-            font-size: 8rem;
-            font-weight: 900;
-            color: #00d4ff;
-            z-index: 20;
-            text-shadow: 0 0 30px rgba(0, 212, 255, 0.8);
-            pointer-events: none;
-        }
-
-        .loading-banner {
-            font-size: 2rem;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .loading-banner span {
-            font-size: 1rem;
-            color: #aaa;
-            font-weight: 400;
-            text-shadow: none;
-        }
+        .overlay-banner { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; font-size: 8rem; font-weight: 900; color: #00d4ff; z-index: 20; text-shadow: 0 0 30px rgba(0, 212, 255, 0.8); pointer-events: none; }
+        .loading-banner { font-size: 2rem; flex-direction: column; gap: 15px; }
+        .loading-banner span { font-size: 1rem; color: #aaa; font-weight: 400; text-shadow: none; }
 
         /* Virtual Piano Keyboard */
-        .keyboard-wrapper {
-            position: relative;
-            width: 100%;
-            height: 180px;
-            background: #111;
-            border-top: 2px solid #00d4ff;
-            user-select: none;
-            overflow-x: auto;
-            overflow-y: hidden;
-            scrollbar-width: thin;
-            scrollbar-color: #00d4ff rgba(20, 20, 25, 0.8);
-        }
-
-        .piano {
-            display: flex;
-            position: relative;
-            height: 100%;
-            margin: 0 auto;
-        }
-
-        .key {
-            position: relative;
-            cursor: pointer;
-            transition: background-color 0.08s ease, transform 0.05s ease;
-        }
-
-        .white-key {
-            height: 100%;
-            background: #fdfdfd;
-            border: 1px solid #222;
-            border-bottom-left-radius: 6px;
-            border-bottom-right-radius: 6px;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            align-items: center;
-            padding-bottom: 8px;
-            font-size: 0.7rem;
-            color: #777;
-            flex-shrink: 0;
-        }
-
-        .white-key.active {
-            background: #00d4ff !important;
-            color: #000 !important;
-            box-shadow: 0 0 20px #00d4ff;
-        }
-
-        .black-key {
-            position: absolute;
-            height: 60%;
-            background: #181818;
-            border: 1px solid #000;
-            border-bottom-left-radius: 4px;
-            border-bottom-right-radius: 4px;
-            z-index: 2;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            align-items: center;
-            padding-bottom: 6px;
-            font-size: 0.62rem;
-            color: #aaa;
-        }
-
-        .black-key.active {
-            background: #0077ff !important;
-            color: #fff !important;
-            box-shadow: 0 0 15px #0077ff;
-        }
-
-        .pitch {
-            font-weight: bold;
-            line-height: 1.1;
-        }
+        .keyboard-wrapper { position: relative; width: 100%; height: 180px; background: #111; border-top: 2px solid #00d4ff; user-select: none; overflow-x: auto; overflow-y: hidden; scrollbar-width: thin; scrollbar-color: #00d4ff rgba(20, 20, 25, 0.8); }
+        .piano { display: flex; position: relative; height: 100%; margin: 0 auto; }
+        .key { position: relative; cursor: pointer; transition: background-color 0.08s ease, transform 0.05s ease; }
         
-        .octave {
-            font-size: 0.85em;
-            opacity: 0.75;
-            margin-bottom: 3px;
-            line-height: 1;
-        }
+        .white-key { height: 100%; background: #fdfdfd; border: 1px solid #222; border-bottom-left-radius: 6px; border-bottom-right-radius: 6px; z-index: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 8px; font-size: 0.7rem; color: #777; flex-shrink: 0; }
+        .white-key.active { background: #00d4ff !important; color: #000 !important; box-shadow: 0 0 20px #00d4ff; }
+        
+        .black-key { position: absolute; height: 60%; background: #181818; border: 1px solid #000; border-bottom-left-radius: 4px; border-bottom-right-radius: 4px; z-index: 2; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 6px; font-size: 0.62rem; color: #aaa; }
+        .black-key.active { background: #0077ff !important; color: #fff !important; box-shadow: 0 0 15px #0077ff; }
 
-        .key-hint {
-            font-size: 0.6rem;
-            opacity: 0.6;
-            margin-top: 1px;
-            color: #00d4ff;
-        }
+        .pitch { font-weight: bold; line-height: 1.1; }
+        .octave { font-size: 0.85em; opacity: 0.75; margin-bottom: 3px; line-height: 1; }
+        .key-hint { font-size: 0.6rem; opacity: 0.6; margin-top: 1px; color: #00d4ff; }
 
-        .waiting-badge {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 212, 255, 0.15);
-            border: 1px solid #00d4ff;
-            color: #00d4ff;
-            padding: 8px 18px;
-            border-radius: 20px;
-            font-size: 0.88rem;
-            font-weight: 600;
-            display: none;
-            z-index: 10;
-            animation: pulse 1.5s infinite;
-        }
+        .waiting-badge { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0, 212, 255, 0.15); border: 1px solid #00d4ff; color: #00d4ff; padding: 8px 18px; border-radius: 20px; font-size: 0.88rem; font-weight: 600; display: none; z-index: 30; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 0.8; transform: translateX(-50%) scale(1); } 50% { opacity: 1; transform: translateX(-50%) scale(1.04); } }
+        .midi-badge { font-size: 0.8rem; padding: 4px 10px; border-radius: 20px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); color: #888; display: flex; align-items: center; gap: 6px; }
+        .midi-badge.connected { color: #10b981; border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.1); }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 0.8; transform: translateX(-50%) scale(1); }
-            50% { opacity: 1; transform: translateX(-50%) scale(1.04); }
-        }
-
-        .midi-badge {
-            font-size: 0.8rem;
-            padding: 4px 10px;
-            border-radius: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #888;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .midi-badge.connected {
-            color: #10b981;
-            border-color: rgba(16, 185, 129, 0.3);
-            background: rgba(16, 185, 129, 0.1);
+        /* Responsive Breakpoints */
+        @media (max-width: 1200px) {
+            .layout-grid { grid-template-columns: 1fr; }
+            .center-stage { order: -1; } /* Moves piano to top on mobile */
         }
     </style>
 </head>
@@ -463,208 +161,206 @@
             </div>
         </div>
 
-        <!-- Audio Settings Sub-Ribbon (Custom Dropdowns) -->
-        <div class="audio-ribbon">
-            <div class="control-element">
-                <label style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-sliders"></i> Inst:</label>
-                <div class="custom-select-wrapper" id="instrumentSelectWrapper" style="width: 150px;">
-                    <div class="custom-select-trigger" id="instrumentSelectTrigger">
-                        <span>Concert Piano</span>
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </div>
-                    <div class="custom-select-options" id="instrumentSelectOptions">
-                        <div class="custom-option selected" data-value="grandpiano">Concert Piano</div>
-                        <div class="custom-option" data-value="electricpiano">Electric Piano</div>
-                        <div class="custom-option" data-value="softpiano">Soft Piano</div>
-                        <div class="custom-option" data-value="bell">Soft Bell</div>
-                    </div>
-                </div>
-                <select id="instrumentSelect" style="display: none;">
-                    <option value="grandpiano" selected>Concert Piano</option>
-                    <option value="electricpiano">Electric Piano</option>
-                    <option value="softpiano">Soft Piano</option>
-                    <option value="bell">Soft Bell</option>
-                </select>
-            </div>
+        <!-- 3-COLUMN STUDIO LAYOUT -->
+        <div class="layout-grid">
             
-            <div class="control-element">
-                <label for="instVolSlider" style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-volume-high"></i> Vol:</label>
-                <input type="range" id="instVolSlider" min="0" max="1.5" step="0.05" value="0.9" style="width: 70px;">
-            </div>
+            <!-- LEFT PANEL: GRADE THEORY -->
+            <aside class="info-card left-sidebar">
+                <h3><i class="fa-solid fa-graduation-cap"></i> Grade Module</h3>
+                <p id="gradeDescText">Loading module details...</p>
+            </aside>
 
-            <div class="control-element" style="margin-left: 15px; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px;">
-                <label style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-wave-square"></i> Metro:</label>
-                <div class="custom-select-wrapper" id="metronomeSoundSelectWrapper" style="width: 130px;">
-                    <div class="custom-select-trigger" id="metronomeSoundSelectTrigger">
-                        <span>Digital Click</span>
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </div>
-                    <div class="custom-select-options" id="metronomeSoundSelectOptions">
-                        <div class="custom-option selected" data-value="digital">Digital Click</div>
-                        <div class="custom-option" data-value="woodblock">Woodblock</div>
-                        <div class="custom-option" data-value="drum">Kick Drum</div>
-                    </div>
-                </div>
-                <select id="metronomeSoundSelect" style="display: none;">
-                    <option value="digital" selected>Digital Click</option>
-                    <option value="woodblock">Woodblock</option>
-                    <option value="drum">Kick Drum</option>
-                </select>
-            </div>
-            
-            <div class="control-element">
-                <input type="range" id="metroVolSlider" min="0" max="1.5" step="0.05" value="0.8" style="width: 70px;">
-            </div>
-        </div>
-
-        <!-- Two-Tier Curriculum Controls Ribbon -->
-        <div class="controls-ribbon">
-            <div class="control-group-left">
+            <!-- CENTER PANEL: MAIN STAGE & CONTROLS -->
+            <div class="center-stage">
                 
-                <div class="control-element">
-                    <label style="font-size: 0.85rem; color: #aaa;">Grade:</label>
-                    <div class="custom-select-wrapper" id="gradeSelectWrapper" style="width: 200px;">
-                        <div class="custom-select-trigger" id="gradeSelectTrigger">
-                            <span>Grade 1: Fundamentals</span>
-                            <i class="fa-solid fa-chevron-down"></i>
+                <!-- Audio Settings Sub-Ribbon -->
+                <div class="audio-ribbon">
+                    <div class="control-element">
+                        <label style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-sliders"></i> Inst:</label>
+                        <div class="custom-select-wrapper" id="instrumentSelectWrapper" style="width: 150px;">
+                            <div class="custom-select-trigger" id="instrumentSelectTrigger">
+                                <span>Concert Piano</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="instrumentSelectOptions">
+                                <div class="custom-option selected" data-value="grandpiano">Concert Piano</div>
+                                <div class="custom-option" data-value="electricpiano">Electric Piano</div>
+                                <div class="custom-option" data-value="softpiano">Soft Piano</div>
+                                <div class="custom-option" data-value="bell">Soft Bell</div>
+                            </div>
                         </div>
-                        <div class="custom-select-options" id="gradeSelectOptions">
-                            <div class="custom-option selected" data-value="grade1">Grade 1: Fundamentals</div>
+                        <select id="instrumentSelect" style="display: none;">
+                            <option value="grandpiano" selected>Concert Piano</option>
+                            <option value="electricpiano">Electric Piano</option>
+                            <option value="softpiano">Soft Piano</option>
+                            <option value="bell">Soft Bell</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-element">
+                        <label for="instVolSlider" style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-volume-high"></i> Vol:</label>
+                        <input type="range" id="instVolSlider" min="0" max="1.5" step="0.05" value="0.9" style="width: 70px;">
+                    </div>
+
+                    <div class="control-element" style="margin-left: 15px; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 20px;">
+                        <label style="font-size: 0.85rem; color: #aaa;"><i class="fa-solid fa-wave-square"></i> Metro:</label>
+                        <div class="custom-select-wrapper" id="metronomeSoundSelectWrapper" style="width: 130px;">
+                            <div class="custom-select-trigger" id="metronomeSoundSelectTrigger">
+                                <span>Digital Click</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="metronomeSoundSelectOptions">
+                                <div class="custom-option selected" data-value="digital">Digital Click</div>
+                                <div class="custom-option" data-value="woodblock">Woodblock</div>
+                                <div class="custom-option" data-value="drum">Kick Drum</div>
+                            </div>
+                        </div>
+                        <select id="metronomeSoundSelect" style="display: none;">
+                            <option value="digital" selected>Digital Click</option>
+                            <option value="woodblock">Woodblock</option>
+                            <option value="drum">Kick Drum</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-element">
+                        <input type="range" id="metroVolSlider" min="0" max="1.5" step="0.05" value="0.8" style="width: 70px;">
+                    </div>
+                </div>
+
+                <!-- Controls Ribbon -->
+                <div class="controls-ribbon">
+                    <div class="control-group-left">
+                        <div class="control-element">
+                            <label style="font-size: 0.85rem; color: #aaa;">Grade:</label>
+                            <div class="custom-select-wrapper" id="gradeSelectWrapper" style="width: 200px;">
+                                <div class="custom-select-trigger" id="gradeSelectTrigger">
+                                    <span>Grade 1: Fundamentals</span>
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </div>
+                                <div class="custom-select-options" id="gradeSelectOptions">
+                                    <div class="custom-option selected" data-value="grade1">Grade 1: Fundamentals</div>
+                                </div>
+                            </div>
+                            <select id="gradeSelect" style="display: none;">
+                                <option value="grade1" selected>Grade 1: Fundamentals</option>
+                            </select>
+                        </div>
+
+                        <div class="control-element">
+                            <label style="font-size: 0.85rem; color: #aaa;">Exercise:</label>
+                            <div class="custom-select-wrapper" id="songSelectWrapper" style="width: 240px;">
+                                <div class="custom-select-trigger" id="songSelectTrigger">
+                                    <span>1. Finding Middle C</span>
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </div>
+                                <div class="custom-select-options" id="songSelectOptions"></div>
+                            </div>
+                            <select id="songSelect" style="display: none;"></select>
+                        </div>
+
+                        <div class="control-element">
+                            <label style="font-size: 0.85rem; color: #aaa;">Range:</label>
+                            <div class="custom-select-wrapper" id="keyboardSizeSelectWrapper" style="width: 90px;">
+                                <div class="custom-select-trigger" id="keyboardSizeSelectTrigger">
+                                    <span>Auto</span>
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </div>
+                                <div class="custom-select-options" id="keyboardSizeSelectOptions">
+                                    <div class="custom-option selected" data-value="auto">Auto</div>
+                                    <div class="custom-option" data-value="25">25-Key</div>
+                                    <div class="custom-option" data-value="49">49-Key</div>
+                                    <div class="custom-option" data-value="61">61-Key</div>
+                                    <div class="custom-option" data-value="88">88-Key</div>
+                                </div>
+                            </div>
+                            <select id="keyboardSizeSelect" style="display: none;">
+                                <option value="auto" selected>Auto</option>
+                                <option value="25">25-Key</option>
+                                <option value="49">49-Key</option>
+                                <option value="61">61-Key</option>
+                                <option value="88">88-Key</option>
+                            </select>
+                        </div>
+
+                        <div class="control-element">
+                            <label style="font-size: 0.85rem; color: #aaa;">Mode:</label>
+                            <div class="custom-select-wrapper" id="playModeSelectWrapper" style="width: 160px;">
+                                <div class="custom-select-trigger" id="playModeSelectTrigger">
+                                    <span>Wait for Right Key</span>
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </div>
+                                <div class="custom-select-options" id="playModeSelectOptions">
+                                    <div class="custom-option selected" data-value="wait">Wait for Right Key</div>
+                                    <div class="custom-option" data-value="continuous">Continuous Flow</div>
+                                </div>
+                            </div>
+                            <select id="playModeSelect" style="display: none;">
+                                <option value="wait" selected>Wait for Right Key</option>
+                                <option value="continuous">Continuous Flow</option>
+                            </select>
+                        </div>
+
+                        <div class="control-element">
+                            <label for="tempoInput" style="font-size: 0.85rem; color: #aaa;">BPM:</label>
+                            <input type="number" id="tempoInput" min="30" max="300" style="width: 60px;">
+                            <button id="btnResetTempo" class="btn-icon" title="Reset to Song Default"><i class="fa-solid fa-rotate-left"></i></button>
+                        </div>
+
+                        <div class="control-element">
+                            <button id="btnMetronome" class="btn-icon" title="Toggle Metronome"><i class="fa-solid fa-stopwatch"></i> Metronome</button>
+                        </div>
+
+                        <div class="control-element">
+                            <div id="midiStatus" class="midi-badge">
+                                <i class="fa-solid fa-circle-dot"></i> MIDI: Inactive
+                            </div>
                         </div>
                     </div>
-                    <select id="gradeSelect" style="display: none;">
-                        <option value="grade1" selected>Grade 1: Fundamentals</option>
-                    </select>
-                </div>
 
-                <div class="control-element">
-                    <label style="font-size: 0.85rem; color: #aaa;">Exercise:</label>
-                    <div class="custom-select-wrapper" id="songSelectWrapper" style="width: 260px;">
-                        <div class="custom-select-trigger" id="songSelectTrigger">
-                            <span>1. Finding Middle C</span>
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </div>
-                        <div class="custom-select-options" id="songSelectOptions">
-                            <!-- Injected via JS -->
-                        </div>
+                    <div style="display: flex; gap: 10px; padding-top: 5px; width: 100%; justify-content: flex-end;">
+                        <button id="btnDemo" class="btn-secondary">
+                            <i class="fa-solid fa-eye"></i> Watch Demo
+                        </button>
+                        <button id="btnPlay" class="primary-btn">
+                            <i class="fa-solid fa-play"></i> Start Practice
+                        </button>
                     </div>
-                    <select id="songSelect" style="display: none;"></select>
                 </div>
 
-                <div class="control-element">
-                    <label style="font-size: 0.85rem; color: #aaa;">Hands:</label>
-                    <div class="custom-select-wrapper" id="handSelectWrapper" style="width: 140px;">
-                        <div class="custom-select-trigger" id="handSelectTrigger">
-                            <span>Both Hands</span>
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </div>
-                        <div class="custom-select-options" id="handSelectOptions">
-                            <div class="custom-option selected" data-value="both">Both Hands</div>
-                            <div class="custom-option" data-value="R">Right Hand Only</div>
-                            <div class="custom-option" data-value="L">Left Hand Only</div>
-                        </div>
+                <!-- Main Stage: Falling Notes Canvas & Virtual Piano -->
+                <div class="stage-wrapper">
+                    <div id="countdownBanner" class="overlay-banner">3</div>
+                    <div id="loadingBanner" class="overlay-banner loading-banner">
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                        <span>Loading High-Quality Audio Samples...</span>
                     </div>
-                    <select id="handSelect" style="display: none;">
-                        <option value="both" selected>Both Hands</option>
-                        <option value="R">Right Hand Only</option>
-                        <option value="L">Left Hand Only</option>
-                    </select>
-                </div>
-
-                <div class="control-element">
-                    <label style="font-size: 0.85rem; color: #aaa;">Range:</label>
-                    <div class="custom-select-wrapper" id="keyboardSizeSelectWrapper" style="width: 100px;">
-                        <div class="custom-select-trigger" id="keyboardSizeSelectTrigger">
-                            <span>Auto</span>
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </div>
-                        <div class="custom-select-options" id="keyboardSizeSelectOptions">
-                            <div class="custom-option selected" data-value="auto">Auto</div>
-                            <div class="custom-option" data-value="25">25-Key</div>
-                            <div class="custom-option" data-value="49">49-Key</div>
-                            <div class="custom-option" data-value="61">61-Key</div>
-                            <div class="custom-option" data-value="88">88-Key</div>
-                        </div>
+                    <div id="waitingBanner" class="waiting-badge">
+                        <i class="fa-solid fa-hand"></i> Press <span id="waitingNoteName" style="color:#fff; text-decoration: underline;">C4</span>
                     </div>
-                    <select id="keyboardSizeSelect" style="display: none;">
-                        <option value="auto" selected>Auto</option>
-                        <option value="25">25-Key</option>
-                        <option value="49">49-Key</option>
-                        <option value="61">61-Key</option>
-                        <option value="88">88-Key</option>
-                    </select>
-                </div>
 
-                <div class="control-element">
-                    <label style="font-size: 0.85rem; color: #aaa;">Mode:</label>
-                    <div class="custom-select-wrapper" id="playModeSelectWrapper" style="width: 160px;">
-                        <div class="custom-select-trigger" id="playModeSelectTrigger">
-                            <span>Wait for Right Key</span>
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </div>
-                        <div class="custom-select-options" id="playModeSelectOptions">
-                            <div class="custom-option selected" data-value="wait">Wait for Right Key</div>
-                            <div class="custom-option" data-value="continuous">Continuous Flow</div>
-                        </div>
+                    <div class="canvas-scroll-container" id="canvasScrollContainer">
+                        <canvas id="fallingCanvas"></canvas>
                     </div>
-                    <select id="playModeSelect" style="display: none;">
-                        <option value="wait" selected>Wait for Right Key</option>
-                        <option value="continuous">Continuous Flow</option>
-                    </select>
-                </div>
-
-                <div class="control-element">
-                    <label for="tempoInput" style="font-size: 0.85rem; color: #aaa;">BPM:</label>
-                    <input type="number" id="tempoInput" min="30" max="300" style="width: 60px;">
-                    <button id="btnResetTempo" class="btn-icon" title="Reset to Song Default"><i class="fa-solid fa-rotate-left"></i></button>
-                </div>
-
-                <div class="control-element">
-                    <button id="btnMetronome" class="btn-icon" title="Toggle Metronome"><i class="fa-solid fa-stopwatch"></i> Metronome</button>
-                </div>
-
-                <div class="control-element">
-                    <div id="midiStatus" class="midi-badge">
-                        <i class="fa-solid fa-circle-dot"></i> MIDI: Inactive
+                    
+                    <div class="keyboard-wrapper" id="keyboardScrollContainer">
+                        <div class="piano" id="pianoKeyboard">
+                            <!-- Keys dynamically injected -->
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div style="display: flex; gap: 10px; padding-top: 5px;">
-                <button id="btnDemo" class="btn-secondary">
-                    <i class="fa-solid fa-eye"></i> Demo
-                </button>
-                <button id="btnPlay" class="primary-btn">
-                    <i class="fa-solid fa-play"></i> Start Practice
-                </button>
-            </div>
+            <!-- RIGHT PANEL: EXERCISE FOCUS -->
+            <aside class="info-card right-sidebar">
+                <h3><i class="fa-solid fa-music"></i> Exercise Focus</h3>
+                <p id="songDescText">Loading exercise details...</p>
+                <div class="highlight-box">
+                    <strong><i class="fa-solid fa-hand"></i> Finger Placement</strong>
+                    <p id="fingeringText">Loading placement details...</p>
+                </div>
+            </aside>
+
         </div>
-
-        <!-- Main Stage: Falling Notes Canvas & Virtual Piano -->
-        <div class="stage-wrapper">
-            
-            <div id="countdownBanner" class="overlay-banner">3</div>
-            
-            <div id="loadingBanner" class="overlay-banner loading-banner">
-                <i class="fa-solid fa-spinner fa-spin"></i>
-                <span>Loading High-Quality Audio Samples...</span>
-            </div>
-
-            <div id="waitingBanner" class="waiting-badge">
-                <i class="fa-solid fa-hand"></i> Press <span id="waitingNoteName" style="color:#fff; text-decoration: underline;">C4</span>
-            </div>
-
-            <div class="canvas-scroll-container" id="canvasScrollContainer">
-                <canvas id="fallingCanvas"></canvas>
-            </div>
-            
-            <div class="keyboard-wrapper" id="keyboardScrollContainer">
-                <div class="piano" id="pianoKeyboard">
-                    <!-- Keys dynamically injected -->
-                </div>
-            </div>
-        </div>
-
     </div>
 
     <!-- UNIVERSAL FOOTER -->
@@ -722,9 +418,7 @@
         });
 
         // Initialize Native-to-Custom UI Dropdowns
-        ['instrumentSelect', 'metronomeSoundSelect', 'gradeSelect', 'handSelect', 'playModeSelect', 'keyboardSizeSelect'].forEach(setupCustomDropdown);
-        
-        // songSelect requires special init since it dynamically populates
+        ['instrumentSelect', 'metronomeSoundSelect', 'gradeSelect', 'playModeSelect', 'keyboardSizeSelect'].forEach(setupCustomDropdown);
         setupCustomDropdown('songSelect');
 
         // ==========================================
@@ -733,58 +427,69 @@
         const CURRICULUM = {
             grade1: {
                 title: "Grade 1: Fundamentals",
+                description: "Welcome to Grade 1! This module focuses on the absolute basics of keyboard geography. You will learn to locate Middle C, navigate the white keys using a standard 5-finger position, and identify the black key groupings. No prior experience is needed.",
                 songs: {
                     findingMiddleC: {
-                        title: "1. Finding Middle C (Orientation)", tempo: 80,
+                        title: "1. Finding Middle C", 
+                        tempo: 80,
+                        description: "Middle C is the anchor of the piano. This exercise helps you locate it and play it consistently.",
+                        fingering: "Place your thumb (Finger 1) on Middle C (C4).",
                         notes: [
-                            { note: "C3", time: 1.0, dur: 0.8, hand: "L" }, { note: "C4", time: 2.0, dur: 0.8, hand: "R" },
-                            { note: "C3", time: 3.0, dur: 0.8, hand: "L" }, { note: "C4", time: 4.0, dur: 0.8, hand: "R" },
-                            { note: "C3", time: 5.0, dur: 0.4, hand: "L" }, { note: "C4", time: 5.5, dur: 0.4, hand: "R" },
-                            { note: "C3", time: 6.0, dur: 0.4, hand: "L" }, { note: "C4", time: 6.5, dur: 0.4, hand: "R" },
-                            { note: "C3", time: 7.0, dur: 1.5, hand: "L" }, { note: "C4", time: 7.0, dur: 1.5, hand: "R" } 
+                            { note: "C4", time: 1.0, dur: 0.8 }, { note: "C4", time: 2.0, dur: 0.8 },
+                            { note: "C4", time: 3.0, dur: 0.8 }, { note: "C4", time: 4.0, dur: 0.8 },
+                            { note: "C4", time: 5.0, dur: 0.4 }, { note: "C4", time: 5.5, dur: 0.4 },
+                            { note: "C4", time: 6.0, dur: 0.4 }, { note: "C4", time: 6.5, dur: 0.4 },
+                            { note: "C4", time: 7.0, dur: 1.5 } 
                         ]
                     },
                     whiteKeyWalk: {
-                        title: "2. The White Key Walk (5-Finger)", tempo: 90,
+                        title: "2. The White Key Walk", 
+                        tempo: 90,
+                        description: "Learn to rest your fingers on five consecutive white keys and play them one by one without moving your wrist.",
+                        fingering: "Place your thumb (1) on C4, index (2) on D4, middle (3) on E4, ring (4) on F4, and pinky (5) on G4.",
                         notes: [
-                            { note: "C3", time: 1.0, dur: 0.4, hand: "L" }, { note: "C4", time: 1.0, dur: 0.4, hand: "R" },
-                            { note: "D3", time: 1.5, dur: 0.4, hand: "L" }, { note: "D4", time: 1.5, dur: 0.4, hand: "R" },
-                            { note: "E3", time: 2.0, dur: 0.4, hand: "L" }, { note: "E4", time: 2.0, dur: 0.4, hand: "R" },
-                            { note: "F3", time: 2.5, dur: 0.4, hand: "L" }, { note: "F4", time: 2.5, dur: 0.4, hand: "R" },
-                            { note: "G3", time: 3.0, dur: 0.8, hand: "L" }, { note: "G4", time: 3.0, dur: 0.8, hand: "R" },
-                            { note: "F3", time: 4.0, dur: 0.4, hand: "L" }, { note: "F4", time: 4.0, dur: 0.4, hand: "R" },
-                            { note: "E3", time: 4.5, dur: 0.4, hand: "L" }, { note: "E4", time: 4.5, dur: 0.4, hand: "R" },
-                            { note: "D3", time: 5.0, dur: 0.4, hand: "L" }, { note: "D4", time: 5.0, dur: 0.4, hand: "R" },
-                            { note: "C3", time: 5.5, dur: 1.5, hand: "L" }, { note: "C4", time: 5.5, dur: 1.5, hand: "R" }
+                            { note: "C4", time: 1.0, dur: 0.4 }, { note: "D4", time: 1.5, dur: 0.4 },
+                            { note: "E4", time: 2.0, dur: 0.4 }, { note: "F4", time: 2.5, dur: 0.4 },
+                            { note: "G4", time: 3.0, dur: 0.8 }, { note: "F4", time: 4.0, dur: 0.4 },
+                            { note: "E4", time: 4.5, dur: 0.4 }, { note: "D4", time: 5.0, dur: 0.4 },
+                            { note: "C4", time: 5.5, dur: 1.5 }
                         ]
                     },
                     blackKeyGroups: {
-                        title: "3. Black Key Groups (2s and 3s)", tempo: 75,
+                        title: "3. Black Key Groups", 
+                        tempo: 75,
+                        description: "The black keys are grouped in 2s and 3s. Feeling these groups helps you navigate the keyboard visually and physically.",
+                        fingering: "Use your pointer and middle fingers (2, 3) for the 2-key groups, and add your ring finger (4) for the 3-key groups.",
                         notes: [
-                            { note: "C#3", time: 1.0, dur: 0.4, hand: "L" }, { note: "D#3", time: 1.5, dur: 0.8, hand: "L" },
-                            { note: "C#4", time: 2.5, dur: 0.4, hand: "R" }, { note: "D#4", time: 3.0, dur: 0.8, hand: "R" },
-                            { note: "F#3", time: 4.5, dur: 0.4, hand: "L" }, { note: "G#3", time: 5.0, dur: 0.4, hand: "L" }, { note: "A#3", time: 5.5, dur: 0.8, hand: "L" },
-                            { note: "F#4", time: 7.0, dur: 0.4, hand: "R" }, { note: "G#4", time: 7.5, dur: 0.4, hand: "R" }, { note: "A#4", time: 8.0, dur: 0.8, hand: "R" }
+                            { note: "C#4", time: 1.0, dur: 0.4 }, { note: "D#4", time: 1.5, dur: 0.8 },
+                            { note: "F#4", time: 3.0, dur: 0.4 }, { note: "G#4", time: 3.5, dur: 0.4 }, { note: "A#4", time: 4.0, dur: 0.8 },
+                            { note: "C#5", time: 5.5, dur: 0.4 }, { note: "D#5", time: 6.0, dur: 0.8 }
                         ]
                     },
                     octaveStretch: {
-                        title: "4. The Octave Stretch", tempo: 85,
+                        title: "4. The Octave Stretch", 
+                        tempo: 85,
+                        description: "An octave is the distance from one note to the next note with the exact same name. Get a feel for this physical distance.",
+                        fingering: "Stretch your hand. Use your thumb (1) for the lower note and your pinky (5) for the higher note.",
                         notes: [
-                            { note: "C3", time: 1.0, dur: 0.4, hand: "L" }, { note: "C4", time: 1.5, dur: 0.4, hand: "R" },
-                            { note: "D3", time: 2.5, dur: 0.4, hand: "L" }, { note: "D4", time: 3.0, dur: 0.4, hand: "R" },
-                            { note: "E3", time: 4.0, dur: 0.4, hand: "L" }, { note: "E4", time: 4.5, dur: 0.4, hand: "R" },
-                            { note: "F3", time: 5.5, dur: 0.4, hand: "L" }, { note: "F4", time: 6.0, dur: 0.4, hand: "R" },
-                            { note: "G3", time: 7.0, dur: 0.8, hand: "L" }, { note: "G4", time: 7.0, dur: 0.8, hand: "R" }
+                            { note: "C4", time: 1.0, dur: 0.4 }, { note: "C5", time: 1.5, dur: 0.4 },
+                            { note: "D4", time: 2.5, dur: 0.4 }, { note: "D5", time: 3.0, dur: 0.4 },
+                            { note: "E4", time: 4.0, dur: 0.4 }, { note: "E5", time: 4.5, dur: 0.4 },
+                            { note: "F4", time: 5.5, dur: 0.4 }, { note: "F5", time: 6.0, dur: 0.4 },
+                            { note: "C4", time: 7.0, dur: 0.8 }, { note: "C5", time: 7.0, dur: 0.8 }
                         ]
                     },
                     simpleSimon: {
-                        title: "5. Simple Simon (Reaction)", tempo: 100,
+                        title: "5. Simple Simon", 
+                        tempo: 100,
+                        description: "A fun reaction game to test your visual and physical coordination on the first three notes of the scale.",
+                        fingering: "Rest your thumb, index, and middle fingers tightly on C4, D4, and E4. React quickly!",
                         notes: [
-                            { note: "C4", time: 1.0, dur: 0.4, hand: "R" }, { note: "E4", time: 2.0, dur: 0.4, hand: "R" },
-                            { note: "D4", time: 3.0, dur: 0.4, hand: "R" }, { note: "C3", time: 4.0, dur: 0.4, hand: "L" },
-                            { note: "D3", time: 5.0, dur: 0.4, hand: "L" }, { note: "E3", time: 6.0, dur: 0.4, hand: "L" },
-                            { note: "E4", time: 7.0, dur: 0.4, hand: "R" }, { note: "C3", time: 7.5, dur: 0.4, hand: "L" },
-                            { note: "D4", time: 8.0, dur: 0.4, hand: "R" }, { note: "D3", time: 8.5, dur: 0.4, hand: "L" }
+                            { note: "C4", time: 1.0, dur: 0.4 }, { note: "E4", time: 2.0, dur: 0.4 },
+                            { note: "D4", time: 3.0, dur: 0.4 }, { note: "C4", time: 4.0, dur: 0.4 },
+                            { note: "D4", time: 5.0, dur: 0.4 }, { note: "E4", time: 6.0, dur: 0.4 },
+                            { note: "C4", time: 7.0, dur: 0.4 }, { note: "E4", time: 7.5, dur: 0.4 },
+                            { note: "D4", time: 8.0, dur: 0.8 }
                         ]
                     }
                 }
@@ -809,7 +514,6 @@
         // ==========================================
         const gradeSelect = document.getElementById("gradeSelect");
         const songSelect = document.getElementById("songSelect");
-        const handSelect = document.getElementById("handSelect");
         const keyboardSizeSelect = document.getElementById("keyboardSizeSelect");
         const tempoInput = document.getElementById("tempoInput");
         
@@ -874,6 +578,17 @@
             return songs.every(isSongCompleted);
         }
 
+        function updateSidebars() {
+            const grade = gradeSelect.value;
+            const songKey = songSelect.value;
+            const gradeData = CURRICULUM[grade];
+            const songData = gradeData.songs[songKey];
+
+            document.getElementById("gradeDescText").innerText = gradeData.description;
+            document.getElementById("songDescText").innerText = songData.description;
+            document.getElementById("fingeringText").innerText = songData.fingering;
+        }
+
         function updateGradeDropdown() {
             const optionsContainer = document.getElementById('gradeSelectOptions');
             const triggerSpan = document.querySelector('#gradeSelectTrigger span');
@@ -928,6 +643,7 @@
             if(firstSong) triggerSpan.textContent = firstSong.title;
             
             resetTempo();
+            updateSidebars();
         }
 
         function getCurrentSongData() {
@@ -948,11 +664,13 @@
             buildDynamicPiano();
         }
 
-        gradeSelect.addEventListener("change", populateSongs);
-        songSelect.addEventListener("change", resetTempo);
-        handSelect.addEventListener("change", () => {
-            if (isPlaying || isCountingDown) stopPractice();
-            buildDynamicPiano();
+        gradeSelect.addEventListener("change", () => {
+            populateSongs();
+        });
+        
+        songSelect.addEventListener("change", () => {
+            resetTempo();
+            updateSidebars();
         });
 
         tempoInput.addEventListener("change", (e) => {
@@ -1098,8 +816,7 @@
             keyPositions = {};
             
             const rawSongData = getCurrentSongData();
-            const hand = handSelect.value;
-            const filteredNotes = rawSongData.notes.filter(n => hand === "both" || n.hand === hand);
+            const filteredNotes = rawSongData.notes; 
 
             let rangeConfig = keyboardSizeSelect.value === "auto" ? getAutoSongRange(filteredNotes) : KEYBOARD_RANGES[keyboardSizeSelect.value];
             let whiteCount = 0;
@@ -1107,7 +824,7 @@
                 if (!Tone.Midi(i).toNote().includes('#')) whiteCount++;
             }
 
-            let containerWidth = canvasScrollContainer.clientWidth || 1170;
+            let containerWidth = canvasScrollContainer.clientWidth || 800;
             let whiteWidth = rangeConfig.whiteKeyWidth;
             if ((whiteCount * whiteWidth) < containerWidth) whiteWidth = containerWidth / whiteCount;
             if (whiteWidth > 65) whiteWidth = 65; 
@@ -1281,13 +998,13 @@
                         const pos = keyPositions[n.note];
 
                         if (pos) {
-                            // Assign distinct colors based on hand assignment (White for L, Cyan for R)
                             let fillCol = "#00d4ff"; 
-                            if (n.hand === "L") fillCol = "#ffffff"; 
                             
-                            ctx.fillStyle = n.hit ? "#10b981" : fillCol;
-                            ctx.shadowColor = fillCol;
-                            ctx.shadowBlur = 8;
+                            // CHANGE: Note Hit Color changed from green to Glowing White/Cyan
+                            ctx.fillStyle = n.hit ? "#ffffff" : fillCol;
+                            ctx.shadowColor = n.hit ? "#00d4ff" : fillCol;
+                            ctx.shadowBlur = n.hit ? 15 : 8;
+                            
                             ctx.beginPath();
                             ctx.roundRect(pos.x + 2, blockY - blockHeight, pos.w - 4, blockHeight, 5);
                             ctx.fill();
@@ -1332,8 +1049,6 @@
 
             const rawSongData = getCurrentSongData();
             activeSong = JSON.parse(JSON.stringify(rawSongData));
-            const hand = handSelect.value;
-            activeSong.notes = activeSong.notes.filter(n => hand === "both" || n.hand === hand);
             
             totalExpectedNotes = activeSong.notes.length;
             notesHit = 0; currentStreak = 0; totalScore = 0;
