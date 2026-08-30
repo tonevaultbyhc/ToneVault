@@ -15,7 +15,8 @@ class SiteHeader extends HTMLElement {
                                 <ul class="dropdown-menu">
                                     <li><a href="/AI Tools/Audio2MIDI.html"><i class="fa-solid fa-music" style="margin-right: 8px; color: #00d4ff;"></i> Audio2MIDI</a></li>
                                     <li><a href="/AI Tools/StemSplitter.html"><i class="fa-solid fa-sliders" style="margin-right: 8px; color: #00d4ff;"></i> Stem Splitter</a></li>
-                                    <li><a href="/AI Tools/Thoughts2Midi.html"><i class="fa-solid fa-brain" style="margin-right: 8px; color: #00d4ff;"></i> Thoughts2MIDI</a></li>
+                                    <li><a href="/AI Tools/Thoughts2Beats.html"><i class="fa-solid fa-drum" style="margin-right: 8px; color: #00d4ff;"></i> Thoughts2Beats</a></li>
+                                    <li><a href="/AI Tools/Thoughts2Notes.html"><i class="fa-solid fa-brain" style="margin-right: 8px; color: #00d4ff;"></i> Thoughts2Notes</a></li>
                                 </ul>
                             </li>
                             <li><a href="/Pages/Services.html">Services</a></li>
@@ -68,9 +69,12 @@ document.addEventListener("DOMContentLoaded", function() {
     } else if (path.includes("stemsplitter") || path.includes("stem%20separator")) {
         pageTitle = "Stem Splitter | ToneVault";
         pageDescription = "Isolate vocals, drums, bass, and instruments instantly using our AI-powered stem separation tool.";
-    } else if (path.includes("thoughts2midi") || path.includes("thoughts%202%20midi")) {
-        pageTitle = "Thoughts2MIDI | ToneVault";
-        pageDescription = "Generate complex MIDI patterns and musical ideas from simple text descriptions using AI.";
+    } else if (path.includes("thoughts2beats")) {
+        pageTitle = "Thoughts2Beats | ToneVault";
+        pageDescription = "Generate highly structured, sample-accurate drum beats with individual stem audio and MIDI isolation.";
+    } else if (path.includes("thoughts2notes")) {
+        pageTitle = "Thoughts2Notes | ToneVault";
+        pageDescription = "Generate precise melodic MIDI compositions matching your exact bar length, time signature, and structural arrangement.";
     } else if (path.includes("about")) {
         pageTitle = "About & Contact | ToneVault";
         pageDescription = "Get in touch with Harish Cousal for collaborations, custom beats, and project inquiries.";
@@ -82,7 +86,7 @@ document.addEventListener("DOMContentLoaded", function() {
         { charset: "UTF-8" },
         { name: "viewport", content: "width=device-width, initial-scale=1.0" },
         { name: "description", content: pageDescription },
-        { name: "keywords", content: "Harish Cousal, ToneVault, music producer, EDM producer, cinematic scoring, custom beats, mixing and mastering, audio to midi, stem separator, thoughts to midi, Audio2MIDI, Stem Splitter, Thoughts2MIDI" },
+        { name: "keywords", content: "Harish Cousal, ToneVault, music producer, EDM producer, cinematic scoring, custom beats, mixing and mastering, audio to midi, stem separator, Thoughts2Beats, Thoughts2Notes, Audio2MIDI, Stem Splitter" },
         { name: "author", content: "Harish Cousal" },
         
         { property: "og:title", content: pageTitle },
