@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thoughts2MIDI | ToneVault</title>
+    
+    <!-- FONTAWESOME ICONS CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- WAVESURFER.JS FOR AUDIO WAVEFORMS -->
+    <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+
+    <!-- TONE.JS & @TONEJS/MIDI -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://unpkg.com/@tonejs/midi@2.0.28/build/Midi.js"></script>
+
+    <!-- UNIVERSAL DESIGN EDITOR -->
+    <link rel="stylesheet" href="/style.css">
+
+    <!-- Page-Specific Styles -->
+    <style>
+        /* CSS RESET FOR PERFECT CENTERING */
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { overflow-x: hidden; margin: 0; padding: 0; }
+        
+        .page-header { text-align: center; margin-top: 60px; margin-bottom: 30px; padding: 0 20px; }
+        .page-header h1 { font-size: 3rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; margin-top: 0; color: #ffffff; }
+        .page-header h1 span { color: #00d4ff; }
+        .page-header p { color: #bbbbbb; font-size: 1.1rem; max-width: 750px; margin: 0 auto; line-height: 1.6; }
+
+        /* 2-COLUMN LAYOUT CONTAINER */
+        .layout-container { width: 100%; max-width: 1200px; margin: 0 auto 50px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 340px; gap: 30px; align-items: start; }
+        .stem-card { background: rgba(20, 20, 20, 0.95); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 18px; padding: 35px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+
+        /* SETTINGS SECTION */
+        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .setting-group label { display: block; color: #bbb; font-size: 0.9rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .setting-group input, .setting-group textarea { width: 100%; background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(255, 255, 255, 0.15); color: #ffffff; padding: 12px 15px; border-radius: 10px; font-size: 1rem; outline: none; transition: border-color 0.2s ease; }
+        .setting-group textarea { resize: vertical; }
+        .setting-group input:focus, .setting-group textarea:focus { border-color: #00d4ff; }
+
+        /* CUSTOM DROPDOWN STYLES */
+        .custom-select-wrapper { position: relative; user-select: none; width: 100%; z-index: 1; }
+        .custom-select-wrapper.open { z-index: 100; }
+        .custom-select-trigger { background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(255, 255, 255, 0.15); color: #ffffff; padding: 12px 15px; border-radius: 10px; font-size: 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+        .preview-toolbar .custom-select-trigger { padding: 8px 12px; font-size: 0.9rem; border-radius: 8px; min-width: 220px; }
+        .custom-select-wrapper.open .custom-select-trigger { border-color: #00d4ff; border-bottom-left-radius: 0; border-bottom-right-radius: 0; background: rgba(15, 15, 15, 0.95); }
+        .custom-select-trigger i { color: #00d4ff; transition: transform 0.3s ease; font-size: 0.9rem; margin-left: 10px; }
+        .custom-select-wrapper.open .custom-select-trigger i { transform: rotate(180deg); }
+        .custom-select-options { position: absolute; top: 100%; left: 0; right: 0; background: rgba(15, 15, 15, 0.95); backdrop-filter: blur(10px); border: 1px solid #00d4ff; border-top: none; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; box-shadow: 0 15px 30px rgba(0,0,0,0.6); opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 50; overflow-y: auto; max-height: 250px; }
+        .custom-select-wrapper.open .custom-select-options { opacity: 1; visibility: visible; }
+        .custom-select-options::-webkit-scrollbar { width: 6px; }
+        .custom-select-options::-webkit-scrollbar-thumb { background: #00d4ff; border-radius: 3px; }
+        .custom-select-options::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        .custom-option { padding: 12px 15px; color: #bbb; font-size: 0.95rem; cursor: pointer; transition: all 0.2s ease; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .preview-toolbar .custom-option { padding: 10px 12px; font-size: 0.85rem; }
+        .custom-option:last-child { border-bottom: none; }
+        .custom-option:hover { background: rgba(0, 212, 255, 0.1); color: #00d4ff; padding-left: 20px; }
+        .custom-option.selected { color: #ffffff; background: rgba(0, 212, 255, 0.05); font-weight: bold; }
+
+        /* HYBRID COMBOBOX FOR TIME SIGNATURE */
+        .custom-combobox-wrapper { position: relative; width: 100%; z-index: 2; }
+        .custom-combobox-wrapper.open { z-index: 100; }
+        .custom-combobox-input { width: 100%; background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(255, 255, 255, 0.15); color: #ffffff; padding: 12px 35px 12px 15px; border-radius: 10px; font-size: 1rem; outline: none; transition: border-color 0.2s ease; }
+        .custom-combobox-input:focus { border-color: #00d4ff; }
+        .combobox-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #00d4ff; cursor: pointer; pointer-events: none; transition: transform 0.3s ease; font-size: 0.9rem; }
+        .custom-combobox-wrapper.open .combobox-icon { transform: translateY(-50%) rotate(180deg); }
+        .custom-combobox-wrapper.open .custom-combobox-input { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-color: #00d4ff; background: rgba(15, 15, 15, 0.95); }
+        .custom-combobox-options { position: absolute; top: 100%; left: 0; right: 0; background: rgba(15, 15, 15, 0.95); backdrop-filter: blur(10px); border: 1px solid #00d4ff; border-top: none; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; box-shadow: 0 15px 30px rgba(0,0,0,0.6); opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 50; overflow-y: auto; max-height: 250px; }
+        .custom-combobox-wrapper.open .custom-combobox-options { opacity: 1; visibility: visible; }
+        .custom-combobox-options::-webkit-scrollbar { width: 6px; }
+        .custom-combobox-options::-webkit-scrollbar-thumb { background: #00d4ff; border-radius: 3px; }
+        .custom-combobox-options::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+
+        /* WAVEFORM CONTAINER PREVIEW */
+        .waveform-preview-container { background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 15px; margin-bottom: 25px; display: none; }
+        .waveform-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: #bbb; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .waveform-controls { display: flex; align-items: center; gap: 12px; flex-direction: row; }
+        .play-pause-btn { background: #00d4ff; border: none; color: #000; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: transform 0.2s ease; flex-shrink: 0; }
+        .play-pause-btn:hover { transform: scale(1.05); }
+        .waveform-box { width: 100%; }
+        
+        .preview-toolbar { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.08); gap: 15px; flex-wrap: wrap; }
+        .preview-instrument-select { display: flex; align-items: center; gap: 10px; }
+        .preview-instrument-select label { color: #bbb; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin: 0; }
+        .volume-control-wrapper { display: flex; align-items: center; gap: 8px; color: #888; font-size: 0.85rem; }
+        .volume-control-wrapper i { color: #bbb; }
+        .volume-slider { -webkit-appearance: none; width: 90px; height: 4px; background: rgba(255, 255, 255, 0.15); border-radius: 2px; outline: none; accent-color: #00d4ff; }
+        .volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #00d4ff; cursor: pointer; }
+
+        .action-btn { width: 100%; background: linear-gradient(135deg, #00d4ff, #0077ff); color: #ffffff; border: none; padding: 16px; font-size: 1.1rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; border-radius: 12px; cursor: pointer; transition: opacity 0.2s ease, transform 0.2s ease; box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3); margin-top: 15px; }
+        .action-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .action-btn:disabled { background: #333; color: #777; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        /* STATUS & RESULTS */
+        #statusMessage { margin-top: 25px; display: none; }
+        .status-text { text-align: center; color: #00d4ff; font-size: 1.05rem; margin-bottom: 10px; }
+        .progress-bar-container { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 3px; overflow: hidden; }
+        .progress-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #0077ff, #00d4ff); transition: width 0.2s ease; }
+        #resultsArea { margin-top: 30px; display: none; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 25px; }
+        #resultsArea h3 { color: #ffffff; margin-bottom: 20px; font-size: 1.3rem; }
+        .download-btn { background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.3); color: #00d4ff; padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px; }
+        .download-btn:hover { background: #00d4ff; color: #000; }
+        .action-buttons-group { display: flex; justify-content: flex-end; margin-top: 15px; }
+
+        /* KEYWORD GUIDE STYLES */
+        .keyword-guide { padding: 25px 20px; background: rgba(20, 20, 20, 0.95); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 18px; color: #cfcfcf; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+        .keyword-guide-header { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 15px; }
+        .keyword-guide-header strong { color: #ffffff; letter-spacing: 0.5px; text-transform: uppercase; }
+        .keyword-category { margin-bottom: 20px; }
+        .keyword-category h4 { margin: 0 0 10px 0; color: #00c8ff; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; }
+        .keyword-row { display: flex; align-items: center; gap: 12px; padding: 4px 0; font-size: 11px; }
+        .keyword { min-width: 85px; padding: 3px 6px; border-radius: 4px; background: rgba(0, 200, 255, 0.08); color: #00c8ff; font-family: monospace; font-size: 10px; text-align: center; }
+        .keyword-example { margin-top: 20px; padding: 15px; border-left: 3px solid #00c8ff; background: rgba(0, 200, 255, 0.04); border-radius: 0 8px 8px 0; }
+        .keyword-example strong { display: block; margin-bottom: 8px; color: #fff; font-size: 12px; }
+        .keyword-example code { display: block; margin-bottom: 10px; color: #00c8ff; font-size: 11px; line-height: 1.5; }
+        .keyword-example p { margin: 0; color: #999; font-size: 11px; line-height: 1.5; }
+        .custom-keyword-note { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 11px; color: #888; font-style: italic; line-height: 1.5; }
+        .creator-credit { text-align: center; margin-top: 80px; margin-bottom: 80px; font-size: 0.9rem; color: #888; padding: 0 15px; }
+        .creator-credit a { color: #00d4ff; text-decoration: none; font-weight: bold; transition: color 0.2s ease; }
+        .creator-credit a:hover { color: #ffffff; text-decoration: underline; }
+
+        @media (max-width: 992px) { .layout-container { grid-template-columns: 1fr; max-width: 900px; } }
+        @media (max-width: 768px) { .settings-grid { grid-template-columns: 1fr; gap: 15px; } .preview-toolbar { flex-direction: column; align-items: stretch; } .keyword-row { flex-direction: column; align-items: flex-start; gap: 4px; } .preview-instrument-select { flex-direction: column; align-items: flex-start; } .preview-toolbar .custom-select-trigger { width: 100%; min-width: 0; } }
+    </style>
+</head>
+<body>
+
+    <site-header></site-header>
+
+    <main>
+        <div class="page-header">
+            <h1>Thoughts <span>2</span> MIDI</h1>
+            <p>Generate precise melodic MIDI compositions matching your exact bar length, time signature, and structural arrangement.</p>
+        </div>
+
+        <div class="layout-container">
+            
+            <!-- LEFT COLUMN: MAIN GENERATOR TOOL -->
+            <div class="stem-card">
+                
+                <div class="settings-grid">
+                    
+                    <!-- 1. Style Selection -->
+                    <div class="setting-group">
+                        <label><i class="fa-solid fa-compact-disc"></i> Musical Style</label>
+                        <div class="custom-select-wrapper" id="genreSelectWrapper">
+                            <div class="custom-select-trigger" id="genreSelectTrigger">
+                                <span>Cinematic Electronic</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="genreSelectOptions">
+                                <div class="custom-option selected" data-value="electronic">Cinematic Electronic</div>
+                                <div class="custom-option" data-value="pop">Upbeat Pop</div>
+                                <div class="custom-option" data-value="lofi">Ambient Lo-Fi</div>
+                                <div class="custom-option" data-value="rock">Heavy Rock</div>
+                                <div class="custom-option" data-value="classical">Classical Orchestral</div>
+                                <div class="custom-option" data-value="jazz">Jazz Fusion</div>
+                                <div class="custom-option" data-value="carnatic">Carnatic / South Indian</div>
+                            </div>
+                        </div>
+                        <select id="genreSelect" style="display: none;">
+                            <option value="electronic" selected>Cinematic Electronic</option>
+                            <option value="pop">Upbeat Pop</option>
+                            <option value="lofi">Ambient Lo-Fi</option>
+                            <option value="rock">Heavy Rock</option>
+                            <option value="classical">Classical Orchestral</option>
+                            <option value="jazz">Jazz Fusion</option>
+                            <option value="carnatic">Carnatic / South Indian</option>
+                        </select>
+                    </div>
+
+                    <!-- 2. Song Section / Pattern -->
+                    <div class="setting-group">
+                        <label><i class="fa-solid fa-puzzle-piece"></i> Song Section</label>
+                        <div class="custom-select-wrapper" id="patternSelectWrapper">
+                            <div class="custom-select-trigger" id="patternSelectTrigger">
+                                <span>Drop / Main Hook</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="patternSelectOptions"></div>
+                        </div>
+                        <select id="patternSelect" style="display: none;"></select>
+                    </div>
+
+                    <!-- Tempo Input -->
+                    <div class="setting-group">
+                        <label for="tempoInput"><i class="fa-solid fa-metronome"></i> Tempo (BPM)</label>
+                        <input type="number" id="tempoInput" value="120" min="40" max="240" placeholder="e.g. 120">
+                    </div>
+
+                    <!-- Key Root Dropdown -->
+                    <div class="setting-group">
+                        <label><i class="fa-solid fa-key"></i> Key Root</label>
+                        <div class="custom-select-wrapper" id="keySelectWrapper">
+                            <div class="custom-select-trigger" id="keySelectTrigger">
+                                <span>G</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="keySelectOptions">
+                                <div class="custom-option" data-value="C">C</div>
+                                <div class="custom-option" data-value="C#">C#</div>
+                                <div class="custom-option" data-value="D">D</div>
+                                <div class="custom-option" data-value="D#">D#</div>
+                                <div class="custom-option" data-value="E">E</div>
+                                <div class="custom-option" data-value="F">F</div>
+                                <div class="custom-option" data-value="F#">F#</div>
+                                <div class="custom-option selected" data-value="G">G</div>
+                                <div class="custom-option" data-value="G#">G#</div>
+                                <div class="custom-option" data-value="A">A</div>
+                                <div class="custom-option" data-value="A#">A#</div>
+                                <div class="custom-option" data-value="B">B</div>
+                            </div>
+                        </div>
+                        <select id="keySelect" style="display: none;">
+                            <option value="C">C</option><option value="C#">C#</option><option value="D">D</option><option value="D#">D#</option>
+                            <option value="E">E</option><option value="F">F</option><option value="F#">F#</option><option value="G" selected>G</option>
+                            <option value="G#">G#</option><option value="A">A</option><option value="A#">A#</option><option value="B">B</option>
+                        </select>
+                    </div>
+
+                    <!-- Time Signature Combobox -->
+                    <div class="setting-group">
+                        <label><i class="fa-solid fa-clock"></i> Time Signature</label>
+                        <div class="custom-combobox-wrapper" id="timeSigWrapper">
+                            <input type="text" id="timeSigInput" class="custom-combobox-input" value="4/4" placeholder="e.g. 4/4 or 7/8">
+                            <i class="fa-solid fa-chevron-down combobox-icon" id="timeSigIcon"></i>
+                            <div class="custom-combobox-options" id="timeSigOptions">
+                                <div class="custom-option" data-value="2/2">2/2 (Cut Time)</div>
+                                <div class="custom-option" data-value="2/4">2/4 (March)</div>
+                                <div class="custom-option" data-value="3/4">3/4 (Waltz)</div>
+                                <div class="custom-option selected" data-value="4/4">4/4 (Standard)</div>
+                                <div class="custom-option" data-value="3/2">3/2</div>
+                                <div class="custom-option" data-value="4/2">4/2</div>
+                                <div class="custom-option" data-value="6/8">6/8 (Compound)</div>
+                                <div class="custom-option" data-value="9/8">9/8</div>
+                                <div class="custom-option" data-value="12/8">12/8</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Exact Length Input -->
+                    <div class="setting-group">
+                        <label for="barsInput"><i class="fa-solid fa-arrows-split-up-and-left"></i> Exact Length (Bars)</label>
+                        <input type="number" id="barsInput" value="8" min="1" max="64" placeholder="e.g. 8, 12, 16">
+                    </div>
+
+                    <!-- Scale Type Dropdown -->
+                    <div class="setting-group" style="grid-column: 1 / -1;">
+                        <label><i class="fa-solid fa-music"></i> Scale Type</label>
+                        <div class="custom-select-wrapper" id="scaleSelectWrapper">
+                            <div class="custom-select-trigger" id="scaleSelectTrigger">
+                                <span>Natural Minor</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="scaleSelectOptions">
+                                <div class="custom-option" data-value="major">Major</div>
+                                <div class="custom-option selected" data-value="minor">Natural Minor</div>
+                                <div class="custom-option" data-value="pentatonic">Pentatonic</div>
+                                <div class="custom-option" data-value="dorian">Dorian</div>
+                            </div>
+                        </div>
+                        <select id="scaleSelect" style="display: none;">
+                            <option value="major">Major</option>
+                            <option value="minor" selected>Natural Minor</option>
+                            <option value="pentatonic">Pentatonic</option>
+                            <option value="dorian">Dorian</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <!-- THOUGHTS TEXTAREA -->
+                <div class="setting-group" style="margin-bottom: 25px;">
+                    <label for="thoughtsInput"><i class="fa-solid fa-brain"></i> Thoughts / Inspiration / Keywords</label>
+                    <textarea id="thoughtsInput" rows="2" placeholder="e.g. fast, syncopated, staccato, repeating..."></textarea>
+                </div>
+
+                <button id="processBtn" class="action-btn">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generate MIDI
+                </button>
+
+                <!-- STATUS MESSAGE -->
+                <div id="statusMessage">
+                    <div class="status-text" id="statusText"><i class="fa-solid fa-spinner fa-spin"></i> Processing Rhythmic Groove...</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="progressBarFill"></div>
+                    </div>
+                </div>
+
+                <!-- RESULTS CONTAINER -->
+                <div id="resultsArea">
+                    <h3><i class="fa-solid fa-file-audio"></i> Generated Composition</h3>
+                    
+                    <div class="waveform-preview-container" id="waveformPreviewContainer">
+                        <div class="waveform-header">
+                            <span><i class="fa-solid fa-waveform-lines"></i> Audio Preview</span>
+                            <span id="audioDurationText">0:00</span>
+                        </div>
+                        <div class="waveform-controls">
+                            <button class="play-pause-btn" id="previewPlayBtn"><i class="fa-solid fa-play" id="previewPlayIcon"></i></button>
+                            <div class="waveform-box" id="waveform"></div>
+                        </div>
+
+                        <div class="preview-toolbar">
+                            <div class="preview-instrument-select">
+                                <label><i class="fa-solid fa-sliders"></i> Preview Instrument:</label>
+                                <div class="custom-select-wrapper" id="postInstrumentSelectWrapper" style="width: auto;">
+                                    <div class="custom-select-trigger" id="postInstrumentSelectTrigger">
+                                        <span>Grand Piano — Concert</span>
+                                        <i class="fa-solid fa-chevron-down"></i>
+                                    </div>
+                                    <div class="custom-select-options" id="postInstrumentSelectOptions">
+                                        <div class="custom-option selected" data-value="grandpiano">Grand Piano — Concert</div>
+                                        <div class="custom-option" data-value="softpiano">Soft Grand Piano</div>
+                                        <div class="custom-option" data-value="electricpiano">Electric Piano</div>
+                                        <div class="custom-option" data-value="strings">Warm Strings</div>
+                                        <div class="custom-option" data-value="pad">Cinematic Pad</div>
+                                        <div class="custom-option" data-value="bell">Soft Bell</div>
+                                    </div>
+                                </div>
+                                <select id="postInstrumentSelect" style="display: none;">
+                                    <option value="grandpiano" selected>Grand Piano — Concert</option>
+                                    <option value="softpiano">Soft Grand Piano</option>
+                                    <option value="electricpiano">Electric Piano</option>
+                                    <option value="strings">Warm Strings</option>
+                                    <option value="pad">Cinematic Pad</option>
+                                    <option value="bell">Soft Bell</option>
+                                </select>
+                            </div>
+                            
+                            <div class="volume-control-wrapper">
+                                <i class="fa-solid fa-volume-high"></i>
+                                <input type="range" class="volume-slider" id="previewVolume" min="0" max="1" step="0.05" value="0.85">
+                            </div>
+                        </div>
+                        
+                        <div class="action-buttons-group">
+                            <a href="#" class="download-btn" id="downloadMidiBtn" download="tonevault_composition.mid" target="_blank" style="background: #00d4ff; color: #000;">
+                                <i class="fa-solid fa-file-music"></i> Download MIDI File
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT COLUMN: KEYWORD GUIDE SIDEBAR -->
+            <aside class="keyword-guide">
+                <div class="keyword-guide-header">
+                    <i class="fa-solid fa-book-open" style="color: #00d4ff;"></i>
+                    <strong>Keyword Guide</strong>
+                </div>
+
+                <div class="keyword-category">
+                    <h4>RHYTHM & MOOD</h4>
+                    <div class="keyword-row"><span class="keyword">fast</span><span>Shorter notes, more movement</span></div>
+                    <div class="keyword-row"><span class="keyword">staccato</span><span>Short note durations</span></div>
+                    <div class="keyword-row"><span class="keyword">syncopated</span><span>Off-beat accents</span></div>
+                    <div class="keyword-row"><span class="keyword">repeating</span><span>Recurring motifs</span></div>
+                    <div class="keyword-row"><span class="keyword">energetic</span><span>Higher rhythmic activity</span></div>
+                </div>
+
+                <div class="keyword-category">
+                    <h4>STRUCTURE</h4>
+                    <div class="keyword-row"><span class="keyword">build</span><span>Gradually increasing activity</span></div>
+                    <div class="keyword-row"><span class="keyword">variation</span><span>Change repeated ideas</span></div>
+                    <div class="keyword-row"><span class="keyword">break</span><span>Create a short musical gap</span></div>
+                    <div class="keyword-row"><span class="keyword">climax</span><span>Highest musical intensity</span></div>
+                    <div class="keyword-row"><span class="keyword">outro</span><span>Gradual reduction of activity</span></div>
+                </div>
+
+                <div class="keyword-example">
+                    <strong>Example</strong>
+                    <code>fast, syncopated, staccato, repeating, ascending, energetic</code>
+                    <p>Creates shorter notes, stronger rhythmic movement, off-beat accents, recurring motifs, rising melodic motion and increased intensity.</p>
+                </div>
+
+                <div class="custom-keyword-note">
+                    <i class="fa-solid fa-lightbulb" style="color: #00d4ff; margin-right: 5px;"></i> This is just an example guide—feel free to add your own unique keywords and thoughts!
+                </div>
+            </aside>
+
+        </div>
+
+        <div class="creator-credit">
+            Physical Modeling Engine Powered by <a href="https://tonejs.github.io/" target="_blank">Tone.js</a> | Integrated & Maintained by <a href="https://tonevault.qd.je" target="_blank">ToneVault by HC</a>
+        </div>
+    </main>
+
+    <site-footer></site-footer>
+
+    <script src="/components.js"></script>
+
+    <!-- CLIENT-SIDE RHYTHMIC GROOVE & MIDI LOGIC -->
+    <script type="module">
+
+        // ==========================================
+        // DYNAMIC CONFIGURATION MATRIX (THOUGHTS2NOTES)
+        // ==========================================
+        const MELODY_CONFIGS = {
+            electronic: {
+                patterns: [
+                    {val: 'intro', text: 'Intro / Atmosphere'},
+                    {val: 'build', text: 'Build-Up / Riser'},
+                    {val: 'drop', text: 'Drop / Main Hook'},
+                    {val: 'verse', text: 'Verse / Sparse'}
+                ],
+                defaultTempo: 128
+            },
+            pop: {
+                patterns: [
+                    {val: 'verse', text: 'Verse (Sparse)'},
+                    {val: 'prechorus', text: 'Pre-Chorus (Building)'},
+                    {val: 'chorus', text: 'Chorus (Full/Dense)'},
+                    {val: 'bridge', text: 'Bridge (Variation)'}
+                ],
+                defaultTempo: 115
+            },
+            lofi: {
+                patterns: [
+                    {val: 'intro', text: 'Intro Loop'},
+                    {val: 'verse', text: 'Main Loop'},
+                    {val: 'bridge', text: 'Sparse Variation'},
+                    {val: 'outro', text: 'Outro'}
+                ],
+                defaultTempo: 78
+            },
+            rock: {
+                patterns: [
+                    {val: 'verse', text: 'Verse (Rhythmic)'},
+                    {val: 'chorus', text: 'Heavy Chorus'},
+                    {val: 'solo', text: 'Lead / Solo Backing'},
+                    {val: 'breakdown', text: 'Breakdown'}
+                ],
+                defaultTempo: 140
+            },
+            classical: {
+                patterns: [
+                    {val: 'adagio', text: 'Adagio (Slow/Sparse)'},
+                    {val: 'allegro', text: 'Allegro (Fast/Dense)'},
+                    {val: 'crescendo', text: 'Crescendo (Build)'}
+                ],
+                defaultTempo: 100
+            },
+            jazz: {
+                patterns: [
+                    {val: 'head', text: 'Head (Main Theme)'},
+                    {val: 'comping', text: 'Comping (Sparse)'},
+                    {val: 'solo', text: 'Solo Section (Dense)'}
+                ],
+                defaultTempo: 110
+            },
+            carnatic: {
+                patterns: [
+                    {val: 'alapana', text: 'Alapana (Free/Sparse)'},
+                    {val: 'pallavi', text: 'Pallavi (Main Theme)'},
+                    {val: 'charanam', text: 'Charanam (Variation)'},
+                    {val: 'kalpanaswaram', text: 'Kalpanaswaram (Dense/Mathematical)'}
+                ],
+                defaultTempo: 90
+            }
+        };
+
+        function updateSelectOptions(selectId, optionsData) {
+            const select = document.getElementById(selectId);
+            const optionsContainer = document.getElementById(selectId + 'Options');
+            const triggerSpan = document.querySelector('#' + selectId + 'Trigger span');
+            
+            if (select) select.innerHTML = '';
+            optionsContainer.innerHTML = '';
+            
+            optionsData.forEach((opt, index) => {
+                if (select) {
+                    const optionEl = document.createElement('option');
+                    optionEl.value = opt.val;
+                    optionEl.textContent = opt.text;
+                    if (index === 0) optionEl.selected = true;
+                    select.appendChild(optionEl);
+                }
+
+                const div = document.createElement('div');
+                div.className = 'custom-option' + (index === 0 ? ' selected' : '');
+                div.dataset.value = opt.val;
+                div.textContent = opt.text;
+                optionsContainer.appendChild(div);
+
+                if (index === 0) triggerSpan.textContent = opt.text;
+            });
+        }
+
+        // ==========================================
+        // CUSTOM DROPDOWN LOGIC INIT
+        // ==========================================
+        function setupCustomDropdown(selectId) {
+            const hiddenSelect = document.getElementById(selectId);
+            const wrapper = document.getElementById(selectId + 'Wrapper');
+            const trigger = document.getElementById(selectId + 'Trigger');
+            const optionsContainer = document.getElementById(selectId + 'Options');
+            
+            // Safety check in case ID isn't in HTML yet
+            if(!wrapper || !trigger || !optionsContainer) return;
+
+            const triggerText = trigger.querySelector('span');
+
+            // Open/Close toggle
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                // Close other open wrappers
+                document.querySelectorAll('.custom-select-wrapper, .custom-combobox-wrapper').forEach(w => {
+                    if (w !== wrapper) w.classList.remove('open');
+                });
+                if (!wrapper.classList.contains('disabled')) {
+                    wrapper.classList.toggle('open');
+                }
+            });
+
+            // Option selection (Event Delegation)
+            optionsContainer.addEventListener('click', (e) => {
+                const opt = e.target.closest('.custom-option');
+                if (!opt) return;
+
+                e.stopPropagation();
+                triggerText.textContent = opt.textContent;
+                
+                optionsContainer.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                
+                if (hiddenSelect) {
+                    hiddenSelect.value = opt.dataset.value;
+                    hiddenSelect.dispatchEvent(new Event('change'));
+                }
+                wrapper.classList.remove('open');
+            });
+        }
+
+        // ==========================================
+        // HYBRID COMBOBOX (TIME SIGNATURE) INIT
+        // ==========================================
+        const timeSigWrapper = document.getElementById('timeSigWrapper');
+        const timeSigInput = document.getElementById('timeSigInput');
+        const timeSigOptions = document.getElementById('timeSigOptions');
+        const timeSigIcon = document.getElementById('timeSigIcon');
+
+        [timeSigInput, timeSigIcon].forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.querySelectorAll('.custom-select-wrapper, .custom-combobox-wrapper').forEach(w => {
+                    if (w !== timeSigWrapper) w.classList.remove('open');
+                });
+                timeSigWrapper.classList.toggle('open');
+            });
+        });
+
+        timeSigOptions.addEventListener('click', (e) => {
+            const opt = e.target.closest('.custom-option');
+            if (!opt) return;
+            e.stopPropagation();
+            
+            timeSigInput.value = opt.dataset.value;
+            timeSigOptions.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+            timeSigWrapper.classList.remove('open');
+        });
+
+        window.addEventListener('click', () => {
+            document.querySelectorAll('.custom-select-wrapper, .custom-combobox-wrapper').forEach(w => {
+                w.classList.remove('open');
+            });
+        });
+
+        // Initialize all Custom Dropdowns safely
+        ['genreSelect', 'patternSelect', 'keySelect', 'scaleSelect', 'postInstrumentSelect'].forEach(setupCustomDropdown);
+
+        // Load Default Pattern config based on initial genre
+        updateSelectOptions('patternSelect', MELODY_CONFIGS.electronic.patterns);
+
+        // Dynamic Genre Listener
+        document.getElementById('genreSelect').addEventListener('change', (e) => {
+            const genre = e.target.value;
+            const config = MELODY_CONFIGS[genre];
+            if (config) {
+                updateSelectOptions('patternSelect', config.patterns);
+                document.getElementById('tempoInput').value = config.defaultTempo;
+            }
+        });
+
+        // ==========================================
+        // CORE TONE.JS LOGIC
+        // ==========================================
+        const tempoInput = document.getElementById("tempoInput");
+        const barsInput = document.getElementById("barsInput");
+        const genreSelect = document.getElementById("genreSelect");
+        const patternSelect = document.getElementById("patternSelect");
+        const keySelect = document.getElementById("keySelect"); 
+        const scaleSelect = document.getElementById("scaleSelect");
+        const postInstrumentSelect = document.getElementById("postInstrumentSelect");
+        const thoughtsInput = document.getElementById("thoughtsInput");
+        
+        const processBtn = document.getElementById("processBtn");
+        const statusMessage = document.getElementById("statusMessage");
+        const statusText = document.getElementById("statusText");
+        const progressBarFill = document.getElementById("progressBarFill");
+        const resultsArea = document.getElementById("resultsArea");
+        
+        const waveformPreviewContainer = document.getElementById("waveformPreviewContainer");
+        const previewPlayBtn = document.getElementById("previewPlayBtn");
+        const previewPlayIcon = document.getElementById("previewPlayIcon");
+        const audioDurationText = document.getElementById("audioDurationText");
+        const previewVolume = document.getElementById("previewVolume");
+        const downloadMidiBtn = document.getElementById("downloadMidiBtn");
+
+        let wavesurfer = null;
+        let midiBlobUrl = null;
+        let generatedNotes = []; 
+        let currentTempo = 120;
+        let exactMaxTime = 8; 
+
+        const scaleIntervals = {
+            major: [0, 2, 4, 5, 7, 9, 11],
+            minor: [0, 2, 3, 5, 7, 8, 10],
+            pentatonic: [0, 3, 5, 7, 10],
+            dorian: [0, 2, 3, 5, 7, 9, 10]
+        };
+
+        const noteToVal = { 'C':0, 'C#':1, 'D':2, 'D#':3, 'E':4, 'F':5, 'F#':6, 'G':7, 'G#':8, 'A':9, 'A#':10, 'B':11 };
+
+        // Bank of procedural chord progressions based on scale degrees
+        const progressionBank = [
+            [0, 5, 3, 4], // I - vi - IV - V
+            [0, 4, 5, 3], // I - V - vi - IV
+            [5, 3, 0, 4], // vi - IV - I - V
+            [3, 4, 0, 5], // IV - V - I - vi
+            [0, 3, 0, 4], // I - IV - I - V
+            [5, 4, 3, 4]  // vi - V - IV - V
+        ];
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        previewPlayBtn.addEventListener("click", async () => {
+            await Tone.start();
+            if (wavesurfer) wavesurfer.playPause();
+        });
+
+        previewVolume.addEventListener("input", (e) => {
+            const vol = parseFloat(e.target.value);
+            if (wavesurfer) wavesurfer.setVolume(vol);
+        });
+
+        postInstrumentSelect.addEventListener("change", async () => {
+            if (generatedNotes.length > 0) {
+                await Tone.start();
+                await renderAcousticAudioPreview(generatedNotes, exactMaxTime, postInstrumentSelect.value);
+            }
+        });
+
+        processBtn.addEventListener("click", async () => {
+            await Tone.start();
+
+            processBtn.setAttribute("disabled", "true");
+            statusMessage.style.display = "block";
+            resultsArea.style.display = "none";
+            waveformPreviewContainer.style.display = "none";
+            
+            progressBarFill.style.width = "30%";
+            statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Building structured arrangement...`;
+
+            setTimeout(async () => {
+                try {
+                    progressBarFill.style.width = "60%";
+                    statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Quantizing melody...`;
+
+                    currentTempo = parseInt(tempoInput.value) || 120;
+                    const totalBars = parseInt(barsInput.value) || 8;
+                    const rootKey = keySelect.value;
+                    const scaleType = scaleSelect.value;
+                    const pattern = patternSelect.value; // GET SELECTED SECTION
+                    
+                    const rawTimeSig = timeSigInput.value.match(/^\d+\/\d+$/) ? timeSigInput.value : '4/4';
+                    const [beatsPerBar, beatUnit] = rawTimeSig.split('/').map(Number);
+                    
+                    const rootNoteVal = 48 + noteToVal[rootKey]; 
+                    const secondsPerBeat = 60 / currentTempo;
+                    const secondsPerTimeUnit = secondsPerBeat * (4 / beatUnit);
+                    const barDuration = beatsPerBar * secondsPerTimeUnit;
+                    
+                    exactMaxTime = totalBars * barDuration;
+                    const midi = new Midi();
+                    midi.header.setTempo(currentTempo);
+                    midi.header.timeSignatures.push({ ticks: 0, timeSignature: [beatsPerBar, beatUnit] });
+
+                    const track = midi.addTrack();
+                    const intervals = scaleIntervals[scaleType];
+                    const stepDuration = secondsPerBeat * 0.5; // Eighth note grid
+                    let currentTime = 0;
+                    generatedNotes = [];
+
+                    const chordProgression = progressionBank[Math.floor(Math.random() * progressionBank.length)];
+                    let currentChordIdx = 0;
+                    const arpDensitySeed = Math.random();
+
+                    // ==========================================
+                    // SECTION/PATTERN LOGIC MODIFIERS
+                    // ==========================================
+                    const isDense = ['drop', 'chorus', 'kalpanaswaram', 'allegro', 'solo'].includes(pattern);
+                    const isSparse = ['intro', 'verse', 'alapana', 'adagio', 'comping'].includes(pattern);
+                    const isBuild = ['build', 'prechorus', 'crescendo'].includes(pattern);
+
+                    while (currentTime + stepDuration <= exactMaxTime) {
+                        if (Math.floor(currentTime / (barDuration * 2)) !== currentChordIdx) {
+                            currentChordIdx = Math.floor(currentTime / (barDuration * 2)) % chordProgression.length;
+                        }
+
+                        const baseDegree = chordProgression[currentChordIdx];
+                        const beatPositionInBar = Math.floor((currentTime % barDuration) / secondsPerTimeUnit);
+                        const isDownbeat = beatPositionInBar === 0;
+
+                        // Dynamic Velocity Curve for Builds
+                        let currentVel = 0.75;
+                        if (isBuild) currentVel = 0.4 + (0.5 * (currentTime / exactMaxTime));
+                        if (isDense) currentVel = 0.85;
+                        if (isSparse) currentVel = 0.55;
+
+                        // Chords on Downbeats
+                        if (isDownbeat) {
+                            let duration = Math.min(barDuration * 0.8, exactMaxTime - currentTime);
+                            const midiNote = rootNoteVal + intervals[baseDegree % intervals.length];
+                            track.addNote({ midi: midiNote, time: currentTime, duration: duration, velocity: currentVel });
+                            generatedNotes.push({ name: Tone.Midi(midiNote).toNote(), duration: duration, time: currentTime, velocity: currentVel });
+                            
+                            // Add Bass Octave if Dense
+                            if(isDense) {
+                                track.addNote({ midi: midiNote - 12, time: currentTime, duration: duration, velocity: currentVel });
+                                generatedNotes.push({ name: Tone.Midi(midiNote - 12).toNote(), duration: duration, time: currentTime, velocity: currentVel });
+                            }
+                        } 
+                        // Procedural Arpeggios (Respecting Pattern Density)
+                        else {
+                            let shouldPlayArp = false;
+                            if (isBuild) shouldPlayArp = (currentTime / exactMaxTime) > 0.5; // Arps come in halfway through build
+                            else if (isDense) shouldPlayArp = Math.random() > 0.15; // Very active
+                            else if (isSparse) shouldPlayArp = Math.random() > 0.85; // Very rare
+                            else shouldPlayArp = Math.random() > (arpDensitySeed > 0.5 ? 0.3 : 0.6); // Standard random
+
+                            if (shouldPlayArp) {
+                                let duration = Math.min(stepDuration * (isDense ? 0.5 : 0.9), exactMaxTime - currentTime);
+                                const randomInterval = intervals[(baseDegree + Math.floor(Math.random() * 3) * 2) % intervals.length];
+                                const midiNote = rootNoteVal + 12 + randomInterval;
+
+                                track.addNote({ midi: midiNote, time: currentTime, duration: duration, velocity: currentVel * 0.8 });
+                                generatedNotes.push({ name: Tone.Midi(midiNote).toNote(), duration: duration, time: currentTime, velocity: currentVel * 0.8 });
+                            }
+                        }
+
+                        currentTime += stepDuration;
+                        currentTime = Math.min(currentTime, exactMaxTime);
+                    }
+
+                    // Export MIDI Blob
+                    const midiArray = midi.toArray();
+                    const midiBlob = new Blob([midiArray], { type: "audio/midi" });
+                    if (midiBlobUrl) URL.revokeObjectURL(midiBlobUrl);
+                    midiBlobUrl = URL.createObjectURL(midiBlob);
+                    downloadMidiBtn.href = midiBlobUrl;
+                    downloadMidiBtn.download = `tonevault_${genreSelect.value}_${pattern}_${rootKey}_${totalBars}b.mid`;
+
+                    progressBarFill.style.width = "100%";
+                    statusText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#00d4ff;"></i> Composition Ready!`;
+
+                    setTimeout(() => {
+                        statusMessage.style.display = "none";
+                        progressBarFill.style.width = "0%";
+                    }, 800);
+
+                    resultsArea.style.display = "block";
+                    waveformPreviewContainer.style.display = "block";
+
+                    await renderAcousticAudioPreview(generatedNotes, exactMaxTime, postInstrumentSelect.value);
+
+                    processBtn.removeAttribute("disabled");
+                    resultsArea.scrollIntoView({ behavior: "smooth", block: "start" });
+
+                } catch (error) {
+                    console.error("FULL GENERATION ERROR:", error);
+                    alert("Error: " + error.message);
+                    processBtn.removeAttribute("disabled");
+                    statusMessage.style.display = "none";
+                }
+            }, 500);
+        });
+
+        // ============================================================
+        // TONEVAULT PREVIEW INSTRUMENTS
+        // ============================================================
+
+        let pianoSamples = null;
+        let pianoSamplesLoading = null;
+        const SALAMANDER_PIANO_URL = "https://tonejs.github.io/audio/salamander/";
+
+        async function loadPianoSamples() {
+            if (pianoSamples) return pianoSamples;
+            if (pianoSamplesLoading) return pianoSamplesLoading;
+
+            pianoSamplesLoading = new Promise((resolve, reject) => {
+                const sampleUrls = {
+                    C3: "C3.mp3", "D#3": "Ds3.mp3", "F#3": "Fs3.mp3", A3: "A3.mp3",
+                    C4: "C4.mp3", "D#4": "Ds4.mp3", "F#4": "Fs4.mp3", A4: "A4.mp3",
+                    C5: "C5.mp3", "D#5": "Ds5.mp3", "F#5": "Fs5.mp3", A5: "A5.mp3",
+                    C6: "C6.mp3", "D#6": "Ds6.mp3", "F#6": "Fs6.mp3", A6: "A6.mp3"
+                };
+
+                const entries = Object.entries(sampleUrls);
+                Promise.all(entries.map(async ([note, filename]) => {
+                        const response = await fetch(SALAMANDER_PIANO_URL + filename);
+                        if (!response.ok) throw new Error(`Could not load piano sample: ${filename}`);
+                        const arrayBuffer = await response.arrayBuffer();
+                        const audioBuffer = await Tone.getContext().rawContext.decodeAudioData(arrayBuffer);
+                        return [note, audioBuffer];
+                    })
+                )
+                .then(results => {
+                    pianoSamples = Object.fromEntries(results);
+                    console.log("ToneVault: Grand Piano samples loaded.");
+                    resolve(pianoSamples);
+                })
+                .catch(error => {
+                    console.error("ToneVault: Piano sample loading failed:", error);
+                    pianoSamplesLoading = null;
+                    reject(error);
+                });
+            });
+
+            return pianoSamplesLoading;
+        }
+
+        async function renderAcousticAudioPreview(notes, totalDuration, instrumentType) {
+            try {
+                let loadedPianoSamples = null;
+                if (instrumentType === "grandpiano" || instrumentType === "softpiano") {
+                    statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading piano samples...`;
+                    loadedPianoSamples = await loadPianoSamples();
+                }
+
+                const buffer = await Tone.Offline(async () => {
+                    const reverb = new Tone.Reverb({ decay: 2.8, preDelay: 0.015, wet: 0.24 }).toDestination();
+                    const delay = new Tone.FeedbackDelay({ delayTime: "8n", feedback: 0.08, wet: 0.06 }).connect(reverb);
+                    const compressor = new Tone.Compressor({ threshold: -18, ratio: 2.5, attack: 0.01, release: 0.15 }).connect(delay);
+                    const masterBus = new Tone.Gain(0.82).connect(compressor);
+
+                    let instrument;
+                    if (instrumentType === "grandpiano") {
+                        instrument = new Tone.Sampler({ urls: loadedPianoSamples, attack: 0.002, release: 1.8 }).connect(masterBus);
+                    } 
+                    else if (instrumentType === "softpiano") {
+                        const pianoFilter = new Tone.Filter({ type: "lowpass", frequency: 5500, rolloff: -12 }).connect(masterBus);
+                        instrument = new Tone.Sampler({ urls: loadedPianoSamples, attack: 0.008, release: 2.2 }).connect(pianoFilter);
+                        instrument.volume.value = -2.5;
+                    } 
+                    else if (instrumentType === "electricpiano") {
+                        instrument = new Tone.PolySynth(Tone.FMSynth, {
+                            harmonicity: 2.5, modulationIndex: 1.5, oscillator: { type: "sine" },
+                            envelope: { attack: 0.01, decay: 1.2, sustain: 0.45, release: 1.8 }
+                        }).connect(masterBus);
+                        instrument.volume.value = -4;
+                    } 
+                    else if (instrumentType === "strings") {
+                        instrument = new Tone.PolySynth(Tone.Synth, {
+                            oscillator: { type: "triangle" }, envelope: { attack: 0.35, decay: 0.5, sustain: 0.65, release: 2.5 }
+                        }).connect(masterBus);
+                        instrument.volume.value = -8;
+                    } 
+                    else if (instrumentType === "pad") {
+                        instrument = new Tone.PolySynth(Tone.Synth, {
+                            oscillator: { type: "sine" }, envelope: { attack: 0.8, decay: 1.2, sustain: 0.7, release: 3.5 }
+                        }).connect(masterBus);
+                        instrument.volume.value = -10;
+                    } 
+                    else if (instrumentType === "bell") {
+                        instrument = new Tone.MetalSynth({
+                            frequency: 250, envelope: { attack: 0.001, decay: 1.8, release: 2.0 },
+                            harmonicity: 5.1, modulationIndex: 12, resonance: 3500, octaves: 1.5
+                        }).connect(masterBus);
+                        instrument.volume.value = -8;
+                    } 
+                    else {
+                        instrument = new Tone.PolySynth(Tone.Synth, {
+                            oscillator: { type: "triangle" }, envelope: { attack: 0.03, decay: 0.4, sustain: 0.4, release: 1.2 }
+                        }).connect(masterBus);
+                    }
+
+                    notes.forEach(note => {
+                        instrument.triggerAttackRelease(note.name, note.duration, note.time, note.velocity);
+                    });
+
+                }, Math.max(totalDuration, 1));
+
+                const wavBlob = bufferToWave(buffer.get(), buffer.length);
+                const wavUrl = URL.createObjectURL(wavBlob);
+
+                if (wavesurfer) { wavesurfer.destroy(); }
+
+                wavesurfer = WaveSurfer.create({
+                    container: '#waveform', waveColor: '#444', progressColor: '#00d4ff', cursorColor: '#ffffff',
+                    barWidth: 3, barRadius: 3, height: 60, normalize: true
+                });
+
+                wavesurfer.load(wavUrl);
+
+                wavesurfer.on('ready', () => {
+                    audioDurationText.textContent = formatTime(wavesurfer.getDuration());
+                    wavesurfer.setVolume(parseFloat(previewVolume.value));
+                    statusText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#00d4ff;"></i> Preview Ready`;
+                });
+
+                wavesurfer.on('play', () => { previewPlayIcon.className = "fa-solid fa-pause"; });
+                wavesurfer.on('pause', () => { previewPlayIcon.className = "fa-solid fa-play"; });
+                wavesurfer.on('finish', () => { previewPlayIcon.className = "fa-solid fa-play"; });
+
+            } catch (error) {
+                console.error("ToneVault preview rendering error:", error);
+                alert("Could not load the preview instrument. Please check your internet connection and try again.");
+            }
+        }
+        
+        function bufferToWave(abuffer, len) {
+            let numOfChan = abuffer.numberOfChannels, length = len * numOfChan * 2 + 44,
+                buffer = new ArrayBuffer(length), view = new DataView(buffer),
+                channels = [], sampleRate = abuffer.sampleRate, offset = 0, pos = 0;
+
+            function setUint16(data) { view.setUint16(pos, data, true); pos += 2; }
+            function setUint32(data) { view.setUint32(pos, data, true); pos += 4; }
+
+            setUint32(0x46464952); setUint32(length - 8); setUint32(0x45564157); setUint32(0x20746d66);
+            setUint32(16); setUint16(1); setUint16(numOfChan); setUint32(sampleRate);
+            setUint32(sampleRate * 2 * numOfChan); setUint16(numOfChan * 2); setUint16(16);
+            setUint32(0x61746164); setUint32(length - pos - 4);
+
+            for (let i = 0; i < abuffer.numberOfChannels; i++) channels.push(abuffer.getChannelData(i));
+
+            while (pos < length) {
+                for (let i = 0; i < numOfChan; i++) {
+                    let sample = Math.max(-1, Math.min(1, channels[i][offset]));
+                    sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767)|0;
+                    view.setInt16(pos, sample, true);
+                    pos += 2;
+                }
+                offset++;
+            }
+            return new Blob([buffer], { type: "audio/wav" });
+        }
+    </script>
+</body>
+</html>
