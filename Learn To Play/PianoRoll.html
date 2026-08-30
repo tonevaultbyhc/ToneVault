@@ -18,8 +18,7 @@
         *, *::before, *::after { box-sizing: border-box; }
         body { margin: 0; padding: 0; color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
 
-        /* Pushed down well below the navigation header */
-        .container { max-width: 1750px; margin: 110px auto 30px auto; padding: 0 20px; }
+        .container { max-width: 1750px; margin: 40px auto 30px auto; padding: 0 20px; }
 
         /* 3-COLUMN FULL-SCREEN STUDIO LAYOUT */
         .layout-grid {
@@ -93,7 +92,7 @@
         .custom-select-options::-webkit-scrollbar-thumb { background: #00d4ff; border-radius: 3px; }
         .custom-select-options::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
 
-        /* Buttons */
+        /* Buttons & Stage Overlays */
         .primary-btn { background: linear-gradient(135deg, #00d4ff, #0077ff); color: #000; font-weight: bold; border: none; border-radius: 6px; padding: 8px 16px; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: transform 0.2s, opacity 0.2s; white-space: nowrap; }
         .primary-btn:hover { transform: scale(1.03); opacity: 0.95; }
         .btn-secondary { background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 6px; padding: 8px 16px; font-size: 0.85rem; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s; white-space: nowrap; }
@@ -101,6 +100,26 @@
         .btn-icon { background: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid rgba(255, 255, 255, 0.2); padding: 6px 10px; border-radius: 6px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.8rem; }
         .btn-icon:hover { background: rgba(255, 255, 255, 0.2); }
         .btn-icon.active { background: rgba(0, 212, 255, 0.2); border-color: #00d4ff; color: #00d4ff; }
+
+        /* Stage Overlay Buttons */
+        .stage-overlay-btn {
+            position: absolute;
+            top: 15px;
+            z-index: 25;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            transition: transform 0.2s, opacity 0.2s;
+        }
+        .stage-overlay-btn:hover { transform: scale(1.03); }
+        .stage-overlay-btn.demo-btn { left: 15px; background: rgba(255, 255, 255, 0.15); color: #fff; border: 1px solid rgba(255, 255, 255, 0.3); backdrop-filter: blur(5px); }
+        .stage-overlay-btn.practice-btn { right: 15px; background: linear-gradient(135deg, #00d4ff, #0077ff); color: #000; border: none; }
 
         /* Stage Area (Canvas + Piano) */
         .stage-wrapper { background: rgba(12, 12, 18, 0.95); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 14px; overflow: hidden; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6); display: flex; flex-direction: column; position: relative; backdrop-filter: blur(10px); z-index: 10; }
@@ -117,19 +136,19 @@
         .piano { display: flex; position: relative; height: 100%; margin: 0 auto; }
         .key { position: relative; cursor: pointer; transition: background-color 0.08s ease, transform 0.05s ease; }
         
-        /* White Key Typography (Dark/Black text for readability) */
+        /* White Key Typography */
         .white-key { height: 100%; background: #fdfdfd; border: 1px solid #222; border-bottom-left-radius: 5px; border-bottom-right-radius: 5px; z-index: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 6px; font-size: 0.65rem; color: #111; flex-shrink: 0; }
         .white-key.active { background: #00d4ff !important; color: #000 !important; box-shadow: 0 0 20px #00d4ff; }
         .white-key .key-hint { color: #0077ff; font-weight: bold; }
 
-        /* Black Key Typography (White text for contrast) */
+        /* Black Key Typography */
         .black-key { position: absolute; height: 60%; background: #181818; border: 1px solid #000; border-bottom-left-radius: 3px; border-bottom-right-radius: 3px; z-index: 2; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding-bottom: 5px; font-size: 0.55rem; color: #fff; }
         .black-key.active { background: #0077ff !important; color: #fff !important; box-shadow: 0 0 15px #0077ff; }
         .black-key .key-hint { color: #00d4ff; font-weight: bold; }
 
         .pitch { font-weight: bold; line-height: 1.1; }
         .octave { font-size: 0.85em; opacity: 0.75; margin-bottom: 3px; line-height: 1; }
-        .key-hint { font-size: 0.55rem; opacity: 0.85; margin-top: 1px; }
+        .key-hint { font-size: 0.55rem; opacity: 0.95; margin-top: 1px; }
 
         .waiting-badge { position: absolute; top: 15px; left: 50%; transform: translateX(-50%); background: rgba(0, 212, 255, 0.15); border: 1px solid #00d4ff; color: #00d4ff; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; display: none; z-index: 30; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 0.8; transform: translateX(-50%) scale(1); } 50% { opacity: 1; transform: translateX(-50%) scale(1.04); } }
@@ -147,7 +166,7 @@
     <!-- UNIVERSAL HEADER -->
     <site-header></site-header>
 
-    <div class="container">
+    <div class="container" style="margin-top: 115px;">
 
         <!-- 3-COLUMN STUDIO LAYOUT -->
         <div class="layout-grid">
@@ -235,13 +254,13 @@
                     </div>
                 </div>
 
-                <!-- Main Two-Tier Controls Ribbon -->
+                <!-- Main Two-Tier Controls Ribbon (Demo/Practice buttons removed from here) -->
                 <div class="controls-ribbon">
-                    <div class="control-group-left">
+                    <div class="control-group-left" style="width: 100%;">
                         
                         <div class="control-element">
                             <label style="font-size: 0.8rem; color: #aaa;">Grade:</label>
-                            <div class="custom-select-wrapper" id="gradeSelectWrapper" style="width: 170px;">
+                            <div class="custom-select-wrapper" id="gradeSelectWrapper" style="width: 175px;">
                                 <div class="custom-select-trigger" id="gradeSelectTrigger">
                                     <span>Grade 1: Fundamentals</span>
                                     <i class="fa-solid fa-chevron-down"></i>
@@ -257,7 +276,7 @@
 
                         <div class="control-element">
                             <label style="font-size: 0.8rem; color: #aaa;">Exercise:</label>
-                            <div class="custom-select-wrapper" id="songSelectWrapper" style="width: 180px;">
+                            <div class="custom-select-wrapper" id="songSelectWrapper" style="width: 195px;">
                                 <div class="custom-select-trigger" id="songSelectTrigger">
                                     <span>1. Finding Middle C</span>
                                     <i class="fa-solid fa-chevron-down"></i>
@@ -269,7 +288,7 @@
 
                         <div class="control-element">
                             <label style="font-size: 0.8rem; color: #aaa;">Range:</label>
-                            <div class="custom-select-wrapper" id="keyboardSizeSelectWrapper" style="width: 85px;">
+                            <div class="custom-select-wrapper" id="keyboardSizeSelectWrapper" style="width: 90px;">
                                 <div class="custom-select-trigger" id="keyboardSizeSelectTrigger">
                                     <span>Auto</span>
                                     <i class="fa-solid fa-chevron-down"></i>
@@ -293,7 +312,7 @@
 
                         <div class="control-element">
                             <label style="font-size: 0.8rem; color: #aaa;">Mode:</label>
-                            <div class="custom-select-wrapper" id="playModeSelectWrapper" style="width: 130px;">
+                            <div class="custom-select-wrapper" id="playModeSelectWrapper" style="width: 140px;">
                                 <div class="custom-select-trigger" id="playModeSelectTrigger">
                                     <span>Wait for Key</span>
                                     <i class="fa-solid fa-chevron-down"></i>
@@ -315,19 +334,13 @@
                             <button id="btnResetTempo" class="btn-icon" title="Reset to Song Default"><i class="fa-solid fa-rotate-left"></i></button>
                         </div>
                     </div>
-
-                    <div style="display: flex; gap: 8px;">
-                        <button id="btnDemo" class="btn-secondary">
-                            <i class="fa-solid fa-eye"></i> Demo
-                        </button>
-                        <button id="btnPlay" class="primary-btn">
-                            <i class="fa-solid fa-play"></i> Practice
-                        </button>
-                    </div>
                 </div>
 
-                <!-- Main Stage: Falling Notes Canvas & Virtual Piano -->
+                <!-- Main Stage: Falling Notes Canvas & Virtual Piano with Overlay Demo/Practice Buttons -->
                 <div class="stage-wrapper">
+                    <button id="btnDemo" class="stage-overlay-btn demo-btn"><i class="fa-solid fa-eye"></i> Watch Demo</button>
+                    <button id="btnPlay" class="stage-overlay-btn practice-btn"><i class="fa-solid fa-play"></i> Start Practice</button>
+
                     <div id="countdownBanner" class="overlay-banner">3</div>
                     <div id="loadingBanner" class="overlay-banner loading-banner">
                         <i class="fa-solid fa-spinner fa-spin"></i>
@@ -520,7 +533,7 @@
             "88": { startMidi: 21, endMidi: 108, whiteKeyWidth: "fit" }  
         };
 
-        // Extended QWERTY mapping covering 2 full octaves for full keyboard ranges
+        // Complete 3-octave QWERTY mapping for all keyboard sizes
         const QWERTY_MAP = {
             'z': 'C3', 's': 'C#3', 'x': 'D3', 'd': 'D#3', 'c': 'E3', 'v': 'F3',
             'g': 'F#3', 'b': 'G3', 'h': 'G#3', 'n': 'A3', 'j': 'A#3', 'm': 'B3',
@@ -1138,11 +1151,11 @@
             activeSong = null; isDemoMode = false;
             
             btnPlay.disabled = false; btnPlay.style.opacity = "1";
-            btnPlay.innerHTML = '<i class="fa-solid fa-play"></i> Practice';
+            btnPlay.innerHTML = '<i class="fa-solid fa-play"></i> Start Practice';
             btnPlay.style.background = "linear-gradient(135deg, #00d4ff, #0077ff)";
 
             btnDemo.disabled = false; btnDemo.style.opacity = "1";
-            btnDemo.innerHTML = '<i class="fa-solid fa-eye"></i> Demo';
+            btnDemo.innerHTML = '<i class="fa-solid fa-eye"></i> Watch Demo';
             btnDemo.style.background = "rgba(255, 255, 255, 0.1)";
             btnDemo.style.borderColor = "rgba(255, 255, 255, 0.2)";
         }
