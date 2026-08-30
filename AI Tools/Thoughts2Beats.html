@@ -1,0 +1,1552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thoughts2Beats | ToneVault</title>
+    
+    <!-- FONTAWESOME ICONS CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- WAVESURFER.JS -->
+    <script src="https://unpkg.com/wavesurfer.js@7/dist/wavesurfer.min.js"></script>
+
+    <!-- TONE.JS & @TONEJS/MIDI -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    <script src="https://unpkg.com/@tonejs/midi@2.0.28/build/Midi.js"></script>
+
+    <!-- UNIVERSAL DESIGN EDITOR -->
+    <link rel="stylesheet" href="/style.css">
+
+    <style>
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { overflow-x: hidden; margin: 0; padding: 0; }
+        .page-header { text-align: center; margin-top: 60px; margin-bottom: 30px; padding: 0 20px; }
+        .page-header h1 { font-size: 3rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 15px; margin-top: 0; color: #ffffff; }
+        .page-header h1 span { color: #00d4ff; }
+        .page-header p { color: #bbbbbb; font-size: 1.1rem; max-width: 750px; margin: 0 auto; line-height: 1.6; }
+        .layout-container { width: 100%; max-width: 1200px; margin: 0 auto 50px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 340px; gap: 30px; align-items: start; }
+        .stem-card { background: rgba(20, 20, 20, 0.95); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 18px; padding: 35px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+        .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .setting-group label { display: block; color: #bbb; font-size: 0.9rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .setting-group input, .setting-group textarea { width: 100%; background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(255, 255, 255, 0.15); color: #ffffff; padding: 12px 15px; border-radius: 10px; font-size: 1rem; outline: none; transition: border-color 0.2s ease; }
+        .setting-group textarea { resize: vertical; }
+        .setting-group input:focus, .setting-group textarea:focus { border-color: #00d4ff; }
+
+        /* CUSTOM DROPDOWN STYLES */
+        .custom-select-wrapper { position: relative; user-select: none; width: 100%; z-index: 1; }
+        .custom-select-wrapper.open { z-index: 100; }
+        .custom-select-trigger { background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(255, 255, 255, 0.15); color: #ffffff; padding: 12px 15px; border-radius: 10px; font-size: 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+        .custom-select-wrapper.open .custom-select-trigger { border-color: #00d4ff; border-bottom-left-radius: 0; border-bottom-right-radius: 0; background: rgba(15, 15, 15, 0.95); }
+        .custom-select-trigger i { color: #00d4ff; transition: transform 0.3s ease; font-size: 0.9rem; margin-left: 10px; }
+        .custom-select-wrapper.open .custom-select-trigger i { transform: rotate(180deg); }
+        .custom-select-options { position: absolute; top: 100%; left: 0; right: 0; background: rgba(15, 15, 15, 0.95); backdrop-filter: blur(10px); border: 1px solid #00d4ff; border-top: none; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; box-shadow: 0 15px 30px rgba(0,0,0,0.6); opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 50; overflow-y: auto; max-height: 250px; }
+        .custom-select-wrapper.open .custom-select-options { opacity: 1; visibility: visible; }
+        .custom-option { padding: 12px 15px; color: #bbb; font-size: 0.95rem; cursor: pointer; transition: all 0.2s ease; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .custom-option:last-child { border-bottom: none; }
+        .custom-option:hover { background: rgba(0, 212, 255, 0.1); color: #00d4ff; padding-left: 20px; }
+        .custom-option.selected { color: #ffffff; background: rgba(0, 212, 255, 0.05); font-weight: bold; }
+        .custom-select-options::-webkit-scrollbar { width: 6px; }
+        .custom-select-options::-webkit-scrollbar-thumb { background: #00d4ff; border-radius: 3px; }
+        .custom-select-options::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+
+        /* HYBRID COMBOBOX FOR TIME SIGNATURE */
+        .custom-combobox-wrapper { position: relative; width: 100%; z-index: 2; }
+        .custom-combobox-wrapper.open { z-index: 100; }
+        .custom-combobox-input { width: 100%; background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(255, 255, 255, 0.15); color: #ffffff; padding: 12px 35px 12px 15px; border-radius: 10px; font-size: 1rem; outline: none; transition: border-color 0.2s ease; }
+        .custom-combobox-input:focus { border-color: #00d4ff; }
+        .combobox-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #00d4ff; cursor: pointer; pointer-events: none; transition: transform 0.3s ease; font-size: 0.9rem; }
+        .custom-combobox-wrapper.open .combobox-icon { transform: translateY(-50%) rotate(180deg); }
+        .custom-combobox-wrapper.open .custom-combobox-input { border-bottom-left-radius: 0; border-bottom-right-radius: 0; border-color: #00d4ff; background: rgba(15, 15, 15, 0.95); }
+        .custom-combobox-options { position: absolute; top: 100%; left: 0; right: 0; background: rgba(15, 15, 15, 0.95); backdrop-filter: blur(10px); border: 1px solid #00d4ff; border-top: none; border-bottom-left-radius: 10px; border-bottom-right-radius: 10px; box-shadow: 0 15px 30px rgba(0,0,0,0.6); opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 50; overflow-y: auto; max-height: 250px; }
+        .custom-combobox-wrapper.open .custom-combobox-options { opacity: 1; visibility: visible; }
+        .custom-combobox-options::-webkit-scrollbar { width: 6px; }
+        .custom-combobox-options::-webkit-scrollbar-thumb { background: #00d4ff; border-radius: 3px; }
+        .custom-combobox-options::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+
+        /* WAVEFORM PREVIEW */
+        .waveform-preview-container { background: rgba(10, 10, 10, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 15px; margin-bottom: 25px; display: none; }
+        .waveform-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; color: #bbb; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; }
+        .waveform-controls { display: flex; align-items: center; gap: 12px; }
+        .play-pause-btn { background: #00d4ff; border: none; color: #000; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.9rem; transition: transform 0.2s ease; flex-shrink: 0; }
+        .play-pause-btn:hover { transform: scale(1.05); }
+        .waveform-box { width: 100%; }
+        .preview-toolbar { display: flex; justify-content: space-between; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.08); gap: 15px; flex-wrap: wrap; }
+        .volume-control-wrapper { display: flex; align-items: center; gap: 8px; color: #888; font-size: 0.85rem; }
+        .volume-control-wrapper i { color: #bbb; }
+        .volume-slider { -webkit-appearance: none; width: 90px; height: 4px; background: rgba(255, 255, 255, 0.15); border-radius: 2px; outline: none; accent-color: #00d4ff; }
+        .volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: #00d4ff; cursor: pointer; }
+        
+        .action-btn { width: 100%; background: linear-gradient(135deg, #00d4ff, #0077ff); color: #ffffff; border: none; padding: 16px; font-size: 1.1rem; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; border-radius: 12px; cursor: pointer; transition: opacity 0.2s ease, transform 0.2s ease; box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3); margin-top: 15px; }
+        .action-btn:hover { opacity: 0.9; transform: translateY(-2px); }
+        .action-btn:disabled { background: #333; color: #777; cursor: not-allowed; box-shadow: none; transform: none; }
+
+        /* STATUS & RESULTS */
+        #statusMessage { margin-top: 25px; display: none; }
+        .status-text { text-align: center; color: #00d4ff; font-size: 1.05rem; margin-bottom: 10px; }
+        .progress-bar-container { width: 100%; height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 3px; overflow: hidden; }
+        .progress-bar-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #0077ff, #00d4ff); transition: width 0.2s ease; }
+        #resultsArea { margin-top: 30px; display: none; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 25px; }
+        #resultsArea h3 { color: #ffffff; margin-bottom: 20px; font-size: 1.3rem; }
+        .download-btn { background: rgba(0, 212, 255, 0.1); border: 1px solid rgba(0, 212, 255, 0.3); color: #00d4ff; padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px; }
+        .download-btn:hover { background: #00d4ff; color: #000; }
+
+        /* ISOLATED STEMS */
+        .generated-instruments-panel { margin-top: 25px; padding-top: 25px; border-top: 1px solid rgba(255, 255, 255, 0.08); }
+        .generated-instruments-header { display: flex; justify-content: space-between; align-items: center; gap: 15px; margin-bottom: 15px; flex-wrap: wrap; }
+        .generated-instruments-header strong { color: #ffffff; font-size: 1rem; letter-spacing: 0.5px; }
+        .generated-instruments-header span { color: #777; font-size: 0.78rem; }
+        .instrument-midi-list { display: grid; grid-template-columns: 1fr; gap: 10px; }
+        .instrument-midi-row { display: grid; grid-template-columns: 165px 50px minmax(140px, 1fr) auto auto; align-items: center; gap: 12px; padding: 12px 14px; background: rgba(10, 10, 10, 0.65); border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 10px; }
+        .instrument-midi-info { display: flex; align-items: center; gap: 10px; }
+        .instrument-midi-info i { color: #00d4ff; width: 18px; text-align: center; }
+        .instrument-midi-name { color: #ddd; font-size: 0.9rem; font-weight: 600; }
+        .instrument-midi-count { color: #777; font-size: 0.72rem; margin-left: 5px; }
+        
+        .stem-play-col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+        .instrument-play-btn { width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(0, 212, 255, 0.3); background: rgba(0, 212, 255, 0.08); color: #00d4ff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; }
+        .instrument-play-btn:hover, .instrument-play-btn.active { background: #00d4ff; color: #000; }
+        .stem-volume-slider { -webkit-appearance: none; width: 40px; height: 3px; background: rgba(255, 255, 255, 0.15); border-radius: 2px; outline: none; accent-color: #00d4ff; cursor: pointer;}
+        .stem-volume-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 8px; height: 8px; border-radius: 50%; background: #00d4ff; }
+
+        .instrument-waveform { min-width: 0; height: 48px; }
+
+        /* SIDEBAR GUIDE */
+        .keyword-guide { padding: 25px 20px; background: rgba(20, 20, 20, 0.95); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 18px; color: #cfcfcf; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+        .keyword-guide-header { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-size: 15px; }
+        .keyword-guide-header strong { color: #ffffff; letter-spacing: 0.5px; text-transform: uppercase; }
+        .keyword-category { margin-bottom: 20px; }
+        .keyword-category h4 { margin: 0 0 10px 0; color: #00c8ff; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; }
+        .keyword-row { display: flex; align-items: center; gap: 12px; padding: 4px 0; font-size: 11px; }
+        .keyword { min-width: 85px; padding: 3px 6px; border-radius: 4px; background: rgba(0, 200, 255, 0.08); color: #00c8ff; font-family: monospace; font-size: 10px; text-align: center; }
+        .custom-keyword-note { margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 11px; color: #888; font-style: italic; line-height: 1.5; }
+
+        /* Hide inactive guides */
+        .genre-guide { display: none; }
+        .genre-guide.active { display: block; }
+
+        html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
+        html { -ms-overflow-style: none; scrollbar-width: none; }
+        .creator-credit { text-align: center; margin: 80px 0; font-size: 0.9rem; color: #888; }
+        .creator-credit a { color: #00d4ff; text-decoration: none; font-weight: bold; }
+
+        @media (max-width: 992px) { .layout-container { grid-template-columns: 1fr; max-width: 900px; } }
+        @media (max-width: 768px) { .settings-grid { grid-template-columns: 1fr; gap: 15px; } .preview-toolbar { flex-direction: column; align-items: stretch; } .instrument-midi-row { grid-template-columns: 1fr auto; } .instrument-midi-info { grid-column: 1; } .stem-play-col { grid-column: 2; grid-row: 1; flex-direction: row; } .instrument-waveform { grid-column: 1 / -1; width: 100%; } .download-btn { justify-content: center; } .keyword-row { flex-direction: column; align-items: flex-start; gap: 4px; } }
+    </style>
+</head>
+<body>
+
+    <site-header></site-header>
+
+    <main>
+        <div class="page-header">
+            <h1>Thoughts <span>2</span> Beats</h1>
+            <p>Generate highly structured, sample-accurate drum beats with individual stem audio and MIDI isolation.</p>
+        </div>
+
+        <div class="layout-container">
+            <div class="stem-card">
+                
+                <div class="settings-grid">
+                    
+                    <!-- 1. Style Selection (ADDED INDIAN STYLES) -->
+                    <div class="setting-group">
+                        <label><i class="fa-solid fa-compact-disc"></i> Groove Style</label>
+                        <div class="custom-select-wrapper" id="genreSelectWrapper">
+                            <div class="custom-select-trigger" id="genreSelectTrigger">
+                                <span>Pop / Modern Pop</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="genreSelectOptions">
+                                <div class="custom-option selected" data-value="pop">Pop / Modern Pop</div>
+                                <div class="custom-option" data-value="boombap">Boom Bap / Hip-Hop</div>
+                                <div class="custom-option" data-value="trap">Modern Trap / Drill</div>
+                                <div class="custom-option" data-value="house">House / EDM</div>
+                                <div class="custom-option" data-value="lofi">Lo-Fi / Chillhop</div>
+                                <div class="custom-option" data-value="cinematic">Cinematic Orchestral</div>
+                                <div class="custom-option" data-value="indian">Indian / Bollywood</div>
+                                <div class="custom-option" data-value="southindian">South Indian / Koothu</div>
+                            </div>
+                        </div>
+                        <select id="genreSelect" style="display: none;">
+                            <option value="pop" selected>Pop / Modern Pop</option>
+                            <option value="boombap">Boom Bap / Hip-Hop</option>
+                            <option value="trap">Modern Trap / Drill</option>
+                            <option value="house">House / EDM</option>
+                            <option value="lofi">Lo-Fi / Chillhop</option>
+                            <option value="cinematic">Cinematic Orchestral</option>
+                            <option value="indian">Indian / Bollywood</option>
+                            <option value="southindian">South Indian / Koothu</option>
+                        </select>
+                    </div>
+
+                    <!-- 2. Rhythm Character -->
+                    <div class="setting-group">
+                        <label><i class="fa-solid fa-wave-square"></i> Rhythm Character</label>
+                        <div class="custom-select-wrapper" id="rhythmSelectWrapper">
+                            <div class="custom-select-trigger" id="rhythmSelectTrigger">
+                                <span>Auto (from Keywords)</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="rhythmSelectOptions"></div>
+                        </div>
+                        <select id="rhythmSelect" style="display:none;"></select>
+                    </div>
+
+                    <!-- 3. Percussion Set Override -->
+                    <div class="setting-group">
+                        <label><i class="fa-solid fa-drum"></i> Percussion Set Override</label>
+                        <div class="custom-select-wrapper" id="instrumentSelectWrapper">
+                            <div class="custom-select-trigger" id="instrumentSelectTrigger">
+                                <span>Auto (from Style)</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="instrumentSelectOptions"></div>
+                        </div>
+                        <select id="instrumentSelect" style="display:none;"></select>
+                    </div>
+
+                    <!-- 4. Tempo Input -->
+                    <div class="setting-group">
+                        <label for="tempoInput"><i class="fa-solid fa-metronome"></i> Tempo (BPM)</label>
+                        <input type="number" id="tempoInput" value="135" min="40" max="240" placeholder="e.g. 135">
+                    </div>
+                    
+                    <!-- 5. Time Signature (HYBRID COMBOBOX) -->
+                    <div class="setting-group">
+                        <label><i class="fa-solid fa-clock"></i> Time Signature</label>
+                        <div class="custom-combobox-wrapper" id="timeSigWrapper">
+                            <input type="text" id="timeSigInput" class="custom-combobox-input" value="4/4" placeholder="e.g. 4/4 or 7/8">
+                            <i class="fa-solid fa-chevron-down combobox-icon" id="timeSigIcon"></i>
+                            <div class="custom-combobox-options" id="timeSigOptions">
+                                <div class="custom-option" data-value="2/2">2/2 (Cut Time)</div>
+                                <div class="custom-option" data-value="2/4">2/4 (March)</div>
+                                <div class="custom-option" data-value="3/4">3/4 (Waltz)</div>
+                                <div class="custom-option selected" data-value="4/4">4/4 (Standard)</div>
+                                <div class="custom-option" data-value="3/2">3/2</div>
+                                <div class="custom-option" data-value="4/2">4/2</div>
+                                <div class="custom-option" data-value="6/8">6/8 (Compound)</div>
+                                <div class="custom-option" data-value="9/8">9/8</div>
+                                <div class="custom-option" data-value="12/8">12/8</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6. Length -->
+                    <div class="setting-group">
+                        <label for="barsInput"><i class="fa-solid fa-arrows-split-up-and-left"></i> Length (Bars)</label>
+                        <input type="number" id="barsInput" value="8" min="1" max="64" placeholder="e.g. 8">
+                    </div>
+
+                    <!-- 7. Density -->
+                    <div class="setting-group">
+                        <label><i class="fa-solid fa-layer-group"></i> Beat Density</label>
+                        <div class="custom-select-wrapper" id="densitySelectWrapper">
+                            <div class="custom-select-trigger" id="densitySelectTrigger">
+                                <span>Standard</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="densitySelectOptions">
+                                <div class="custom-option" data-value="minimal">Minimal (Sparse)</div>
+                                <div class="custom-option selected" data-value="standard">Standard</div>
+                                <div class="custom-option" data-value="busy">Busy (Ghost Notes & Rolls)</div>
+                            </div>
+                        </div>
+                        <select id="densitySelect" style="display: none;">
+                            <option value="minimal">Minimal (Sparse)</option>
+                            <option value="standard" selected>Standard</option>
+                            <option value="busy">Busy (Ghost Notes & Rolls)</option>
+                        </select>
+                    </div>
+
+                    <!-- 8. Swing -->
+                    <div class="setting-group">
+                        <label><i class="fa-solid fa-water"></i> Swing / Shuffle</label>
+                        <div class="custom-select-wrapper" id="swingSelectWrapper">
+                            <div class="custom-select-trigger" id="swingSelectTrigger">
+                                <span>Light Swing (20%)</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="swingSelectOptions">
+                                <div class="custom-option" data-value="0">Straight (0%)</div>
+                                <div class="custom-option selected" data-value="0.2">Light Swing (20%)</div>
+                                <div class="custom-option" data-value="0.4">Heavy Shuffle (40%)</div>
+                            </div>
+                        </div>
+                        <select id="swingSelect" style="display: none;">
+                            <option value="0">Straight (0%)</option>
+                            <option value="0.2" selected>Light Swing (20%)</option>
+                            <option value="0.4">Heavy Shuffle (40%)</option>
+                        </select>
+                    </div>
+
+                    <!-- 9. Humanize -->
+                    <div class="setting-group">
+                        <label><i class="fa-solid fa-person"></i> Humanize Level</label>
+                        <div class="custom-select-wrapper" id="humanizeSelectWrapper">
+                            <div class="custom-select-trigger" id="humanizeSelectTrigger">
+                                <span>Subtle (Pro Drummer)</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="humanizeSelectOptions">
+                                <div class="custom-option" data-value="0">Robotic (Locked to Grid)</div>
+                                <div class="custom-option selected" data-value="0.015">Subtle (Pro Drummer)</div>
+                                <div class="custom-option" data-value="0.045">Loose (Live Player)</div>
+                            </div>
+                        </div>
+                        <select id="humanizeSelect" style="display: none;">
+                            <option value="0">Robotic (Locked to Grid)</option>
+                            <option value="0.015" selected>Subtle (Pro Drummer)</option>
+                            <option value="0.045">Loose (Live Player)</option>
+                        </select>
+                    </div>
+
+                    <!-- 10. Fills -->
+                    <div class="setting-group">
+                        <label><i class="fa-solid fa-bolt"></i> Fill Frequency</label>
+                        <div class="custom-select-wrapper" id="fillSelectWrapper">
+                            <div class="custom-select-trigger" id="fillSelectTrigger">
+                                <span>Fills Every 4 Bars</span>
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </div>
+                            <div class="custom-select-options" id="fillSelectOptions">
+                                <div class="custom-option" data-value="0">No Fills</div>
+                                <div class="custom-option selected" data-value="4">Fills Every 4 Bars</div>
+                                <div class="custom-option" data-value="8">Fills Every 8 Bars</div>
+                            </div>
+                        </div>
+                        <select id="fillSelect" style="display: none;">
+                            <option value="0">No Fills</option>
+                            <option value="4" selected>Fills Every 4 Bars</option>
+                            <option value="8">Fills Every 8 Bars</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Keywords Textarea -->
+                <div class="setting-group" style="margin-bottom: 25px;">
+                    <label for="thoughtsInput"><i class="fa-solid fa-brain"></i> Thoughts / Keywords / Inspiration</label>
+                    <textarea id="thoughtsInput" rows="2" placeholder="e.g. driving, syncopated, disco, ballad, build..."></textarea>
+                </div>
+
+                <button id="processBtn" class="action-btn">
+                    <i class="fa-solid fa-drum-steelpan"></i> Generate Rhythm
+                </button>
+
+                <!-- Status Screen -->
+                <div id="statusMessage">
+                    <div class="status-text" id="statusText"><i class="fa-solid fa-spinner fa-spin"></i> Arranging matrix...</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="progressBarFill"></div>
+                    </div>
+                </div>
+
+                <!-- Results Output -->
+                <div id="resultsArea">
+                    <h3><i class="fa-solid fa-file-audio"></i> Generated Track</h3>
+                    
+                    <div class="waveform-preview-container" id="waveformPreviewContainer">
+                        <div class="waveform-header">
+                            <span><i class="fa-solid fa-waveform-lines"></i> Full Kit Preview</span>
+                            <span id="audioDurationText">0:00</span>
+                        </div>
+                        <div class="waveform-controls">
+                            <button class="play-pause-btn" id="previewPlayBtn"><i class="fa-solid fa-play" id="previewPlayIcon"></i></button>
+                            <div class="waveform-box" id="waveform"></div>
+                        </div>
+
+                        <div class="preview-toolbar">
+                            <div class="volume-control-wrapper">
+                                <i class="fa-solid fa-volume-high"></i>
+                                <input type="range" class="volume-slider" id="previewVolume" min="0" max="1" step="0.05" value="0.85">
+                            </div>
+                            
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <a href="#" class="download-btn" id="downloadMainWavBtn" download="tonevault_preview.wav" target="_blank">
+                                    <i class="fa-solid fa-file-waveform"></i> Download WAV
+                                </a>
+                                <a href="#" class="download-btn" id="downloadMidiBtn" download="tonevault_full_kit.mid" target="_blank">
+                                    <i class="fa-solid fa-file-music"></i> Download Full MIDI
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="generated-instruments-panel" id="generatedInstrumentsPanel">
+                        <div class="generated-instruments-header">
+                            <strong><i class="fa-solid fa-layer-group" style="color:#00d4ff; margin-right:7px;"></i> Isolated Stems</strong>
+                            <span id="generatedInstrumentSummary">Stems generated from this kit</span>
+                        </div>
+                        <div class="instrument-midi-list" id="instrumentMidiList">
+                            <div style="color:#777; font-size:0.85rem;">Click Generate to build your stems.</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- DYNAMIC SIDEBAR GUIDES -->
+            <aside class="keyword-guide">
+                <div class="keyword-guide-header">
+                    <i class="fa-solid fa-book-open" style="color: #00d4ff;"></i>
+                    <strong>Keyword Guide</strong>
+                </div>
+
+                <!-- POP GUIDE -->
+                <div id="guide-pop" class="genre-guide active">
+                    <div class="keyword-category">
+                        <h4>POP / MODERN POP</h4>
+                        <div class="keyword-row"><span class="keyword">driving</span><span>4-on-the-floor dance pop</span></div>
+                        <div class="keyword-row"><span class="keyword">syncopated</span><span>Off-beat push kicks & disco bounce</span></div>
+                        <div class="keyword-row"><span class="keyword">ballad</span><span>Half-time emotional pop feel</span></div>
+                        <div class="keyword-row"><span class="keyword">build</span><span>Rising snare roll pre-drop</span></div>
+                        <div class="keyword-row"><span class="keyword">upbeat</span><span>Fast and energetic rhythm</span></div>
+                        <div class="keyword-row"><span class="keyword">disco</span><span>Classic 70s/80s pop bounce</span></div>
+                        <div class="keyword-row"><span class="keyword">acoustic</span><span>Singer-songwriter style drums</span></div>
+                    </div>
+                </div>
+
+                <!-- BOOM BAP GUIDE -->
+                <div id="guide-boombap" class="genre-guide">
+                    <div class="keyword-category">
+                        <h4>HIP-HOP / BOOM BAP</h4>
+                        <div class="keyword-row"><span class="keyword">classic</span><span>90s Golden Era boom bap feel</span></div>
+                        <div class="keyword-row"><span class="keyword">lazy</span><span>J-Dilla style delayed kicks/hats</span></div>
+                        <div class="keyword-row"><span class="keyword">ghost</span><span>Busy snare/kick ghost note textures</span></div>
+                        <div class="keyword-row"><span class="keyword">dusty</span><span>Vintage texture and timing</span></div>
+                        <div class="keyword-row"><span class="keyword">heavy swing</span><span>Extreme MPC-style swing</span></div>
+                        <div class="keyword-row"><span class="keyword">chill</span><span>Relaxed and slow paced</span></div>
+                        <div class="keyword-row"><span class="keyword">sparse</span><span>Very few hits, lots of gaps</span></div>
+                    </div>
+                </div>
+
+                <!-- TRAP GUIDE -->
+                <div id="guide-trap" class="genre-guide">
+                    <div class="keyword-category">
+                        <h4>MODERN TRAP / DRILL</h4>
+                        <div class="keyword-row"><span class="keyword">trap</span><span>Half-time 808 bounce</span></div>
+                        <div class="keyword-row"><span class="keyword">drill</span><span>UK Drill triplet & syncopated feel</span></div>
+                        <div class="keyword-row"><span class="keyword">rolls</span><span>Rapid 32nd-note hat subdivisions</span></div>
+                        <div class="keyword-row"><span class="keyword">build</span><span>Rising pre-drop stutter</span></div>
+                        <div class="keyword-row"><span class="keyword">bouncy</span><span>Highly syncopated Atlanta style</span></div>
+                        <div class="keyword-row"><span class="keyword">halftime</span><span>Snare strictly on beat 3</span></div>
+                        <div class="keyword-row"><span class="keyword">intense</span><span>Aggressive velocity and rolls</span></div>
+                    </div>
+                </div>
+
+                <!-- HOUSE GUIDE -->
+                <div id="guide-house" class="genre-guide">
+                    <div class="keyword-category">
+                        <h4>HOUSE / EDM</h4>
+                        <div class="keyword-row"><span class="keyword">classic</span><span>Standard 4/4 beat with off-beat hats</span></div>
+                        <div class="keyword-row"><span class="keyword">tech house</span><span>Bouncy syncopated claps & toms</span></div>
+                        <div class="keyword-row"><span class="keyword">minimal</span><span>Deep, stripped back, sparse grooves</span></div>
+                        <div class="keyword-row"><span class="keyword">build</span><span>EDM festival snare riser</span></div>
+                        <div class="keyword-row"><span class="keyword">deep</span><span>Low velocity, subtle electronic feel</span></div>
+                        <div class="keyword-row"><span class="keyword">driving</span><span>Relentless kick and bass rhythm</span></div>
+                        <div class="keyword-row"><span class="keyword">shuffle</span><span>Swung 16th note house groove</span></div>
+                    </div>
+                </div>
+                
+                <!-- LOFI GUIDE -->
+                <div id="guide-lofi" class="genre-guide">
+                    <div class="keyword-category">
+                        <h4>LO-FI / CHILLHOP</h4>
+                        <div class="keyword-row"><span class="keyword">sleepy</span><span>Extremely sparse, lazy kick placement</span></div>
+                        <div class="keyword-row"><span class="keyword">jazzy</span><span>Heavy swing, syncopated ghost notes</span></div>
+                        <div class="keyword-row"><span class="keyword">swung</span><span>Behind-the-beat human timing</span></div>
+                        <div class="keyword-row"><span class="keyword">drag</span><span>Noticeably late kick drums</span></div>
+                        <div class="keyword-row"><span class="keyword">chillhop</span><span>Standard instrumental hiphop beat</span></div>
+                        <div class="keyword-row"><span class="keyword">unquantized</span><span>Dilla-style organic grid</span></div>
+                    </div>
+                </div>
+
+                <!-- CINEMATIC GUIDE -->
+                <div id="guide-cinematic" class="genre-guide">
+                    <div class="keyword-category">
+                        <h4>CINEMATIC ORCHESTRAL</h4>
+                        <div class="keyword-row"><span class="keyword">epic</span><span>Massive Hollywood trailer hits and swells</span></div>
+                        <div class="keyword-row"><span class="keyword">tension</span><span>Brooding, slow, sparse low toms</span></div>
+                        <div class="keyword-row"><span class="keyword">action</span><span>Fast, aggressive chase rhythms</span></div>
+                        <div class="keyword-row"><span class="keyword">chase</span><span>High-speed percussion pulses</span></div>
+                        <div class="keyword-row"><span class="keyword">trailer</span><span>Big cinematic impact builds</span></div>
+                        <div class="keyword-row"><span class="keyword">dark</span><span>Atmospheric low-end beds</span></div>
+                    </div>
+                </div>
+
+                <!-- INDIAN GUIDE -->
+                <div id="guide-indian" class="genre-guide">
+                    <div class="keyword-category">
+                        <h4>INDIAN / BOLLYWOOD</h4>
+                        <div class="keyword-row"><span class="keyword">teentaal</span><span>16-beat Classical cycle (Dha Dhin Dhin Dha)</span></div>
+                        <div class="keyword-row"><span class="keyword">bhangra</span><span>Swung Punjabi dhol rhythm</span></div>
+                        <div class="keyword-row"><span class="keyword">bollywood</span><span>Upbeat 4/4 syncopated dance</span></div>
+                        <div class="keyword-row"><span class="keyword">garba</span><span>6/8 or swung folk groove</span></div>
+                        <div class="keyword-row"><span class="keyword">classical</span><span>Authentic tabla phrasing</span></div>
+                        <div class="keyword-row"><span class="keyword">punjabi</span><span>Heavy kicks on 1 and 3 with swung off-beats</span></div>
+                    </div>
+                </div>
+
+                <!-- SOUTH INDIAN GUIDE -->
+                <div id="guide-southindian" class="genre-guide">
+                    <div class="keyword-category">
+                        <h4>SOUTH INDIAN / KOOTHU</h4>
+                        <div class="keyword-row"><span class="keyword">dappankoothu</span><span>Fast, syncopated street festival beat</span></div>
+                        <div class="keyword-row"><span class="keyword">kuthu fast</span><span>Double-time aggressive thavil rhythm</span></div>
+                        <div class="keyword-row"><span class="keyword">carnatic</span><span>Traditional 8-beat Adi Tala cycle</span></div>
+                        <div class="keyword-row"><span class="keyword">thavil</span><span>Heavy rolling drum fills</span></div>
+                        <div class="keyword-row"><span class="keyword">street</span><span>Raw, unquantized local feel</span></div>
+                        <div class="keyword-row"><span class="keyword">adi</span><span>Mathematical 4+2+2 subdivision</span></div>
+                    </div>
+                </div>
+
+                <div class="custom-keyword-note">
+                    <i class="fa-solid fa-lightbulb" style="color: #00d4ff; margin-right: 5px;"></i>
+                    Select your Genre on the left to swap options dynamically.
+                </div>
+            </aside>
+        </div>
+
+        <div class="creator-credit">
+            Rhythmic Engine Powered by <a href="https://tonejs.github.io/" target="_blank">Tone.js</a> | Integrated & Maintained by <a href="https://tonevault.qd.je" target="_blank">ToneVault by HC</a>
+        </div>
+    </main>
+
+    <site-footer></site-footer>
+
+    <script src="/components.js"></script>
+
+    <!-- RHYTHM GENERATION ENGINE -->
+    <script type="module">
+
+        const STYLE_CONFIGS = {
+            pop: {
+                rhythms: [
+                    {val: 'auto', text: 'Auto (from Keywords)'},
+                    {val: 'driving', text: 'Driving (4-on-the-Floor)'},
+                    {val: 'syncopated', text: 'Syncopated Groove'},
+                    {val: 'halftime', text: 'Half-Time Ballad'},
+                    {val: 'build', text: 'Pre-Drop Build / Riser'}
+                ],
+                kits: [
+                    {val: 'auto', text: 'Auto (Modern Electro-Pop)'},
+                    {val: 'acoustic', text: 'Acoustic Studio Kit'},
+                    {val: 'cinematic', text: 'Hybrid Cinematic'},
+                    {val: 'lofi', text: 'Lo-Fi / Vintage'}
+                ],
+                defaultKit: 'modern',
+                defaultTempo: 120,
+                placeholder: 'e.g. driving, syncopated, disco, ballad, build...'
+            },
+            boombap: {
+                rhythms: [
+                    {val: 'auto', text: 'Auto (from Keywords)'},
+                    {val: 'classic', text: 'Classic 90s'},
+                    {val: 'lazy', text: 'Lazy / Dragging'},
+                    {val: 'ghost', text: 'Busy Ghost Notes'}
+                ],
+                kits: [
+                    {val: 'auto', text: 'Auto (Vintage Lo-Fi)'},
+                    {val: 'acoustic', text: 'Acoustic Studio Kit'},
+                    {val: 'modern', text: 'Modern Electronic'}
+                ],
+                defaultKit: 'lofi',
+                defaultTempo: 88,
+                placeholder: 'e.g. lazy, ghost notes, classic 90s, dusty...'
+            },
+            trap: {
+                rhythms: [
+                    {val: 'auto', text: 'Auto (from Keywords)'},
+                    {val: 'standard', text: 'Standard Trap (808 Bounce)'},
+                    {val: 'drill', text: 'UK Drill Pulse'},
+                    {val: 'rolls', text: 'Rapid Hat Rolls'},
+                    {val: 'build', text: 'Drop Build-up'}
+                ],
+                kits: [
+                    {val: 'auto', text: 'Auto (Modern 808s)'},
+                    {val: 'cinematic', text: 'Hybrid Cinematic'},
+                    {val: 'lofi', text: 'Lo-Fi / Vintage'}
+                ],
+                defaultKit: 'modern',
+                defaultTempo: 142,
+                placeholder: 'e.g. trap, drill, fast rolls, bouncy, build...'
+            },
+            house: {
+                rhythms: [
+                    {val: 'auto', text: 'Auto (from Keywords)'},
+                    {val: 'classic', text: 'Classic 4/4'},
+                    {val: 'tech', text: 'Tech House (Bouncy)'},
+                    {val: 'minimal', text: 'Minimal / Deep'},
+                    {val: 'build', text: 'Festival Snare Build'}
+                ],
+                kits: [
+                    {val: 'auto', text: 'Auto (Modern Electronic)'},
+                    {val: 'cinematic', text: 'Hybrid Cinematic'},
+                    {val: 'lofi', text: 'Lo-Fi / Vintage'}
+                ],
+                defaultKit: 'modern',
+                defaultTempo: 126,
+                placeholder: 'e.g. tech house, minimal, deep, build...'
+            },
+            lofi: {
+                rhythms: [
+                    {val: 'auto', text: 'Auto (from Keywords)'},
+                    {val: 'sleepy', text: 'Sleepy / Minimal'},
+                    {val: 'jazzy', text: 'Jazzy / Swung'}
+                ],
+                kits: [
+                    {val: 'auto', text: 'Auto (Vintage Lo-Fi)'},
+                    {val: 'acoustic', text: 'Acoustic Studio Kit'},
+                    {val: 'modern', text: 'Modern Electronic'}
+                ],
+                defaultKit: 'lofi',
+                defaultTempo: 78,
+                placeholder: 'e.g. sleepy, minimal, jazzy, swung, chill...'
+            },
+            cinematic: {
+                rhythms: [
+                    {val: 'auto', text: 'Auto (from Keywords)'},
+                    {val: 'epic', text: 'Epic Trailer Build'},
+                    {val: 'tension', text: 'Dark Tension Pulse'},
+                    {val: 'action', text: 'Action / Chase'}
+                ],
+                kits: [
+                    {val: 'auto', text: 'Auto (Orchestra & Taikos)'},
+                    {val: 'hybrid', text: 'Hybrid Cinematic'},
+                    {val: 'indian', text: 'Indian Percussion'}
+                ],
+                defaultKit: 'cinematic',
+                defaultTempo: 110,
+                placeholder: 'e.g. epic, trailer, dark, tension, action, chase...'
+            },
+            indian: {
+                rhythms: [
+                    {val: 'auto', text: 'Auto (from Keywords)'},
+                    {val: 'teentaal', text: 'Teen Taal (16-beat cycle)'},
+                    {val: 'bhangra', text: 'Bhangra (Swung)'},
+                    {val: 'bollywood', text: 'Bollywood Pop'}
+                ],
+                kits: [
+                    {val: 'auto', text: 'Auto (Indian Percussion)'},
+                    {val: 'indian', text: 'Indian Percussion'},
+                    {val: 'southindian_pure', text: 'Pure South Indian'},
+                    {val: 'acoustic', text: 'Acoustic Studio Kit'}
+                ],
+                defaultKit: 'indian',
+                defaultTempo: 100,
+                placeholder: 'e.g. teentaal, classical, bhangra, bollywood, dance...'
+            },
+            southindian: {
+                rhythms: [
+                    {val: 'auto', text: 'Auto (from Keywords)'},
+                    {val: 'dappankoothu', text: 'Dappan Koothu (Street)'},
+                    {val: 'kuthu_fast', text: 'Kuthu Fast'},
+                    {val: 'carnatic', text: 'Carnatic (Adi Tala)'}
+                ],
+                kits: [
+                    {val: 'auto', text: 'Auto (Pure South Indian)'},
+                    {val: 'southindian_pure', text: 'Pure South Indian'},
+                    {val: 'indian', text: 'Hybrid Indian Percussion'},
+                    {val: 'cinematic', text: 'Hybrid Cinematic'}
+                ],
+                defaultKit: 'southindian_pure',
+                defaultTempo: 135,
+                placeholder: 'e.g. koothu, dappan, fast, carnatic, adi...'
+            }
+        };
+
+        function updateSelectOptions(selectId, optionsData) {
+            const select = document.getElementById(selectId);
+            const optionsContainer = document.getElementById(selectId + 'Options');
+            const triggerSpan = document.querySelector('#' + selectId + 'Trigger span');
+            
+            if (select) select.innerHTML = '';
+            optionsContainer.innerHTML = '';
+            
+            optionsData.forEach((opt, index) => {
+                if (select) {
+                    const optionEl = document.createElement('option');
+                    optionEl.value = opt.val;
+                    optionEl.textContent = opt.text;
+                    if (index === 0) optionEl.selected = true;
+                    select.appendChild(optionEl);
+                }
+
+                const div = document.createElement('div');
+                div.className = 'custom-option' + (index === 0 ? ' selected' : '');
+                div.dataset.value = opt.val;
+                div.textContent = opt.text;
+                optionsContainer.appendChild(div);
+
+                if (index === 0) triggerSpan.textContent = opt.text;
+            });
+        }
+
+        document.getElementById('genreSelect').addEventListener('change', (e) => {
+            const genre = e.target.value;
+            const config = STYLE_CONFIGS[genre];
+            if (config) {
+                updateSelectOptions('rhythmSelect', config.rhythms);
+                updateSelectOptions('instrumentSelect', config.kits);
+                document.getElementById('tempoInput').value = config.defaultTempo;
+                document.getElementById('thoughtsInput').placeholder = config.placeholder;
+
+                document.querySelectorAll('.genre-guide').forEach(el => el.classList.remove('active'));
+                const activeGuide = document.getElementById('guide-' + genre);
+                if (activeGuide) activeGuide.classList.add('active');
+            }
+        });
+
+        function setupCustomDropdown(selectId) {
+            const hiddenSelect = document.getElementById(selectId);
+            const wrapper = document.getElementById(selectId + 'Wrapper');
+            const trigger = document.getElementById(selectId + 'Trigger');
+            const optionsContainer = document.getElementById(selectId + 'Options');
+            const triggerText = trigger.querySelector('span');
+
+            trigger.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.querySelectorAll('.custom-select-wrapper, .custom-combobox-wrapper').forEach(w => {
+                    if (w !== wrapper) w.classList.remove('open');
+                });
+                wrapper.classList.toggle('open');
+            });
+
+            optionsContainer.addEventListener('click', (e) => {
+                const opt = e.target.closest('.custom-option');
+                if (!opt) return;
+
+                e.stopPropagation();
+                triggerText.textContent = opt.textContent;
+                
+                optionsContainer.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                
+                if (hiddenSelect) {
+                    hiddenSelect.value = opt.dataset.value;
+                    hiddenSelect.dispatchEvent(new Event('change'));
+                }
+                wrapper.classList.remove('open');
+            });
+        }
+
+        const timeSigWrapper = document.getElementById('timeSigWrapper');
+        const timeSigInput = document.getElementById('timeSigInput');
+        const timeSigOptions = document.getElementById('timeSigOptions');
+        const timeSigIcon = document.getElementById('timeSigIcon');
+
+        [timeSigInput, timeSigIcon].forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                document.querySelectorAll('.custom-select-wrapper, .custom-combobox-wrapper').forEach(w => {
+                    if (w !== timeSigWrapper) w.classList.remove('open');
+                });
+                timeSigWrapper.classList.toggle('open');
+            });
+        });
+
+        timeSigOptions.addEventListener('click', (e) => {
+            const opt = e.target.closest('.custom-option');
+            if (!opt) return;
+            e.stopPropagation();
+            
+            timeSigInput.value = opt.dataset.value;
+            timeSigOptions.querySelectorAll('.custom-option').forEach(o => o.classList.remove('selected'));
+            opt.classList.add('selected');
+            
+            timeSigWrapper.classList.remove('open');
+        });
+
+        window.addEventListener('click', () => {
+            document.querySelectorAll('.custom-select-wrapper, .custom-combobox-wrapper').forEach(w => w.classList.remove('open'));
+        });
+
+        ['genreSelect','rhythmSelect','instrumentSelect','densitySelect','swingSelect','humanizeSelect','fillSelect']
+            .forEach(setupCustomDropdown);
+            
+        updateSelectOptions('rhythmSelect', STYLE_CONFIGS.pop.rhythms);
+        updateSelectOptions('instrumentSelect', STYLE_CONFIGS.pop.kits);
+
+        const tempoInput = document.getElementById('tempoInput');
+        const barsInput = document.getElementById('barsInput');
+        const densitySelect = document.getElementById('densitySelect');
+        const swingSelect = document.getElementById('swingSelect');
+        const humanizeSelect = document.getElementById('humanizeSelect');
+        const fillSelect = document.getElementById('fillSelect');
+        const genreSelect = document.getElementById('genreSelect');
+        const rhythmSelect = document.getElementById('rhythmSelect');
+        const instrumentSelect = document.getElementById('instrumentSelect');
+        const thoughtsInput = document.getElementById('thoughtsInput');
+        const processBtn = document.getElementById('processBtn');
+        const statusMessage = document.getElementById('statusMessage');
+        const statusText = document.getElementById('statusText');
+        const progressBarFill = document.getElementById('progressBarFill');
+        const resultsArea = document.getElementById('resultsArea');
+        const waveformPreviewContainer = document.getElementById('waveformPreviewContainer');
+        const previewPlayBtn = document.getElementById('previewPlayBtn');
+        const previewPlayIcon = document.getElementById('previewPlayIcon');
+        const audioDurationText = document.getElementById('audioDurationText');
+        const previewVolume = document.getElementById('previewVolume');
+        const downloadMidiBtn = document.getElementById('downloadMidiBtn');
+        const downloadMainWavBtn = document.getElementById('downloadMainWavBtn');
+        const instrumentMidiList = document.getElementById('instrumentMidiList');
+        const generatedInstrumentSummary = document.getElementById('generatedInstrumentSummary');
+
+        let wavesurfer = null;
+        let wavBlobUrl = null;
+        let midiBlobUrl = null;
+        let generatedNotes = [];
+        let exactMaxTime = 8;
+        let stemWaveSurfers = new Map();
+        let stemBlobUrls = [];
+
+        const STANDARD_MIDI = {
+            KICK: 36, SNARE: 38, CLAP: 39, CH: 42, OH: 46, TOM_LO: 41, TOM_HI: 45, CRASH: 49
+        };
+
+        const KIT_MAPPINGS = {
+            modern: {
+                36: { name: 'Kick', icon: 'fa-drum', sample: 'Modern/Kick/Kick_001.wav' },
+                38: { name: 'Snare', icon: 'fa-drum-steelpan', sample: 'Modern/Snare/Snare_001.wav' },
+                39: { name: 'Clap', icon: 'fa-hands-clapping', sample: 'Modern/Clap/Clap_001.wav' },
+                42: { name: 'Closed Hi-Hat', icon: 'fa-circle', sample: 'Modern/Closed Hi-Hat/Closed Hi-Hat_001.wav' },
+                46: { name: 'Open Hi-Hat', icon: 'fa-circle-dot', sample: 'Modern/Open Hi-Hat/Open Hi-Hat_001.wav' },
+                41: { name: 'Low Tom', icon: 'fa-drum', sample: 'Modern/Low Tom/Low Tom_001.wav' },
+                45: { name: 'High Tom', icon: 'fa-drum', sample: 'Modern/High Tom/High Tom_001.wav' },
+                49: { name: 'Crash Cymbal', icon: 'fa-compact-disc', sample: 'Modern/Crash/Crash_001.wav' }
+            },
+            cinematic: {
+                36: { name: 'Taiko Low (Kick)', icon: 'fa-drum', sample: 'Cinematic/Taiko Low/taiko_low_01.wav' },
+                38: { name: 'Orch Snare', icon: 'fa-drum-steelpan', sample: 'Cinematic/Orchestral Snare/orchestral_snare_01.wav' },
+                39: { name: 'Taiko High (Clap)', icon: 'fa-hands-clapping', sample: 'Cinematic/Taiko High/taiko_high_01.wav' },
+                42: { name: 'Timpani Mute (CH)', icon: 'fa-circle', sample: 'Cinematic/Timpani/timpani_01.wav' },
+                46: { name: 'Crash Cymbal (OH)', icon: 'fa-circle-dot', sample: 'Cinematic/Crash/crash_01.wav' },
+                41: { name: 'Cinematic Low Tom', icon: 'fa-drum', sample: 'Cinematic/Low Tom/tom_low_01.wav' },
+                45: { name: 'Cinematic High Tom', icon: 'fa-drum', sample: 'Cinematic/High Tom/tom_high_01.wav' },
+                49: { name: 'Piatti Crash', icon: 'fa-compact-disc', sample: 'Cinematic/Crash/crash_01.wav' }
+            },
+            indian: {
+                36: { name: 'Bayan / Thavil Bass', icon: 'fa-drum', sample: 'Indian/Bayan_Low/bayan_low_01.wav' },
+                38: { name: 'Dayan / Snappy Ta', icon: 'fa-drum-steelpan', sample: 'Indian/Dayan_High/dayan_high_01.wav' },
+                39: { name: 'Chati / Hand Clap', icon: 'fa-hands-clapping', sample: 'Indian/Chati_Snap/chati_snap_01.wav' },
+                42: { name: 'Finger Tap / Talam', icon: 'fa-circle', sample: 'Indian/Finger_Taps/finger_tap_01.wav' },
+                46: { name: 'Manjira / Open Bell', icon: 'fa-circle-dot', sample: 'Indian/Manjira_Open/manjira_open_01.wav' },
+                41: { name: 'Mridangam Low', icon: 'fa-drum', sample: 'Indian/Mridangam_Low/mridangam_low_01.wav' },
+                45: { name: 'Thavil High Stick', icon: 'fa-drum', sample: 'Indian/Thavil_Roll/thavil_roll_01.wav' },
+                49: { name: 'Temple Gong Crash', icon: 'fa-compact-disc', sample: 'Indian/Gong_Crash/gong_crash_01.wav' }
+            },
+            southindian_pure: {
+                36: { name: 'Parai Bass', icon: 'fa-drum', sample: 'SouthIndian/Parai/parai_bass_01.wav' },
+                38: { name: 'Parai Slap', icon: 'fa-hand', sample: 'SouthIndian/Parai/parai_slap_01.wav' },
+                39: { name: 'Thavil Slap', icon: 'fa-hands-clapping', sample: 'SouthIndian/Thavil/thavil_slap_01.wav' },
+                42: { name: 'Talam Muted', icon: 'fa-circle', sample: 'SouthIndian/Talam/talam_muted_01.wav' },
+                46: { name: 'Talam Open', icon: 'fa-circle-dot', sample: 'SouthIndian/Talam/talam_open_01.wav' },
+                41: { name: 'Udukkai Bend', icon: 'fa-wave-square', sample: 'SouthIndian/Udukkai/udukkai_bend_01.wav' },
+                45: { name: 'Thavil Stick Roll', icon: 'fa-drum', sample: 'Indian/Thavil_Roll/thavil_roll_01.wav' },
+                49: { name: 'Thavil Bass', icon: 'fa-drum', sample: 'SouthIndian/Thavil/thavil_bass_01.wav' }
+            },
+            acoustic: {
+                36: { name: 'Acoustic Kick', icon: 'fa-drum', sample: 'Acoustic/Kick/kick_01.wav' },
+                38: { name: 'Acoustic Snare', icon: 'fa-drum-steelpan', sample: 'Acoustic/Snare/snare_01.wav' },
+                39: { name: 'Rimshot (Clap)', icon: 'fa-hands-clapping', sample: 'Acoustic/Snap/snap_01.wav' },
+                42: { name: 'Acoustic CH', icon: 'fa-circle', sample: 'Acoustic/Closed Hi-Hat/hihat_closed_01.wav' },
+                46: { name: 'Acoustic OH', icon: 'fa-circle-dot', sample: 'Acoustic/Open Hi-Hat/hihat_open_01.wav' },
+                41: { name: 'Acoustic Low Tom', icon: 'fa-drum', sample: 'Acoustic/Low Tom/tom_low_01.wav' },
+                45: { name: 'Acoustic High Tom', icon: 'fa-drum', sample: 'Acoustic/High Tom/tom_high_01.wav' },
+                49: { name: 'Acoustic Crash', icon: 'fa-compact-disc', sample: 'Acoustic/Crash/crash_01.wav' }
+            },
+            lofi: {
+                36: { name: 'Lo-Fi Kick', icon: 'fa-drum', sample: 'Lo-Fi/Kick/kick_01.wav' },
+                38: { name: 'Lo-Fi Snare', icon: 'fa-drum-steelpan', sample: 'Lo-Fi/Snare/snare_01.wav' },
+                39: { name: 'Lo-Fi Snap', icon: 'fa-hands-clapping', sample: 'Lo-Fi/Snap/snap_01.wav' },
+                42: { name: 'Lo-Fi CH', icon: 'fa-circle', sample: 'Lo-Fi/Closed Hi-Hat/hihat_closed_01.wav' },
+                46: { name: 'Lo-Fi OH', icon: 'fa-circle-dot', sample: 'Lo-Fi/Open Hi-Hat/hihat_open_01.wav' },
+                41: { name: 'Lo-Fi Low Tom', icon: 'fa-drum', sample: 'Lo-Fi/Low Tom/tom_low_01.wav' },
+                45: { name: 'Lo-Fi High Tom', icon: 'fa-drum', sample: 'Lo-Fi/High Tom/tom_high_01.wav' },
+                49: { name: 'Lo-Fi Crash', icon: 'fa-compact-disc', sample: 'Lo-Fi/Crash/crash_01.wav' }
+            }
+        };
+
+        const SAMPLE_BASE_URL = 'https://raw.githubusercontent.com/tonevaultbyhc/ToneVault/main/Samples/';
+        const audioBufferCache = new Map();
+        let audioContext = null;
+
+        async function fetchSample(relativePath) {
+            if (audioBufferCache.has(relativePath)) return audioBufferCache.get(relativePath);
+            if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            
+            const cleanUrl = SAMPLE_BASE_URL + relativePath.split('/').map(encodeURIComponent).join('/');
+            try {
+                const response = await fetch(cleanUrl);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const arrayBuffer = await response.arrayBuffer();
+                const decoded = await audioContext.decodeAudioData(arrayBuffer);
+                audioBufferCache.set(relativePath, decoded);
+                return decoded;
+            } catch (err) {
+                console.warn(`ToneVault: Missing sample skipped (${cleanUrl})`);
+                return null;
+            }
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        function generateRhythmNotes() {
+            const genre = genreSelect.value;
+            const currentTempo = Math.max(40, Math.min(240, parseInt(tempoInput.value) || 120));
+            const totalBars = Math.max(1, Math.min(64, parseInt(barsInput.value) || 8));
+            
+            const rawTimeSig = timeSigInput.value.match(/^\d+\/\d+$/) ? timeSigInput.value : '4/4';
+            const [beatsPerBar, beatUnit] = rawTimeSig.split('/').map(Number);
+            
+            const density = densitySelect.value;
+            const swingAmount = parseFloat(swingSelect.value) || 0;
+            const humanizeAmount = parseFloat(humanizeSelect.value) || 0;
+            const fillFreq = parseInt(fillSelect.value) || 0;
+            const text = thoughtsInput.value.toLowerCase();
+            let rhythm = rhythmSelect.value;
+
+            const grooveVariation = Math.floor(Math.random() * 4);
+
+            if (rhythm === 'auto') {
+                if (genre !== 'lofi' && genre !== 'boombap' && genre !== 'indian' && genre !== 'southindian' && (text.includes('build') || text.includes('drop') || text.includes('riser'))) {
+                    rhythm = 'build';
+                } else if (genre === 'pop') {
+                    if (text.includes('syncopated') || text.includes('disco')) rhythm = 'syncopated';
+                    else if (text.includes('ballad') || text.includes('halftime')) rhythm = 'halftime';
+                    else rhythm = 'driving';
+                } else if (genre === 'boombap') {
+                    if (text.includes('lazy') || text.includes('drag')) rhythm = 'lazy';
+                    else if (text.includes('ghost') || text.includes('busy')) rhythm = 'ghost';
+                    else rhythm = 'classic';
+                } else if (genre === 'trap') {
+                    if (text.includes('drill')) rhythm = 'drill';
+                    else if (text.includes('roll') || text.includes('fast')) rhythm = 'rolls';
+                    else rhythm = 'standard';
+                } else if (genre === 'house') {
+                    if (text.includes('tech') || text.includes('bouncy')) rhythm = 'tech';
+                    else if (text.includes('minimal') || text.includes('deep')) rhythm = 'minimal';
+                    else rhythm = 'classic';
+                } else if (genre === 'lofi') {
+                    if (text.includes('sleepy') || text.includes('minimal')) rhythm = 'sleepy';
+                    else if (text.includes('jazzy') || text.includes('swung')) rhythm = 'jazzy';
+                    else rhythm = 'default';
+                } else if (genre === 'cinematic') {
+                    if (text.includes('tension') || text.includes('dark')) rhythm = 'tension';
+                    else if (text.includes('action') || text.includes('chase')) rhythm = 'action';
+                    else rhythm = 'epic';
+                } else if (genre === 'indian') {
+                    if (text.includes('teen') || text.includes('classical') || text.includes('16')) rhythm = 'teentaal';
+                    else if (text.includes('bhangra') || text.includes('punjabi')) rhythm = 'bhangra';
+                    else rhythm = 'bollywood';
+                } else if (genre === 'southindian') {
+                    if (text.includes('fast') || text.includes('kuthu')) rhythm = 'kuthu_fast';
+                    else if (text.includes('carnatic') || text.includes('adi')) rhythm = 'carnatic';
+                    else rhythm = 'dappankoothu';
+                }
+            }
+
+            const secondsPerBeat = 60 / currentTempo;
+            const secondsPerTimeUnit = secondsPerBeat * (4 / beatUnit);
+            const barDuration = beatsPerBar * secondsPerTimeUnit;
+            const sixteenth = secondsPerTimeUnit * 0.25;
+            exactMaxTime = totalBars * barDuration;
+
+            generatedNotes = [];
+
+            function addNote(midiNumber, rawTime, baseVelocity, duration = 0.1) {
+                let humanTime = rawTime + (Math.random() - 0.5) * humanizeAmount;
+                humanTime = Math.max(0, humanTime);
+                if (humanTime >= exactMaxTime) return;
+                let humanVel = Math.max(0.1, Math.min(1, baseVelocity + (Math.random() - 0.5) * 0.1));
+                generatedNotes.push({ midi: midiNumber, time: humanTime, velocity: humanVel, duration });
+            }
+
+            for (let bar = 0; bar < totalBars; bar++) {
+                const isFillBar = fillFreq > 0 && ((bar + 1) % fillFreq === 0);
+                const isFinalBar = (bar === totalBars - 1);
+                const barStart = bar * barDuration;
+
+                if (bar === 0 || (fillFreq > 0 && bar % fillFreq === 0)) {
+                    if (rhythm !== 'build' && genre !== 'indian' && genre !== 'southindian') addNote(STANDARD_MIDI.CRASH, barStart, 0.85, 1.5);
+                }
+
+                for (let beat = 0; beat < beatsPerBar; beat++) {
+                    const beatStart = barStart + beat * secondsPerTimeUnit;
+
+                    for (let step = 0; step < 4; step++) {
+                        let stepTime = beatStart + step * sixteenth;
+                        if (step % 2 !== 0 && swingAmount > 0) stepTime += (sixteenth * swingAmount * 0.5);
+
+                        const downbeat = (step === 0);
+                        const isBackbeat = downbeat && (beat === 1 || beat === 3);
+                        const inFillZone = (isFillBar || isFinalBar) && (beat >= beatsPerBar - 1);
+                        const stepRoll = Math.random();
+
+                        if (inFillZone && rhythm !== 'build' && genre !== 'indian' && genre !== 'southindian') {
+                            if (step === 0 || step === 2) {
+                                addNote(step === 0 ? STANDARD_MIDI.TOM_HI : STANDARD_MIDI.TOM_LO, stepTime, 0.85);
+                            }
+                            continue;
+                        }
+
+                        if (rhythm === 'build') {
+                            let buildVel = 0.5 + (0.5 * (bar / Math.max(1, totalBars - 1))); 
+                            const isLastBar = (bar === totalBars - 1);
+                            const isSecondToLast = (bar === totalBars - 2);
+
+                            if (!isLastBar && !isSecondToLast) {
+                                if (downbeat) addNote(STANDARD_MIDI.KICK, stepTime, buildVel);
+                                if (isBackbeat) addNote(STANDARD_MIDI.SNARE, stepTime, buildVel * 0.9);
+                                if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime, buildVel * 0.7);
+                                if (grooveVariation % 2 === 0 && beat === 3 && step === 2 && stepRoll > 0.5) addNote(STANDARD_MIDI.KICK, stepTime, buildVel * 0.7);
+                            } else if (isSecondToLast) {
+                                if (step === 0 || step === 2) {
+                                    addNote(STANDARD_MIDI.KICK, stepTime, buildVel);
+                                    addNote(STANDARD_MIDI.SNARE, stepTime, buildVel * 0.9);
+                                }
+                                addNote(STANDARD_MIDI.CH, stepTime, buildVel * 0.8);
+                                if (stepRoll > 0.6) addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.5), buildVel * 0.5, 0.05);
+                            } else if (isLastBar) {
+                                if (beat < 2) {
+                                    addNote(STANDARD_MIDI.SNARE, stepTime, buildVel);
+                                    if (step % 2 === 0 || stepRoll > 0.5) addNote(STANDARD_MIDI.KICK, stepTime, buildVel * 0.8);
+                                } else if (beat === 2) {
+                                    if (grooveVariation === 0) {
+                                        addNote(STANDARD_MIDI.SNARE, stepTime, buildVel);
+                                        addNote(STANDARD_MIDI.SNARE, stepTime + (sixteenth * 0.5), buildVel);
+                                    } else if (grooveVariation === 1) {
+                                        addNote(STANDARD_MIDI.SNARE, stepTime, buildVel);
+                                        if(step % 2 === 0) addNote(STANDARD_MIDI.TOM_HI, stepTime, buildVel);
+                                        addNote(STANDARD_MIDI.SNARE, stepTime + (sixteenth * 0.5), buildVel);
+                                    } else if (grooveVariation === 2) {
+                                        addNote(step % 2 === 0 ? STANDARD_MIDI.SNARE : STANDARD_MIDI.KICK, stepTime, buildVel);
+                                        addNote(STANDARD_MIDI.SNARE, stepTime + (sixteenth * 0.5), buildVel);
+                                    } else {
+                                        addNote(STANDARD_MIDI.SNARE, stepTime, buildVel);
+                                        addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.25), buildVel);
+                                        addNote(STANDARD_MIDI.SNARE, stepTime + (sixteenth * 0.5), buildVel);
+                                        addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.75), buildVel);
+                                    }
+                                } else if (beat === 3) {
+                                     if (step === 3 && stepRoll > 0.7) addNote(STANDARD_MIDI.SNARE, stepTime, buildVel);
+                                     if (step === 3 && grooveVariation === 3) addNote(STANDARD_MIDI.TOM_LO, stepTime, buildVel);
+                                }
+                            }
+                            continue; 
+                        }
+
+                        if (genre === 'pop') {
+                            if (rhythm === 'driving') {
+                                if (downbeat) addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
+                                if (grooveVariation === 1 && beat === 2 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime, 0.8);
+                                if (grooveVariation === 2 && beat === 3 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime, 0.75);
+                                if (grooveVariation === 3 && (beat === 1 || beat === 3) && step === 2 && stepRoll > 0.4) addNote(STANDARD_MIDI.KICK, stepTime, 0.7);
+                            } else if (rhythm === 'syncopated') {
+                                if (downbeat && (beat === 0 || beat === 2)) addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
+                                if (grooveVariation % 2 === 0 && beat === 1 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime, 0.85);
+                                if (grooveVariation % 2 !== 0 && beat === 1 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime, 0.85);
+                                if (beat === 3 && step === 2 && stepRoll > 0.3) addNote(STANDARD_MIDI.KICK, stepTime, 0.75);
+                            } else if (rhythm === 'halftime') {
+                                if (downbeat && beat === 0) addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
+                                if (grooveVariation > 1 && beat === 2 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime, 0.7);
+                                if (grooveVariation === 3 && beat === 3 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime, 0.75);
+                            }
+
+                            if (rhythm === 'halftime') {
+                                if (downbeat && beat === 2) addNote(STANDARD_MIDI.SNARE, stepTime, 0.95);
+                            } else {
+                                if (isBackbeat) {
+                                    addNote(STANDARD_MIDI.SNARE, stepTime, 0.92);
+                                    if (grooveVariation !== 1) addNote(STANDARD_MIDI.CLAP, stepTime, 0.75);
+                                }
+                                if (density === 'busy' && beat === 2 && step === 3 && stepRoll > 0.5) {
+                                    addNote(STANDARD_MIDI.SNARE, stepTime, 0.4);
+                                }
+                            }
+
+                            if (density === 'minimal') {
+                                if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime, 0.55);
+                            } else if (density === 'standard') {
+                                if (grooveVariation === 0) {
+                                    if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime, step === 0 ? 0.75 : 0.5);
+                                } else if (grooveVariation === 1) {
+                                    addNote(STANDARD_MIDI.CH, stepTime, downbeat ? 0.8 : (step === 2 ? 0.6 : 0.38));
+                                } else if (grooveVariation === 2) {
+                                    if (step === 2) addNote(STANDARD_MIDI.OH, stepTime, 0.7);
+                                    else if (step === 0) addNote(STANDARD_MIDI.CH, stepTime, 0.6);
+                                } else {
+                                    if (step === 0 || step === 1 || step === 3) addNote(STANDARD_MIDI.CH, stepTime, 0.55);
+                                }
+                            } else if (density === 'busy') {
+                                addNote(STANDARD_MIDI.CH, stepTime, downbeat ? 0.8 : 0.45);
+                                if (step === 2 && stepRoll > 0.3) addNote(STANDARD_MIDI.OH, stepTime, 0.65);
+                            }
+                        }
+
+                        if (genre === 'boombap') {
+                            let dragOffset = (rhythm === 'lazy') ? (sixteenth * (0.15 + stepRoll * 0.15)) : 0;
+                            if (downbeat && (beat === 0 || beat === 2)) addNote(STANDARD_MIDI.KICK, stepTime + dragOffset, 0.9);
+                            if (grooveVariation === 0 && beat === 1 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime + dragOffset, 0.75);
+                            if (grooveVariation === 1 && beat === 1 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime + dragOffset, 0.75);
+                            if (grooveVariation === 2 && beat === 3 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime + dragOffset, 0.7);
+                            if (grooveVariation === 3 && beat === 2 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime + dragOffset, 0.65);
+
+                            if (isBackbeat) addNote(STANDARD_MIDI.SNARE, stepTime, 0.95);
+                            if (rhythm === 'ghost' && step === 3 && stepRoll > 0.4) addNote(STANDARD_MIDI.SNARE, stepTime, 0.35);
+                            if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime + dragOffset, step === 0 ? 0.75 : 0.45);
+                        }
+
+                        if (genre === 'trap') {
+                            if (downbeat && beat === 0) addNote(STANDARD_MIDI.KICK, stepTime, 0.98);
+                            if (grooveVariation === 0 && beat === 1 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime, 0.88);
+                            if (grooveVariation === 1 && beat === 2 && step === 0) addNote(STANDARD_MIDI.KICK, stepTime, 0.92);
+                            if (grooveVariation === 2 && beat === 3 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime, 0.85);
+                            if (grooveVariation === 3 && beat === 1 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime, 0.82);
+
+                            if (downbeat && beat === 2) {
+                                addNote(STANDARD_MIDI.SNARE, stepTime, 0.95);
+                                addNote(STANDARD_MIDI.CLAP, stepTime, 0.8);
+                            }
+
+                            if (rhythm === 'drill' && (step === 1 || step === 3) && beat === 3 && stepRoll > 0.3) {
+                                addNote(STANDARD_MIDI.SNARE, stepTime, 0.6); 
+                            }
+
+                            addNote(STANDARD_MIDI.CH, stepTime, 0.6);
+                            if (rhythm === 'rolls' || density === 'busy') {
+                                if (stepRoll > 0.6) addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.5), 0.45, 0.05);
+                                if (step === 3 && stepRoll > 0.4) {
+                                    addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.25), 0.35, 0.03);
+                                    addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.75), 0.35, 0.03);
+                                }
+                            }
+                        }
+
+                        if (genre === 'house') {
+                            if (downbeat) addNote(STANDARD_MIDI.KICK, stepTime, 0.94);
+                            if (isBackbeat) addNote(STANDARD_MIDI.CLAP, stepTime, 0.9);
+
+                            if (rhythm === 'tech' && beat === 2 && step === 3) addNote(STANDARD_MIDI.CLAP, stepTime, 0.65);
+                            if (step === 2) addNote(STANDARD_MIDI.OH, stepTime, 0.72);
+
+                            if (density !== 'minimal' && (step === 0 || step === 1 || step === 3) && stepRoll > 0.2) {
+                                addNote(STANDARD_MIDI.CH, stepTime, 0.45);
+                            }
+                            if (rhythm === 'tech') {
+                                if (step === 3 && stepRoll > 0.5) addNote(grooveVariation % 2 === 0 ? STANDARD_MIDI.TOM_HI : STANDARD_MIDI.TOM_LO, stepTime, 0.6);
+                                if (beat === 1 && step === 2 && Math.random() > 0.4) addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.65);
+                            }
+                        }
+
+                        if (genre === 'lofi') {
+                            let drag = sixteenth * (0.15 + stepRoll * 0.15);
+
+                            if (downbeat && beat === 0) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.88);
+                            if (grooveVariation === 0 && beat === 1 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.68);
+                            if (grooveVariation === 1 && beat === 2 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.72);
+                            if (grooveVariation >= 2 && beat === 3 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime + drag, 0.65);
+
+                            if (isBackbeat) addNote(STANDARD_MIDI.SNARE, stepTime, 0.9);
+
+                            if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime + drag, step === 0 ? 0.65 : 0.4);
+                            if (rhythm === 'jazzy' && step === 2 && beat % 2 !== 0 && stepRoll > 0.3) {
+                                addNote(STANDARD_MIDI.OH, stepTime + drag, 0.5);
+                            }
+                        }
+
+                        if (genre === 'cinematic') {
+                            if (rhythm === 'epic') {
+                                if (downbeat && (beat === 0 || beat === 2)) {
+                                    addNote(STANDARD_MIDI.KICK, stepTime, 0.98); 
+                                    addNote(STANDARD_MIDI.CRASH, stepTime, 0.8);
+                                }
+                                if (isBackbeat || (beat === 3 && step === 2)) {
+                                    addNote(STANDARD_MIDI.SNARE, stepTime, 0.95); 
+                                }
+                                if (grooveVariation > 1 && step === 3) {
+                                    addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7);
+                                }
+                            } else if (rhythm === 'tension') {
+                                if (downbeat && beat === 0) addNote(STANDARD_MIDI.KICK, stepTime, 0.9);
+                                if (grooveVariation % 2 === 0 && beat === 2 && step === 0) addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.8);
+                                if (grooveVariation >= 2 && beat === 3 && step === 2) addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.7);
+                                if (beat === 3 && step === 3 && stepRoll > 0.6) addNote(STANDARD_MIDI.SNARE, stepTime, 0.4);
+                            } else if (rhythm === 'action') {
+                                if (downbeat) addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
+                                if (step === 2) addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.8);
+                                if (isBackbeat || step === 3) addNote(STANDARD_MIDI.SNARE, stepTime, 0.9);
+                                if (stepRoll > 0.5) addNote(STANDARD_MIDI.CH, stepTime + (sixteenth * 0.5), 0.5, 0.05);
+                            }
+                        }
+
+                        if (genre === 'indian') {
+                            const cycleBeat = (bar * beatsPerBar + beat) % 16;
+                            
+                            if (rhythm === 'teentaal') {
+                                if (step === 0) {
+                                    if ([0, 3, 4, 7, 8, 15].includes(cycleBeat)) {
+                                        addNote(STANDARD_MIDI.KICK, stepTime, 0.9);
+                                        addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.85);
+                                    } else if ([1, 2, 5, 6, 13, 14].includes(cycleBeat)) {
+                                        addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.7);
+                                    } else if ([9, 10, 11, 12].includes(cycleBeat)) {
+                                        addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.65);
+                                    }
+                                }
+                                if (density !== 'minimal' && step === 2 && stepRoll > 0.5) {
+                                     addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.3);
+                                }
+                                if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime, step === 0 ? 0.6 : 0.4);
+                            } 
+                            else if (rhythm === 'bhangra') {
+                                let bhangraDrag = sixteenth * (swingAmount > 0 ? swingAmount : 0.4); 
+                                
+                                if (downbeat && (beat === 0 || beat === 2)) addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
+                                if (downbeat && (beat === 1 || beat === 3)) addNote(STANDARD_MIDI.SNARE, stepTime, 0.85); 
+                                
+                                if (step === 2) addNote(STANDARD_MIDI.TOM_HI, stepTime + bhangraDrag, 0.85);
+                                if (density === 'busy' && step === 3 && stepRoll > 0.4) addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.5);
+                                
+                                if (step === 0) addNote(STANDARD_MIDI.CH, stepTime, 0.6);
+                                if (step === 2) addNote(STANDARD_MIDI.CH, stepTime + bhangraDrag, 0.5);
+                            } 
+                            else {
+                                if (downbeat && (beat === 0 || beat === 2)) addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
+                                if (beat === 1 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime, 0.85);
+                                if (beat === 3 && step === 3 && stepRoll > 0.3) addNote(STANDARD_MIDI.KICK, stepTime, 0.75);
+                                
+                                if (isBackbeat) addNote(STANDARD_MIDI.CLAP, stepTime, 0.9);
+                                if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime, 0.65);
+                            }
+                        }
+
+                        if (genre === 'southindian') {
+                            if (rhythm === 'dappankoothu') {
+                                if (step === 0 && (beat === 0 || beat === 2)) addNote(STANDARD_MIDI.KICK, stepTime, 1.0); 
+                                if (beat === 1 && step === 2) addNote(STANDARD_MIDI.KICK, stepTime, 0.9); 
+                                if (beat === 3 && step === 3) addNote(STANDARD_MIDI.KICK, stepTime, 0.85); 
+
+                                if (step === 0 && (beat === 1 || beat === 3)) {
+                                    addNote(STANDARD_MIDI.SNARE, stepTime, 1.0);
+                                    addNote(STANDARD_MIDI.CLAP, stepTime, 0.8);
+                                }
+
+                                if ((beat === 0 && step === 3) || (beat === 2 && step === 2)) {
+                                    addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.85);
+                                }
+
+                                if (density !== 'minimal') {
+                                    if (!(step === 0 && (beat === 1 || beat === 3))) { 
+                                        if (stepRoll > 0.2) addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.45 + (stepRoll * 0.3));
+                                    }
+                                }
+                                
+                                if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime, step === 0 ? 0.8 : 0.5);
+                                if (step === 2 && beat === 3) addNote(STANDARD_MIDI.OH, stepTime, 0.7);
+                            } 
+                            else if (rhythm === 'kuthu_fast') {
+                                if (step === 0) addNote(STANDARD_MIDI.KICK, stepTime, 0.95);
+                                if (step === 2) addNote(STANDARD_MIDI.SNARE, stepTime, 0.9);
+                                
+                                if (step === 1 || step === 3) {
+                                    if (stepRoll > 0.3) addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.65);
+                                }
+                                if (step === 0 || step === 2) addNote(STANDARD_MIDI.CH, stepTime, 0.7);
+                            } 
+                            else if (rhythm === 'carnatic') {
+                                const adiBeat = (bar * beatsPerBar + beat) % 8;
+                                const isSamam = (adiBeat === 0 && step === 0);
+                                const isDhrutamStart = (adiBeat === 4 || adiBeat === 6) && step === 0;
+
+                                if (isSamam) {
+                                    addNote(STANDARD_MIDI.KICK, stepTime, 1.0);
+                                    addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.9);
+                                    if (bar % 2 === 0) addNote(STANDARD_MIDI.CRASH, stepTime, 0.7);
+                                } else if (isDhrutamStart) {
+                                    addNote(STANDARD_MIDI.KICK, stepTime, 0.85);
+                                    addNote(STANDARD_MIDI.CLAP, stepTime, 0.75);
+                                }
+
+                                if (grooveVariation === 0) {
+                                    if (step === 0 && (adiBeat === 1 || adiBeat === 2 || adiBeat === 3 || adiBeat === 5 || adiBeat === 7)) {
+                                        addNote(STANDARD_MIDI.TOM_HI, stepTime, 0.75);
+                                    }
+                                    if (step === 2) addNote(STANDARD_MIDI.SNARE, stepTime, 0.6);
+                                } else if (grooveVariation === 1) {
+                                    if ((step === 0 && (adiBeat === 0 || adiBeat === 3 || adiBeat === 6)) || (step === 2 && adiBeat === 1)) {
+                                        addNote(STANDARD_MIDI.KICK, stepTime, 0.85);
+                                        addNote(STANDARD_MIDI.TOM_LO, stepTime, 0.75);
+                                    }
+                                    if (step === 0 && (adiBeat === 2 || adiBeat === 5 || adiBeat === 7)) addNote(STANDARD_MIDI.SNARE, stepTime, 0.8);
+                                } else {
+                                    if (step % 2 === 0 || stepRoll > 0.3) {
+                                        addNote(adiBeat >= 4 ? STANDARD_MIDI.SNARE : STANDARD_MIDI.TOM_HI, stepTime, 0.7 + (stepRoll * 0.15));
+                                    }
+                                }
+
+                                if (step === 0) addNote(STANDARD_MIDI.CH, stepTime, isSamam ? 0.9 : 0.6);
+                            }
+                        }
+
+                    }
+                }
+            }
+
+            generatedNotes.sort((a, b) => a.time - b.time);
+            return { currentTempo, beatsPerBar, beatUnit };
+        }
+
+        let lastBufferMapSize = 0;
+
+        async function renderAudioMix(noteList, selectedKit, filterMidi = null) {
+            const activeNotes = noteList.filter(n => filterMidi === null || n.midi === filterMidi);
+            if (!activeNotes.length) return null;
+
+            const sampleRate = 44100;
+            const renderDuration = Math.max(1, exactMaxTime + 1.5);
+            const offlineCtx = new OfflineAudioContext(2, Math.ceil(renderDuration * sampleRate), sampleRate);
+
+            const kitData = KIT_MAPPINGS[selectedKit] || KIT_MAPPINGS.modern;
+            const neededMidis = [...new Set(activeNotes.map(n => n.midi))];
+            const bufferMap = new Map();
+            
+            for (const midi of neededMidis) {
+                if (kitData[midi]) {
+                    const audioBuf = await fetchSample(kitData[midi].sample);
+                    if (audioBuf) bufferMap.set(midi, audioBuf);
+                }
+            }
+
+            lastBufferMapSize = bufferMap.size;
+            if (bufferMap.size === 0) return null;
+
+            activeNotes.forEach(note => {
+                const buffer = bufferMap.get(note.midi);
+                if (!buffer) return; 
+
+                const source = offlineCtx.createBufferSource();
+                source.buffer = buffer;
+                const gainNode = offlineCtx.createGain();
+                gainNode.gain.setValueAtTime(note.velocity, note.time);
+
+                source.connect(gainNode);
+                gainNode.connect(offlineCtx.destination);
+                source.start(note.time);
+            });
+
+            const renderedBuffer = await offlineCtx.startRendering();
+            return bufferToWave(renderedBuffer, renderedBuffer.length);
+        }
+
+        function createMidiBlob(noteList, trackName, currentTempo, beatsPerBar, beatUnit) {
+            const midi = new Midi();
+            midi.header.setTempo(currentTempo);
+            midi.header.timeSignatures.push({ ticks: 0, timeSignature: [beatsPerBar, beatUnit] });
+
+            const track = midi.addTrack();
+            track.name = trackName;
+            track.channel = 9;
+
+            noteList.forEach(n => {
+                track.addNote({ midi: n.midi, time: n.time, duration: n.duration, velocity: n.velocity });
+            });
+
+            return new Blob([midi.toArray()], { type: 'audio/midi' });
+        }
+
+        processBtn.addEventListener('click', async () => {
+            processBtn.disabled = true;
+            statusMessage.style.display = 'block';
+            resultsArea.style.display = 'none';
+            progressBarFill.style.width = '20%';
+            statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Writing beat matrix...`;
+
+            setTimeout(async () => {
+                try {
+                    const { currentTempo, beatsPerBar, beatUnit } = generateRhythmNotes();
+
+                    const genre = genreSelect.value;
+                    let resolvedKit = instrumentSelect.value;
+                    if (resolvedKit === 'auto') resolvedKit = STYLE_CONFIGS[genre].defaultKit;
+
+                    progressBarFill.style.width = '50%';
+                    statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Loading ${resolvedKit} samples...`;
+
+                    const masterWavBlob = await renderAudioMix(generatedNotes, resolvedKit);
+                    
+                    if (masterWavBlob) {
+                        if (wavBlobUrl) URL.revokeObjectURL(wavBlobUrl);
+                        wavBlobUrl = URL.createObjectURL(masterWavBlob);
+                        downloadMainWavBtn.href = wavBlobUrl;
+                        downloadMainWavBtn.download = `tonevault_${genre}_${resolvedKit}_${currentTempo}bpm_full.wav`;
+                    }
+
+                    const masterMidiBlob = createMidiBlob(generatedNotes, `${genre.toUpperCase()} Full Kit`, currentTempo, beatsPerBar, beatUnit);
+                    if (midiBlobUrl) URL.revokeObjectURL(midiBlobUrl);
+                    midiBlobUrl = URL.createObjectURL(masterMidiBlob);
+                    downloadMidiBtn.href = midiBlobUrl;
+                    downloadMidiBtn.download = `tonevault_${genre}_${resolvedKit}_${currentTempo}bpm_full.mid`;
+
+                    resultsArea.style.display = 'block';
+                    waveformPreviewContainer.style.display = 'block';
+                    if (wavesurfer) wavesurfer.destroy();
+
+                    wavesurfer = WaveSurfer.create({
+                        container: '#waveform',
+                        waveColor: '#444', progressColor: '#00d4ff', cursorColor: '#ffffff',
+                        barWidth: 3, barRadius: 3, height: 60, normalize: true
+                    });
+                    
+                    if (masterWavBlob) {
+                        wavesurfer.load(wavBlobUrl);
+                        wavesurfer.on('ready', () => { 
+                            audioDurationText.textContent = formatTime(wavesurfer.getDuration()); 
+                            wavesurfer.setVolume(parseFloat(previewVolume.value));
+                        });
+                    } else {
+                        audioDurationText.textContent = "0:00 (No Samples Loaded)";
+                    }
+                    
+                    wavesurfer.on('play', () => previewPlayIcon.className = 'fa-solid fa-pause');
+                    wavesurfer.on('pause', () => previewPlayIcon.className = 'fa-solid fa-play');
+                    wavesurfer.on('finish', () => previewPlayIcon.className = 'fa-solid fa-play');
+
+                    progressBarFill.style.width = '80%';
+                    statusText.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Isolating individual stems...`;
+                    
+                    stemWaveSurfers.forEach(ws => ws.destroy());
+                    stemWaveSurfers.clear();
+                    stemBlobUrls.forEach(url => URL.revokeObjectURL(url));
+                    stemBlobUrls = [];
+                    instrumentMidiList.innerHTML = '';
+
+                    const distinctMidis = [...new Set(generatedNotes.map(n => n.midi))];
+                    generatedInstrumentSummary.textContent = `${distinctMidis.length} isolated stems available`;
+                    const kitData = KIT_MAPPINGS[resolvedKit];
+
+                    for (const midi of distinctMidis) {
+                        const stemInfo = kitData[midi];
+                        if (!stemInfo) continue;
+
+                        const stemNotes = generatedNotes.filter(n => n.midi === midi);
+                        const stemWavBlob = await renderAudioMix(stemNotes, resolvedKit, midi);
+                        const stemMidiBlob = createMidiBlob(stemNotes, `${genre} - ${stemInfo.name}`, currentTempo, beatsPerBar, beatUnit);
+                        const stemMidiUrl = URL.createObjectURL(stemMidiBlob);
+                        stemBlobUrls.push(stemMidiUrl);
+
+                        let stemWavUrl = '#';
+                        if (stemWavBlob) {
+                            stemWavUrl = URL.createObjectURL(stemWavBlob);
+                            stemBlobUrls.push(stemWavUrl);
+                        }
+
+                        const row = document.createElement('div');
+                        row.className = 'instrument-midi-row';
+                        row.innerHTML = `
+                            <div class="instrument-midi-info">
+                                <i class="fa-solid ${stemInfo.icon}"></i>
+                                <span class="instrument-midi-name">${stemInfo.name}</span>
+                                <span class="instrument-midi-count">${stemNotes.length} hits</span>
+                            </div>
+                            <div class="stem-play-col">
+                                <button class="instrument-play-btn" title="Play Stem"><i class="fa-solid fa-play"></i></button>
+                                <input type="range" class="stem-volume-slider" min="0" max="1" step="0.05" value="1" title="Stem Volume">
+                            </div>
+                            <div class="instrument-waveform"></div>
+                            <a href="${stemWavUrl}" class="download-btn" download="tonevault_${genre}_${stemInfo.name.toLowerCase()}_${currentTempo}bpm.wav" ${!stemWavBlob ? 'style="opacity:0.3;pointer-events:none;"' : ''}>
+                                <i class="fa-solid fa-file-waveform"></i> WAV
+                            </a>
+                            <a href="${stemMidiUrl}" class="download-btn" download="tonevault_${genre}_${stemInfo.name.toLowerCase()}_${currentTempo}bpm.mid">
+                                <i class="fa-solid fa-file-music"></i> MIDI
+                            </a>
+                        `;
+                        instrumentMidiList.appendChild(row);
+
+                        const stemPlayBtn = row.querySelector('.instrument-play-btn');
+                        const stemVolSlider = row.querySelector('.stem-volume-slider');
+                        const stemWs = WaveSurfer.create({
+                            container: row.querySelector('.instrument-waveform'),
+                            waveColor: '#3f3f3f', progressColor: '#00d4ff', cursorColor: '#ffffff',
+                            barWidth: 2, barRadius: 2, height: 48, normalize: true
+                        });
+                        
+                        if (stemWavBlob) {
+                            stemWs.load(stemWavUrl);
+                            stemWaveSurfers.set(midi, stemWs);
+                            
+                            stemWs.on('ready', () => {
+                                stemWs.setVolume(parseFloat(stemVolSlider.value));
+                            });
+                            stemVolSlider.addEventListener('input', (e) => {
+                                stemWs.setVolume(parseFloat(e.target.value));
+                            });
+
+                            stemPlayBtn.addEventListener('click', () => {
+                                stemWaveSurfers.forEach((otherWs, m) => { if (m !== midi && otherWs.isPlaying()) otherWs.pause(); });
+                                stemWs.playPause();
+                            });
+                            stemWs.on('play', () => stemPlayBtn.innerHTML = '<i class="fa-solid fa-pause"></i>');
+                            stemWs.on('pause', () => stemPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>');
+                            stemWs.on('finish', () => stemPlayBtn.innerHTML = '<i class="fa-solid fa-play"></i>');
+                        } else {
+                            stemPlayBtn.style.opacity = '0.3';
+                            stemPlayBtn.style.pointerEvents = 'none';
+                            stemVolSlider.style.opacity = '0.3';
+                            stemVolSlider.style.pointerEvents = 'none';
+                        }
+                    }
+
+                    if (lastBufferMapSize === 0) {
+                        instrumentMidiList.innerHTML = `<div style="color:#ff4444; font-size:0.95rem; padding: 10px; background: rgba(255,0,0,0.1); border: 1px solid rgba(255,0,0,0.2); border-radius: 8px;">
+                            <i class="fa-solid fa-triangle-exclamation"></i> <b>No Audio Previews Generated</b><br>
+                            <span style="color: #bbb; font-size: 0.85rem;">The MIDI was created successfully, but WAV previews are silent because samples for <b>${resolvedKit}</b> are missing from GitHub.</span>
+                        </div>` + instrumentMidiList.innerHTML;
+                    }
+
+                    progressBarFill.style.width = '100%';
+                    statusText.innerHTML = `<i class="fa-solid fa-circle-check" style="color:#00d4ff;"></i> Rhythm Ready!`;
+                    setTimeout(() => { statusMessage.style.display = "none"; progressBarFill.style.width = "0%"; }, 800);
+                    processBtn.disabled = false;
+                    resultsArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                } catch (err) {
+                    console.error('Generation Error:', err);
+                    alert('Generation Failed: ' + err.message);
+                    processBtn.disabled = false;
+                    statusMessage.style.display = 'none';
+                }
+            }, 100);
+        });
+
+        previewPlayBtn.addEventListener('click', () => { if (wavesurfer) wavesurfer.playPause(); });
+        previewVolume.addEventListener('input', (e) => { if (wavesurfer) wavesurfer.setVolume(parseFloat(e.target.value)); });
+
+        function bufferToWave(abuffer, len) {
+            let numOfChan = abuffer.numberOfChannels, length = len * numOfChan * 2 + 44,
+                buffer = new ArrayBuffer(length), view = new DataView(buffer),
+                channels = [], sampleRate = abuffer.sampleRate, offset = 0, pos = 0;
+            function setUint16(data) { view.setUint16(pos, data, true); pos += 2; }
+            function setUint32(data) { view.setUint32(pos, data, true); pos += 4; }
+            setUint32(0x46464952); setUint32(length - 8); setUint32(0x45564157); setUint32(0x20746d66);
+            setUint32(16); setUint16(1); setUint16(numOfChan); setUint32(sampleRate);
+            setUint32(sampleRate * 2 * numOfChan); setUint16(numOfChan * 2); setUint16(16);
+            setUint32(0x61746164); setUint32(length - pos - 4);
+            for (let i = 0; i < abuffer.numberOfChannels; i++) channels.push(abuffer.getChannelData(i));
+            while (pos < length) {
+                for (let i = 0; i < numOfChan; i++) {
+                    let sample = Math.max(-1, Math.min(1, channels[i][offset] || 0));
+                    sample = (0.5 + sample < 0 ? sample * 32768 : sample * 32767)|0;
+                    view.setInt16(pos, sample, true); pos += 2;
+                }
+                offset++;
+            }
+            return new Blob([buffer], { type: "audio/wav" });
+        }
+    </script>
+</body>
+</html>
