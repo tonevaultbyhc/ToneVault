@@ -18,12 +18,14 @@
         *, *::before, *::after { box-sizing: border-box; }
         body { margin: 0; padding: 0; color: #ffffff; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow-x: hidden; }
 
-        .container { max-width: 1550px; margin: 90px auto 30px auto; padding: 0 20px; }
+        /* Moved higher up using tighter margins and full width usage */
+        .container { max-width: 1750px; margin: 60px auto 20px auto; padding: 0 15px; }
 
         /* Compact Header / Stats Dashboard */
         .dashboard-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px; }
-        .title-group h1 { font-size: 1.8rem; margin: 0; text-transform: uppercase; letter-spacing: 1.5px; }
-        .title-group h1 span { color: #00d4ff; }
+        
+        .title-group h1 { font-size: 2rem; font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: 1.5px; }
+        .title-group h1 span { color: #00d4ff; font-size: 2rem; font-weight: 800; }
         .title-group span { font-size: 0.8rem; color: #888; }
 
         .stats-bar { display: flex; gap: 15px; background: rgba(20, 20, 25, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 6px 15px; backdrop-filter: blur(10px); }
@@ -31,10 +33,10 @@
         .stat-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: #888; }
         .stat-val { font-size: 1rem; font-weight: 700; color: #00d4ff; font-family: monospace; }
 
-        /* 3-COLUMN STUDIO LAYOUT */
+        /* 3-COLUMN FULL-SCREEN STUDIO LAYOUT */
         .layout-grid {
             display: grid;
-            grid-template-columns: 260px minmax(0, 1fr) 260px;
+            grid-template-columns: 280px minmax(0, 1fr) 280px;
             gap: 20px;
             align-items: start;
         }
@@ -47,7 +49,7 @@
             padding: 20px 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             position: sticky;
-            top: 90px;
+            top: 75px;
         }
         .info-card h3 { color: #00d4ff; margin-top: 0; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;}
         .info-card p { color: #bbb; font-size: 0.85rem; line-height: 1.5; margin-bottom: 12px; }
@@ -126,7 +128,7 @@
         .midi-badge.connected { color: #10b981; border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.1); }
 
         /* Responsive Breakpoints */
-        @media (max-width: 1100px) {
+        @media (max-width: 1200px) {
             .layout-grid { grid-template-columns: 1fr; }
             .info-card { position: static; }
         }
@@ -261,7 +263,7 @@
 
                         <div class="control-element">
                             <label style="font-size: 0.8rem; color: #aaa;">Exercise:</label>
-                            <div class="custom-select-wrapper" id="songSelectWrapper" style="width: 190px;">
+                            <div class="custom-select-wrapper" id="songSelectWrapper" style="width: 180px;">
                                 <div class="custom-select-trigger" id="songSelectTrigger">
                                     <span>1. Finding Middle C</span>
                                     <i class="fa-solid fa-chevron-down"></i>
@@ -297,7 +299,7 @@
 
                         <div class="control-element">
                             <label style="font-size: 0.8rem; color: #aaa;">Mode:</label>
-                            <div class="custom-select-wrapper" id="playModeSelectWrapper" style="width: 140px;">
+                            <div class="custom-select-wrapper" id="playModeSelectWrapper" style="width: 130px;">
                                 <div class="custom-select-trigger" id="playModeSelectTrigger">
                                     <span>Wait for Key</span>
                                     <i class="fa-solid fa-chevron-down"></i>
@@ -315,7 +317,7 @@
 
                         <div class="control-element">
                             <label for="tempoInput" style="font-size: 0.8rem; color: #aaa;">BPM:</label>
-                            <input type="number" id="tempoInput" min="30" max="300" style="width: 55px;">
+                            <input type="number" id="tempoInput" min="30" max="300" style="width: 50px;">
                             <button id="btnResetTempo" class="btn-icon" title="Reset to Song Default"><i class="fa-solid fa-rotate-left"></i></button>
                         </div>
                     </div>
@@ -502,7 +504,7 @@
             "25": { startMidi: 48, endMidi: 72, whiteKeyWidth: 40 },  
             "49": { startMidi: 36, endMidi: 84, whiteKeyWidth: 32 },  
             "61": { startMidi: 36, endMidi: 96, whiteKeyWidth: 26 },  
-            "88": { startMidi: 21, endMidi: 108, whiteKeyWidth: 19 }  
+            "88": { startMidi: 21, endMidi: 108, whiteKeyWidth: "fit" }  // Forces all 88 keys to scale to screen width
         };
 
         const QWERTY_MAP = {
@@ -818,15 +820,20 @@
             const filteredNotes = rawSongData.notes; 
 
             let rangeConfig = keyboardSizeSelect.value === "auto" ? getAutoSongRange(filteredNotes) : KEYBOARD_RANGES[keyboardSizeSelect.value];
+            
             let whiteCount = 0;
             for (let i = rangeConfig.startMidi; i <= rangeConfig.endMidi; i++) {
                 if (!Tone.Midi(i).toNote().includes('#')) whiteCount++;
             }
 
-            let containerWidth = canvasScrollContainer.clientWidth || 800;
+            let containerWidth = canvasScrollContainer.clientWidth || 950;
             let whiteWidth = rangeConfig.whiteKeyWidth;
-            if ((whiteCount * whiteWidth) < containerWidth) whiteWidth = containerWidth / whiteCount;
-            if (whiteWidth > 65) whiteWidth = 65; 
+            
+            if (whiteWidth === "fit" || keyboardSizeSelect.value === "88") {
+                whiteWidth = containerWidth / whiteCount;
+            } else if ((whiteCount * whiteWidth) < containerWidth) {
+                whiteWidth = containerWidth / whiteCount;
+            }
 
             const blackWidth = whiteWidth * 0.65;
             let whiteKeys = []; let blackKeys = []; let whiteIndex = 0;
@@ -840,7 +847,7 @@
             const totalPianoWidth = whiteIndex * whiteWidth;
             pianoEl.style.width = `${totalPianoWidth}px`;
             canvas.width = Math.max(totalPianoWidth, containerWidth);
-            canvas.height = 340;
+            canvas.height = 320;
             const xOffset = Math.max(0, (canvas.width - totalPianoWidth) / 2);
 
             whiteKeys.forEach(k => {
@@ -848,7 +855,11 @@
                 const octave = k.note.replace(/[^0-9]/g, '');
                 const keyDiv = document.createElement("div"); keyDiv.className = "key white-key"; keyDiv.id = `key-${k.note}`; keyDiv.style.width = `${whiteWidth}px`;
                 const qwertyKey = Object.keys(QWERTY_MAP).find(key => QWERTY_MAP[key] === k.note);
-                keyDiv.innerHTML = `<span class="pitch">${pitch}</span><span class="octave">${octave}</span>${qwertyKey ? `<span class="key-hint">${qwertyKey.toUpperCase()}</span>` : ''}`;
+                
+                // Hide labels if keys are too narrow (like full 88-key view)
+                const showLabel = whiteWidth > 22;
+                keyDiv.innerHTML = showLabel ? `<span class="pitch">${pitch}</span><span class="octave">${octave}</span>${qwertyKey ? `<span class="key-hint">${qwertyKey.toUpperCase()}</span>` : ''}` : '';
+                
                 keyDiv.addEventListener("mousedown", () => handleUserNoteOn(k.note));
                 keyDiv.addEventListener("mouseup", () => handleUserNoteOff(k.note));
                 pianoEl.appendChild(keyDiv);
@@ -861,7 +872,10 @@
                 const keyDiv = document.createElement("div"); keyDiv.className = "key black-key"; keyDiv.id = `key-${k.note}`; keyDiv.style.width = `${blackWidth}px`;
                 const leftPos = (k.prevWhiteIndex * whiteWidth) + (whiteWidth - (blackWidth / 2)); keyDiv.style.left = `${leftPos}px`;
                 const qwertyKey = Object.keys(QWERTY_MAP).find(key => QWERTY_MAP[key] === k.note);
-                keyDiv.innerHTML = `<span class="pitch">${pitch}</span><span class="octave">${octave}</span>${qwertyKey ? `<span class="key-hint">${qwertyKey.toUpperCase()}</span>` : ''}`;
+                
+                const showLabel = whiteWidth > 28;
+                keyDiv.innerHTML = showLabel ? `<span class="pitch">${pitch}</span><span class="octave">${octave}</span>${qwertyKey ? `<span class="key-hint">${qwertyKey.toUpperCase()}</span>` : ''}` : '';
+                
                 keyDiv.addEventListener("mousedown", () => handleUserNoteOn(k.note));
                 keyDiv.addEventListener("mouseup", () => handleUserNoteOff(k.note));
                 pianoEl.appendChild(keyDiv);
@@ -930,7 +944,7 @@
         // ==========================================
         // 7. ANIMATION ENGINE
         // ==========================================
-        const HIT_ZONE_Y = 330;
+        const HIT_ZONE_Y = 290;
         const FALL_SPEED = 200; 
 
         function renderEngine(timestamp) {
@@ -1008,7 +1022,7 @@
                             ctx.fill();
                             ctx.shadowBlur = 0;
 
-                            if (pos.w > 15 && blockHeight > 18) {
+                            if (pos.w > 20 && blockHeight > 18) {
                                 ctx.fillStyle = pos.isBlack ? "#ffffff" : "#000000";
                                 ctx.font = "bold 11px 'Segoe UI'";
                                 ctx.textAlign = "center";
