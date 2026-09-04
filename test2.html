@@ -127,6 +127,8 @@ const layerWaves=new Map();
 // It renders the complete generated MIDI event set to audio and loads that
 // audio into the same WaveSurfer-style waveform used by the original template.
 async function renderFull(spec, instrumentType){
+  const fullPreview = document.getElementById('waveformPreviewContainer');
+  if(fullPreview) fullPreview.style.display = 'block';
   if(!spec) throw new Error('No generated composition is available.');
   const allEvents=Object.values(spec.tracks||{}).flat().sort((a,b)=>a.time-b.time || a.midi-b.midi);
   if(!allEvents.length) throw new Error('The composition contains no MIDI events.');
