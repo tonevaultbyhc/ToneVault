@@ -1,0 +1,94 @@
+/* ToneVault — consolidated cyan theme overlay
+   Visual styling only: preserves the original layout, backgrounds and behavior. */
+:root {
+  --tv-cyan: #00d4ff;
+  --tv-cyan-hover: #00afd6;
+  --tv-cyan-border: rgba(0, 212, 255, .55);
+  --tv-cyan-border-soft: rgba(0, 212, 255, .32);
+  --tv-cyan-glow: rgba(0, 212, 255, .13);
+  --tv-cyan-tint: rgba(0, 212, 255, .075);
+  --tv-button-text: #06141c;
+}
+
+/* Brand links and keyboard focus */
+a, .cyan-text, .upload-icon { color: var(--tv-cyan); }
+a:hover { color: #7cecff; }
+:focus-visible { outline-color: var(--tv-cyan); }
+
+/* Cyan borders for common panels/cards, without changing their backgrounds */
+.card, .feature-card, .service-card, .tool-card, .track-card, .release-card,
+.product-card, .step-card, .info-card, .glass-panel, .hub, .featured-track,
+.tool-wrapper, .grid-container, .terminal-box, .control-group, .control-element,
+.center-stage, .controls-ribbon, .audio-ribbon, .step-content, .faq-item,
+.timeline-step, .file-info, .custom-keyword-note, .stem-card, .keyword-guide,
+.panel, .panel-card, .content-card, .service-item, .about-card, .contact-card,
+.listen-card, .lesson-card, .module-card {
+  border-color: var(--tv-cyan-border);
+}
+
+/* Form controls */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+select, textarea, .custom-select-trigger, .custom-combobox-input {
+  border-color: var(--tv-cyan-border);
+}
+input:focus, select:focus, textarea:focus,
+.custom-select-trigger:focus, .custom-combobox-input:focus {
+  border-color: var(--tv-cyan) !important;
+  box-shadow: 0 0 0 3px var(--tv-cyan-glow);
+}
+input[type="range"], progress { accent-color: var(--tv-cyan); }
+.progress-bar, .progress-fill { background-color: var(--tv-cyan); }
+.upload-area, .drop-zone, .upload-zone, .file-drop-zone {
+  border-color: var(--tv-cyan-border);
+}
+footer, .site-footer { border-color: var(--tv-cyan-border-soft); }
+::selection { background: rgba(0, 212, 255, .22); }
+
+/* Primary/action buttons share one cyan treatment */
+button, button[type="button"], button[type="submit"],
+input[type="button"], input[type="submit"],
+.btn, .button, .btn-primary, .primary-btn, .action-btn,
+.download-btn, .play-pause-btn, #processBtn, #generateBtn,
+#generateMidiBtn, #sendMessageBtn, #separateBtn, #separateStemsBtn,
+#previewPlayBtn, a.btn, a.button {
+  background: var(--tv-cyan);
+  background-image: none;
+  color: var(--tv-button-text);
+  border-color: var(--tv-cyan);
+}
+button:hover, button[type="button"]:hover, button[type="submit"]:hover,
+input[type="button"]:hover, input[type="submit"]:hover,
+.btn:hover, .button:hover, .btn-primary:hover, .primary-btn:hover,
+.action-btn:hover, .download-btn:hover, .play-pause-btn:hover,
+#processBtn:hover, #generateBtn:hover, #generateMidiBtn:hover,
+#sendMessageBtn:hover, #separateBtn:hover, #separateStemsBtn:hover,
+#previewPlayBtn:hover, a.btn:hover, a.button:hover {
+  background: var(--tv-cyan-hover);
+  background-image: none;
+  color: var(--tv-button-text);
+  border-color: var(--tv-cyan-hover);
+}
+
+/* Secondary/reset/outline controls retain their existing background */
+.btn-secondary, .secondary-btn, .reset-btn,
+button.secondary, button.outline, .secondary-button {
+  border-color: var(--tv-cyan-border) !important;
+}
+button:disabled, button[disabled], input:disabled, .btn:disabled {
+  opacity: .48;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+button svg, button i, .btn svg, .btn i, .button svg, .button i {
+  color: inherit;
+}
+
+/* Musical intent preview: use a subtle cyan tint but preserve inherited text colors */
+#interpretedIntent, .interpreted-intent, .interpreted-intent-box,
+.intent-preview, .musical-intent, #intentPreview, .intent-card {
+  background-color: var(--tv-cyan-tint);
+  border-left-color: var(--tv-cyan);
+}
+
+/* Header border, only when this custom-element structure exists */
+site-header > header { border-color: var(--tv-cyan-border); }
