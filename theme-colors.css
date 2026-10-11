@@ -1,0 +1,210 @@
+
+/* ToneVault: reference-inspired color theme only.
+   Original layouts, dimensions, background images and behavior are preserved. */
+:root {
+  --tv-ref-blue: #315eff;
+  --tv-ref-blue-dark: #2449d8;
+  --tv-ref-text: #14233b;
+  --tv-ref-muted: #64748b;
+  --tv-ref-border: #dbe4f2;
+  --tv-ref-panel: #ffffff;
+}
+body { color: var(--tv-ref-text); }
+h1, h2, h3, h4, h5, h6, .page-header, .section-title { color: var(--tv-ref-text); }
+p, li, small, .muted, .subtitle, .description { color: var(--tv-ref-muted); }
+a { color: var(--tv-ref-blue); }
+a:hover { color: var(--tv-ref-blue-dark); }
+button, .btn, .button, input[type="submit"], input[type="button"],
+.btn-primary, .primary-btn, .action-btn {
+  background-color: var(--tv-ref-blue);
+  border-color: var(--tv-ref-blue);
+  color: #fff;
+}
+button:hover, .btn:hover, .button:hover, input[type="submit"]:hover,
+.btn-primary:hover, .primary-btn:hover, .action-btn:hover {
+  background-color: var(--tv-ref-blue-dark);
+  border-color: var(--tv-ref-blue-dark);
+  color: #fff;
+}
+.btn-secondary, .secondary-btn, .reset-btn, button.secondary, button.outline {
+  background-color: var(--tv-ref-panel);
+  border-color: var(--tv-ref-border);
+  color: var(--tv-ref-text);
+}
+.card, .feature-card, .service-card, .tool-card, .track-card, .release-card,
+.product-card, .step-card, .info-card, .glass-panel, .hub, .featured-track,
+.tool-wrapper, .grid-container, .terminal-box, .control-group, .control-element,
+.center-stage, .controls-ribbon, .audio-ribbon, .step-content, .faq-item,
+.timeline-step, .file-info, .custom-keyword-note, .stem-card, .keyword-guide,
+.panel, .panel-card, .content-card, .service-item, .about-card, .contact-card,
+.listen-card, .lesson-card, .module-card {
+  border-color: var(--tv-ref-border);
+}
+label, .label, .form-label, .control-label { color: var(--tv-ref-text); }
+input:not([type=checkbox]):not([type=radio]):not([type=range]),
+select, textarea, .custom-select-trigger, .custom-combobox-input {
+  border-color: var(--tv-ref-border);
+}
+input:focus, select:focus, textarea:focus,
+.custom-select-trigger:focus, .custom-combobox-input:focus {
+  border-color: var(--tv-ref-blue);
+  box-shadow: 0 0 0 3px rgba(49,94,255,.12);
+}
+input[type=range], progress { accent-color: var(--tv-ref-blue); }
+.progress-bar, .progress-fill { background-color: var(--tv-ref-blue); }
+.upload-area, .drop-zone, .upload-zone, .file-drop-zone { border-color: var(--tv-ref-blue); }
+.upload-icon, .cyan-text { color: var(--tv-ref-blue); }
+footer, .site-footer { border-color: var(--tv-ref-border); }
+::selection { background: rgba(49,94,255,.2); color: var(--tv-ref-text); }
+:focus-visible { outline-color: var(--tv-ref-blue); }
+
+
+/* Brand refinement: replace reference blue accents and white outlines with ToneVault cyan. */
+:root {
+  --tv-ref-blue: #00d4ff;
+  --tv-ref-blue-dark: #00a9d4;
+  --tv-ref-blue-soft: rgba(0, 212, 255, .10);
+  --tv-ref-border: rgba(0, 212, 255, .55);
+}
+/* Cyan is the brand accent; preserve original background and layout. */
+a, .upload-icon, .cyan-text { color: #00d4ff; }
+a:hover { color: #7cecff; }
+button, .btn, .button, input[type="submit"], input[type="button"],
+.btn-primary, .primary-btn, .action-btn {
+  background-color: #00d4ff;
+  border-color: #00d4ff;
+}
+button:hover, .btn:hover, .button:hover, input[type="submit"]:hover,
+.btn-primary:hover, .primary-btn:hover, .action-btn:hover {
+  background-color: #00a9d4;
+  border-color: #00a9d4;
+}
+.card, .feature-card, .service-card, .tool-card, .track-card, .release-card,
+.product-card, .step-card, .info-card, .glass-panel, .hub, .featured-track,
+.tool-wrapper, .grid-container, .terminal-box, .control-group, .control-element,
+.center-stage, .controls-ribbon, .audio-ribbon, .step-content, .faq-item,
+.timeline-step, .file-info, .custom-keyword-note, .stem-card, .keyword-guide,
+.panel, .panel-card, .content-card, .service-item, .about-card, .contact-card,
+.listen-card, .lesson-card, .module-card,
+.custom-select-trigger, input:not([type=checkbox]):not([type=radio]):not([type=range]),
+select, textarea {
+  border-color: rgba(0, 212, 255, .55);
+}
+input:focus, select:focus, textarea:focus,
+.custom-select-trigger:focus, .custom-combobox-input:focus {
+  border-color: #00d4ff;
+  box-shadow: 0 0 0 3px rgba(0,212,255,.13);
+}
+.upload-area, .drop-zone, .upload-zone, .file-drop-zone {
+  border-color: rgba(0,212,255,.7);
+}
+footer, .site-footer { border-color: rgba(0,212,255,.35); }
+:focus-visible { outline-color: #00d4ff; }
+
+
+/* ToneVault brand consistency pass: unify all action buttons and improve intent-note contrast. */
+:root {
+  --tv-brand-cyan: #00d4ff;
+  --tv-brand-cyan-hover: #00afd6;
+  --tv-brand-ink: #06141c;
+  --tv-brand-text: #f4fbff;
+}
+
+/* Give all action buttons one consistent brand treatment, regardless of legacy class names. */
+button,
+button[type="button"],
+button[type="submit"],
+input[type="button"],
+input[type="submit"],
+.btn,
+.button,
+.btn-primary,
+.btn-secondary,
+.primary-btn,
+.secondary-btn,
+.action-btn,
+.download-btn,
+.reset-btn,
+.play-pause-btn,
+#processBtn,
+#generateBtn,
+#generateMidiBtn,
+#sendMessageBtn,
+#separateBtn,
+#separateStemsBtn,
+#previewPlayBtn,
+a.btn,
+a.button {
+  background: #00d4ff !important;
+  background-image: none !important;
+  color: #06141c !important;
+  border: 1px solid #00d4ff !important;
+  box-shadow: 0 5px 18px rgba(0, 212, 255, .12);
+}
+
+button:hover,
+button[type="button"]:hover,
+button[type="submit"]:hover,
+input[type="button"]:hover,
+input[type="submit"]:hover,
+.btn:hover,
+.button:hover,
+.btn-primary:hover,
+.btn-secondary:hover,
+.primary-btn:hover,
+.secondary-btn:hover,
+.action-btn:hover,
+.download-btn:hover,
+.reset-btn:hover,
+.play-pause-btn:hover,
+a.btn:hover,
+a.button:hover {
+  background: #00afd6 !important;
+  background-image: none !important;
+  color: #041018 !important;
+  border-color: #00afd6 !important;
+}
+
+button:disabled,
+button[disabled],
+input:disabled,
+.btn:disabled {
+  opacity: .48;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Keep icons consistent with the button text. */
+button svg, button i, .btn svg, .btn i,
+.button svg, .button i {
+  color: inherit !important;
+}
+
+/* Ensure interpreted musical-intent text is readable on its tinted panel. */
+#interpretedIntent,
+.interpreted-intent,
+.interpreted-intent-box,
+.intent-preview,
+.musical-intent,
+#intentPreview,
+.intent-card {
+  color: #f4fbff !important;
+  background: rgba(0, 212, 255, .075) !important;
+  border-left-color: #00d4ff !important;
+}
+#interpretedIntent *,
+.interpreted-intent *,
+.interpreted-intent-box *,
+.intent-preview *,
+.musical-intent *,
+#intentPreview *,
+.intent-card * {
+  color: #f4fbff !important;
+}
+
+/* Match navigation border to the footer and cards */
+site-header > header {
+    border: 1px solid rgba(0, 212, 255, 0.55) !important;
+    border-radius: 28px !important;
+    overflow: visible;
+}
